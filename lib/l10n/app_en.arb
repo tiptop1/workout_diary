@@ -1,0 +1,18 @@
+{
+  "@@last_modified": "2021-10-16T23:44:56.283461",
+  "appTitle": "Workout diary",
+  "@appTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exercisesTab": "Exercises",
+  "@exercisesTab": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "workoutsTab": "Workouts",
+  "@workoutsTab": {
+    "type": "text",
+    "placeholders": {}
+  }
+}
