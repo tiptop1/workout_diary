@@ -43,7 +43,7 @@ abstract class ParamDefinition<T> {
       {this.group, this.converter, List<Validator<T>> validators = const []})
       : this.validators = List.unmodifiable(validators);
 
-  String quilifiedName() {
+  String qualifiedName() {
     var qualifiedName;
     if (group != null) {
       qualifiedName =
@@ -86,28 +86,21 @@ class IntParamDefinition extends ParamDefinition<int> {
 }
 
 class Configuration extends InheritedWidget {
-  static final Map<String, dynamic> _parameters = {};
+  final SharedPreferences _sharedPreferences;
+  final Map<String, dynamic> _parameters = {};
+  get parameters => Map.unmodifiable(_parameters);
+  final Map<String, ParamGroupDefinition> _definitions = {};
+  get definitions => Map.unmodifiable(_definitions);
 
-  static get parameters => Map.unmodifiable(_parameters);
-
-  static final Map<String, ParamGroupDefinition> _definitions = {};
-
-  static get definitions => Map.unmodifiable(_definitions);
-
-  const Configuration._internal({Key? key, required Widget child})
-      : super(key: key, child: child);
-
-  static Future<Configuration> load({Key? key, required Widget child}) async {
-    var sharedPrefs = await SharedPreferences.getInstance();
-    var config = Configuration._internal(key: key, child: child);
-
+  Configuration({Key? key, required SharedPreferences sharedPreferences, required Widget child})
+      : _sharedPreferences = sharedPreferences, super(key: key, child: child) {
     Map<String, ParamDefinition> paramDefs = {};
     _definitions.forEach((groupName, groupDef) => groupDef.children
-        .forEach((paramDef) => paramDefs[paramDef.quilifiedName()] = paramDef));
+        .forEach((paramDef) => paramDefs[paramDef.qualifiedName()] = paramDef));
 
     // Load into configuration parameters from SharedPreferences.
-    for (var k in sharedPrefs.getKeys()) {
-      var loadedValue = sharedPrefs.get(k);
+    for (var k in _sharedPreferences.getKeys()) {
+      var loadedValue = _sharedPreferences.get(k);
       if (paramDefs.containsKey(k)) {
         // Check value of loaded parameter - if definition exist,
         // but value isn't valid, then set default value
@@ -130,20 +123,18 @@ class Configuration extends InheritedWidget {
       }
     }
 
-    return config;
   }
 
-  void store() async {
-    var prefs = await SharedPreferences.getInstance();
+  Future<void> store() async {
     _parameters.forEach((name, value) {
       if (value is int) {
-        prefs.setInt(name, value);
+        _sharedPreferences.setInt(name, value);
       } else if (value is double) {
-        prefs.setDouble(name, value);
+        _sharedPreferences.setDouble(name, value);
       } else if (value is bool) {
-        prefs.setBool(name, value);
+        _sharedPreferences.setBool(name, value);
       } else if (value is String) {
-        prefs.setString(name, value);
+        _sharedPreferences.setString(name, value);
       } else {
         throw Exception(
             'Parameter of name $name has unsupported type ${value?.runtimeType}.');
