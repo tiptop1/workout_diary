@@ -11,14 +11,6 @@ class Exercise {
 
   Exercise({this.id, required this.name, this.description});
 
-  // Map<String, dynamic> toMap() {
-  //   return {
-  //     colId: id,
-  //     colName: name,
-  //     colDescription: description,
-  //   };
-  // }
-
   @override
   String toString() {
     return 'Exercise{id: $id, name: $name, description: $description}';
@@ -38,16 +30,11 @@ class WorkoutEntry {
   final Workout workout;
   final String details;
 
-  WorkoutEntry({this.id, required this.exercise, required this.workout, required this.details});
-
-  // Map<String, dynamic> toMap() {
-  //   return {
-  //     colId: id,
-  //     colExerciseId: exercise.id,
-  //     colWorkoutId: workout.id,
-  //     colDetails: details,
-  //   };
-  // }
+  WorkoutEntry(
+      {this.id,
+      required this.exercise,
+      required this.workout,
+      required this.details});
 
   @override
   String toString() {
@@ -85,7 +72,7 @@ class Workout {
   @override
   String toString() {
     var entriesStr = '';
-    for (var i=0; i < entries.length; i++) {
+    for (var i = 0; i < entries.length; i++) {
       entriesStr += entries[i].toString();
       if (i < entries.length - 1) {
         entriesStr += ',';
@@ -93,5 +80,4 @@ class Workout {
     }
     return 'Workout{id: $id, startTime: $startTime, endTime: $endTime, entries: [$entriesStr], title: $title, preComment: $preComment, postComment: $postComment}';
   }
-
 }

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:workout_diary/src/domain.dart';
 
+import 'domain.dart';
 
 class ExercisesDao {
   final Database _database;

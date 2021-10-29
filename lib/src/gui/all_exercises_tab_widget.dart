@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:workout_diary/src/repository.dart';
 
 import '../domain.dart';
+import '../repository.dart';
 
 class AllExercisesTabWidget extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
           _exercises = exercises;
         });
       });
-      widget = CircularProgressIndicator();
+      widget = Center(child: CircularProgressIndicator());
     } else {
       widget = _build(context);
     }

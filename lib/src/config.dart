@@ -88,12 +88,18 @@ class IntParamDefinition extends ParamDefinition<int> {
 class Configuration extends InheritedWidget {
   final SharedPreferences _sharedPreferences;
   final Map<String, dynamic> _parameters = {};
+
   get parameters => Map.unmodifiable(_parameters);
   final Map<String, ParamGroupDefinition> _definitions = {};
+
   get definitions => Map.unmodifiable(_definitions);
 
-  Configuration({Key? key, required SharedPreferences sharedPreferences, required Widget child})
-      : _sharedPreferences = sharedPreferences, super(key: key, child: child) {
+  Configuration(
+      {Key? key,
+      required SharedPreferences sharedPreferences,
+      required Widget child})
+      : _sharedPreferences = sharedPreferences,
+        super(key: key, child: child) {
     Map<String, ParamDefinition> paramDefs = {};
     _definitions.forEach((groupName, groupDef) => groupDef.children
         .forEach((paramDef) => paramDefs[paramDef.qualifiedName()] = paramDef));
@@ -122,7 +128,6 @@ class Configuration extends InheritedWidget {
         _parameters[k] = paramDefs[k]!.defaultValue;
       }
     }
-
   }
 
   Future<void> store() async {
