@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:workout_diary/src/config.dart';
 import 'package:workout_diary/src/domain.dart';
-import 'package:workout_diary/src/gui.dart';
+import 'package:workout_diary/src/gui/workout_diary_widget.dart';
 import 'package:workout_diary/src/repository.dart';
 
 void main() {
