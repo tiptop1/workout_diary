@@ -12,9 +12,8 @@ class ExercisesDao {
 
   /// Find all [Exercise] summaries - just id and name.
   /// Useful to show list of all exercises.
-  Future<List<Exercise>> findAllSummaries(int pageOffset, int pageLimit) async {
-    List<Map<String, dynamic>> records = await _database.query(Exercise.table,
-        offset: pageOffset, limit: pageLimit);
+  Future<List<Exercise>> findAllSummaries() async {
+    List<Map<String, dynamic>> records = await _database.query(Exercise.table);
     return List.generate(records.length, (i) {
       return Exercise(
         id: records[i][Exercise.colId] as int?,
@@ -45,9 +44,8 @@ class WorkoutsDao {
 
   const WorkoutsDao(this._database);
 
-  Future<List<Workout>> findAllSummaries(int pageOffset, int pageLimit) async {
-    List<Map<String, dynamic>> records = await _database.query(Workout.table,
-        offset: pageOffset, limit: pageLimit);
+  Future<List<Workout>> findAllSummaries() async {
+    List<Map<String, dynamic>> records = await _database.query(Workout.table);
     return List.generate(records.length, (i) {
       var startTimeMillis = records[i][Workout.colStartTime];
       var endTimeMillis = records[i][Workout.colEndTime];
@@ -84,13 +82,11 @@ class Repository extends InheritedWidget {
   @override
   bool updateShouldNotify(Repository oldRepository) => false;
 
-  Future<List<Exercise>> finaAllExerciseSummaries(
-      int pageOffset, int pageLimit) async {
-    return _exercisesDao.findAllSummaries(pageOffset, pageLimit);
+  Future<List<Exercise>> finaAllExerciseSummaries() async {
+    return _exercisesDao.findAllSummaries();
   }
 
-  Future<List<Workout>> findAllWorkoutSummaries(
-      int pageOffset, int pageLimit) async {
-    return _workoutDao.findAllSummaries(pageOffset, pageLimit);
+  Future<List<Workout>> findAllWorkoutSummaries() async {
+    return _workoutDao.findAllSummaries();
   }
 }
