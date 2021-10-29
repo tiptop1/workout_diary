@@ -1,13 +1,12 @@
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'all_exercises_tab_widget.dart';
+import 'all_workouts_tab_widget.dart';
 
 class Route {
-  static const init = '/init';
   static const allWorkouts = '/allWorkouts';
-  static const allExercises = '/allExercises';
 }
 
 class WorkoutDiaryWidget extends StatelessWidget {
@@ -19,20 +18,18 @@ class WorkoutDiaryWidget extends StatelessWidget {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       onGenerateTitle: (BuildContext ctx) => AppLocalizations.of(ctx)!.appTitle,
-      initialRoute: Route.init,
+      initialRoute: Route.allWorkouts,
       routes: {
-        Route.init: (context) => _initialWidget(context),
-        Route.allWorkouts: (context) => AllWorkoutsWidget(),
-        Route.allExercises: (context) => AllExercisesWidget(),
+        Route.allWorkouts: (context) => _buildAllWorkoutsTabWidget(context),
       },
     );
   }
 }
 
-Widget _initialWidget(BuildContext context) {
+Widget _buildAllWorkoutsTabWidget(BuildContext context) {
   var tabs = {
-    AppLocalizations.of(context)!.workoutsTab: AllWorkoutsWidget(),
-    AppLocalizations.of(context)!.exercisesTab: AllExercisesWidget(),
+    AppLocalizations.of(context)!.workoutsTab: AllWorkoutsTabWidget(),
+    AppLocalizations.of(context)!.exercisesTab: AllExercisesTabWidget(),
   } as LinkedHashMap;
 
   return DefaultTabController(
@@ -57,10 +54,3 @@ Widget _initialWidget(BuildContext context) {
   );
 }
 
-class AllWorkoutsWidget extends StatelessWidget {
-  Widget build(BuildContext context) => Text('$this - implement it!');
-}
-
-class AllExercisesWidget extends StatelessWidget {
-  Widget build(BuildContext context) => Text('$this - implement it!');
-}
