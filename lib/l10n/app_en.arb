@@ -14,5 +14,40 @@
   "@workoutsTab": {
     "type": "text",
     "placeholders": {}
+  },
+  "addExerciseTitle": "Add exercise",
+  "@addExerciseTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "modifyExerciseTitle": "Modify exercise",
+  "@modifyExerciseTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseName": "Name",
+  "@exerciseName": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseNameHint": "Mandatory exercise name",
+  "@exerciseNameHint": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseDescription": "Description",
+  "@exerciseDescription": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseDescriptionHint": "Optional exercise description",
+  "@exerciseDescriptionHint": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseEmptyNameWarning": "Exercise not added - empty name.",
+  "@exerciseEmptyNameWarning": {
+    "type": "text",
+    "placeholders": {}
   }
 }

@@ -1,5 +1,12 @@
 {
   "appTitle": "Dziennik treningowy",
   "exercisesTab": "\u0106wiczenia",
-  "workoutsTab": "Treningi"
+  "workoutsTab": "Treningi",
+  "addExerciseTitle": "Dodaj \u0107wiczenie",
+  "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
+  "exerciseName": "Nazwa",
+  "exerciseNameHint": "Wymagan\u0105 nazw\u0119 \u0107wiczenia",
+  "exerciseDescription": "Opis",
+  "exerciseDescriptionHint": "Opcjonalny opis \u0107wiczenia",
+  "exerciseEmptyNameWarning": "\u0106wiczenie nie dodane - pusta nazwa."
 }
