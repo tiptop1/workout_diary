@@ -37,6 +37,24 @@ class ExercisesDao {
     }
     return exercise;
   }
+
+  Future<Exercise> insert(Exercise exercise) async {
+    var name = exercise.name;
+    var description = exercise.description;
+    var id = await _database.insert(
+      Exercise.table,
+      {
+        Exercise.colName: name,
+        Exercise.colDescription: description,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return Exercise(
+      id: id,
+      name: name,
+      description: description,
+    );
+  }
 }
 
 class WorkoutsDao {
@@ -67,15 +85,18 @@ class Repository extends InheritedWidget {
 
   final WorkoutsDao _workoutDao;
 
+  final Database database;
+
   Repository({Key? key, required Database database, required Widget child})
-      : _exercisesDao = ExercisesDao(database),
+      : database = database,
+        _exercisesDao = ExercisesDao(database),
         _workoutDao = WorkoutsDao(database),
         super(key: key, child: child);
 
   static Repository of(BuildContext context) {
     final Repository? repository =
         context.dependOnInheritedWidgetOfExactType<Repository>();
-    assert(repository != null, 'No $Repository found in context');
+    assert(repository != null, 'No $Repository found in context!');
     return repository!;
   }
 
@@ -88,5 +109,13 @@ class Repository extends InheritedWidget {
 
   Future<List<Workout>> findAllWorkoutSummaries() async {
     return _workoutDao.findAllSummaries();
+  }
+
+  Future<Exercise?> findExerciseDetails(int id) async {
+    return _exercisesDao.findDetails(id);
+  }
+
+  Future<Exercise> insertExercise(Exercise newExercise) async {
+    return _exercisesDao.insert(newExercise);
   }
 }

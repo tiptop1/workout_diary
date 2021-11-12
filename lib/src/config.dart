@@ -87,6 +87,7 @@ class IntParamDefinition extends ParamDefinition<int> {
 
 class Configuration extends InheritedWidget {
   final SharedPreferences _sharedPreferences;
+  get sharedPreferences => _sharedPreferences;
   final Map<String, dynamic> _parameters = {};
 
   get parameters => Map.unmodifiable(_parameters);

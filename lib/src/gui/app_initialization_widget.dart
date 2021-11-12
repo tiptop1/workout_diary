@@ -9,6 +9,7 @@ import 'package:sqflite/sqlite_api.dart';
 import '../config.dart';
 import '../domain.dart';
 import '../repository.dart';
+import 'progress_widget.dart';
 import 'workout_diary_widget.dart';
 
 class AppInitializationWidget extends StatefulWidget {
@@ -23,6 +24,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
 
   @override
   void initState() {
+    super.initState();
     FutureGroup futures = FutureGroup();
     futures.add(SharedPreferences.getInstance());
     futures.add(_openDatabase());
@@ -37,7 +39,6 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
         );
       },
     );
-    super.initState();
   }
 
   @override
@@ -47,7 +48,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
   }
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     Widget widget;
     if (_initializationComplete()) {
       widget = Configuration(
@@ -55,9 +56,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
         child: Repository(database: _database!, child: WorkoutDiaryWidget()),
       );
     } else {
-      widget = Center(
-        child: CircularProgressIndicator(),
-      );
+      widget = ProgressWidget();
     }
     return widget;
   }

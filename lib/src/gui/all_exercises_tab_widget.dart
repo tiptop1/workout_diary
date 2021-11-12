@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../domain.dart';
 import '../repository.dart';
+import 'progress_widget.dart';
 
 class AllExercisesTabWidget extends StatefulWidget {
+
+  AllExercisesTabWidget({Key? key}) : super(key: key);
+
   @override
   State<AllExercisesTabWidget> createState() => _AllExercisesState();
 }
@@ -22,7 +26,7 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
           _exercises = exercises;
         });
       });
-      widget = Center(child: CircularProgressIndicator());
+      widget = ProgressWidget();
     } else {
       widget = _build(context);
     }
@@ -34,7 +38,7 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
       padding: const EdgeInsets.all(8),
       itemCount: _exercises!.length,
       itemBuilder: (BuildContext context, int index) {
-        return Text(_exercises![index].name);
+        return Card(child: ListTile(title: Text(_exercises![index].name)));
       },
     );
   }

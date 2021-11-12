@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'src/gui/all_workouts_tab_widget.dart';
 import 'src/gui/app_initialization_widget.dart';
 
 void main() {
@@ -9,20 +8,16 @@ void main() {
   // "Avoid errors caused by flutter upgrade".
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MaterialApp(
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    theme: ThemeData.light(),
-    darkTheme: ThemeData.dark(),
-    onGenerateTitle: (BuildContext ctx) => AppLocalizations.of(ctx)!.appTitle,
-    initialRoute: Route.appInitialization,
-    routes: {
-      Route.appInitialization: (context) => AppInitializationWidget(),
-      Route.allWorkouts: (context) => AllWorkoutsTabWidget(),
-    },
-  ));
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      onGenerateTitle: (BuildContext ctx) => AppLocalizations.of(ctx)!.appTitle,
+      home: AppInitializationWidget()));
 }
 
-class Route {
+class RouteName {
   static const appInitialization = '/appInitialization';
   static const allWorkouts = '/allWorkouts';
+  static const addExercise = '/addExercise';
 }
