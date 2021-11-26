@@ -5,7 +5,6 @@ import '../repository.dart';
 import 'progress_widget.dart';
 
 class AllExercisesTabWidget extends StatefulWidget {
-
   AllExercisesTabWidget({Key? key}) : super(key: key);
 
   @override
@@ -38,7 +37,12 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
       padding: const EdgeInsets.all(8),
       itemCount: _exercises!.length,
       itemBuilder: (BuildContext context, int index) {
-        return Card(child: ListTile(title: Text(_exercises![index].name)));
+        return Card(
+          child: ListTile(
+            title: Text(_exercises![index].name),
+            trailing: Icon(Icons.menu_rounded),
+          ),
+        );
       },
     );
   }
