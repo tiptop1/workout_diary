@@ -55,6 +55,20 @@ class ExercisesDao {
       description: description,
     );
   }
+
+  Future<Exercise?> update(Exercise exercise) async {
+    var id = exercise.id;
+    var name = exercise.name;
+    var description = exercise.description;
+    var recordsCount = await _database.update(Exercise.table,
+        {Exercise.colName: name, Exercise.colDescription: description},
+        where: '${Exercise.colId} = ?', whereArgs: [id]);
+    var updatedExercise;
+    if (recordsCount == 1) {
+      updatedExercise = Exercise(id: id, name: name, description: description);
+    }
+    return updatedExercise;
+  }
 }
 
 class WorkoutsDao {
@@ -117,5 +131,9 @@ class Repository extends InheritedWidget {
 
   Future<Exercise> insertExercise(Exercise newExercise) async {
     return _exercisesDao.insert(newExercise);
+  }
+
+  Future<Exercise?> updateExercise(Exercise updatedExercise) async {
+    return _exercisesDao.update(updatedExercise);
   }
 }
