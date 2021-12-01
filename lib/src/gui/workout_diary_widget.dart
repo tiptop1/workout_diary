@@ -7,9 +7,9 @@ import 'package:sqflite/sqflite.dart';
 
 import '../config.dart';
 import '../repository.dart';
-import 'add_exercise_widget.dart';
 import 'all_exercises_tab_widget.dart';
 import 'all_workouts_tab_widget.dart';
+import 'exercise_widgets.dart';
 
 class WorkoutDiaryWidget extends StatefulWidget {
   State<WorkoutDiaryWidget> createState() => _WorkoutDiaryWidgetState();
@@ -66,7 +66,7 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
                   sharedPreferences: sharedPrefs,
                   child: Repository(
                     database: db,
-                    child: AddExerciseWidget(),
+                    child: AddExerciseWidget(key: UniqueKey()),
                   ),
                 ),
               ),
