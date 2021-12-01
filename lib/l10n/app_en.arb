@@ -49,5 +49,20 @@
   "@exerciseEmptyNameWarning": {
     "type": "text",
     "placeholders": {}
+  },
+  "showExerciseTitle": "Exercise",
+  "@showExerciseTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "modifyExerciseTitle": "Modify exercise",
+  "@modifyExerciseTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "exerciseNotModifiedWarning": "Exercise not modified - the same name and description.",
+  "@exerciseNotModifiedWarning": {
+    "type": "text",
+    "placeholders": {}
   }
 }

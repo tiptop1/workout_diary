@@ -8,5 +8,8 @@
   "exerciseNameHint": "Wymagan\u0105 nazw\u0119 \u0107wiczenia",
   "exerciseDescription": "Opis",
   "exerciseDescriptionHint": "Opcjonalny opis \u0107wiczenia",
-  "exerciseEmptyNameWarning": "\u0106wiczenie nie dodane - pusta nazwa."
+  "exerciseEmptyNameWarning": "\u0106wiczenie nie dodane - pusta nazwa.",
+  "showExerciseTitle": "Ćwiczenie",
+  "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
+  "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis."
 }
