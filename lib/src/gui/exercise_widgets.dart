@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../domain.dart';
@@ -63,8 +62,8 @@ mixin ExerciseMixin {
           children: [
             SizedBox(height: 10),
             nameTextField,
-            SizedBox(height: 10),
-            descriptionTextField,
+            if (editable || initDescription != null) SizedBox(height: 10),
+            if (editable || initDescription != null) descriptionTextField,
           ],
         ));
   }
@@ -111,7 +110,7 @@ class AddExerciseState extends State<AddExerciseWidget> with ExerciseMixin {
   void backButtonCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
-    if (exerciseName == null || exerciseName == '') {
+    if (exerciseName == '') {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
       ));
@@ -120,7 +119,9 @@ class AddExerciseState extends State<AddExerciseWidget> with ExerciseMixin {
     } else {
       var exercise = Exercise(
         name: exerciseName,
-        description: exerciseDescription,
+        description: (exerciseDescription.trim().length > 0
+            ? exerciseDescription
+            : null),
       );
       Repository.of(context)
           .insertExercise(exercise)
