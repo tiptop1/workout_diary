@@ -11,5 +11,7 @@
   "exerciseEmptyNameWarning": "\u0106wiczenie nie dodane - pusta nazwa.",
   "showExerciseTitle": "Ćwiczenie",
   "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
-  "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis."
+  "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
+  "modify": "Modyfikuj",
+  "delete": "Usu\u0144"
 }

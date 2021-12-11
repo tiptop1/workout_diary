@@ -64,5 +64,15 @@
   "@exerciseNotModifiedWarning": {
     "type": "text",
     "placeholders": {}
+  },
+  "modify" : "Modify",
+  "@modify": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "delete" : "Delete",
+  "@delete": {
+    "type": "text",
+    "placeholders": {}
   }
 }
