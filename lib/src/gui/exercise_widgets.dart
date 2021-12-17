@@ -223,9 +223,12 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
       });
     } else if (_currExercise != null && _modifiedExercise == null) {
       newWidget = buildExerciseWidget(
-          context, AppLocalizations.of(context)!.modifyExerciseTitle,
-          initName: _currExercise!.name,
-          initDescription: _currExercise!.description);
+        context,
+        AppLocalizations.of(context)!.modifyExerciseTitle,
+        initName: _currExercise!.name,
+        initDescription: _currExercise!.description,
+        editable: true,
+      );
     }
 
     return (newWidget != null ? newWidget : ProgressWidget());
@@ -236,7 +239,7 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
     var modifiedName = _nameTextController.value.text;
     var modifiedDescription = _descriptionTextController.value.text;
 
-    if (modifiedName == null || modifiedName == '') {
+    if (modifiedName == '') {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
       ));
@@ -253,7 +256,8 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
       var modifiedExercise = Exercise(
         id: _currExercise!.id,
         name: modifiedName,
-        description: modifiedDescription,
+        description:
+            (modifiedDescription.trim() == '' ? null : modifiedDescription),
       );
       Repository.of(context)
           .updateExercise(modifiedExercise)
