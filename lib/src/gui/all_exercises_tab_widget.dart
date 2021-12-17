@@ -4,6 +4,7 @@ import 'package:workout_diary/src/config.dart';
 
 import '../domain.dart';
 import '../repository.dart';
+import '../utils.dart';
 import 'exercise_widgets.dart';
 import 'progress_widget.dart';
 
@@ -16,7 +17,8 @@ class AllExercisesTabWidget extends StatefulWidget {
   State<AllExercisesTabWidget> createState() => _AllExercisesState();
 }
 
-class _AllExercisesState extends State<AllExercisesTabWidget> {
+class _AllExercisesState extends State<AllExercisesTabWidget>
+    with NavigatorUtils {
   List<Exercise>? _exercises;
 
   @override
@@ -51,10 +53,7 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
               icon: Icon(Icons.menu_rounded),
               onSelected: (ExerciseAction result) {
                 if (result == ExerciseAction.modify) {
-
-                } else if (result == ExerciseAction.delete) {
-
-                }
+                } else if (result == ExerciseAction.delete) {}
               },
               itemBuilder: (BuildContext context) =>
                   <PopupMenuEntry<ExerciseAction>>[
@@ -71,18 +70,10 @@ class _AllExercisesState extends State<AllExercisesTabWidget> {
             onTap: () {
               var sharedPrefs = Configuration.of(context).sharedPreferences;
               var db = Repository.of(context).database;
-              Navigator.push(
+              push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => Configuration(
-                    sharedPreferences: sharedPrefs,
-                    child: Repository(
-                      database: db,
-                      child: ShowExerciseWidget(
-                          key: UniqueKey(), exerciseId: _exercises![index].id!),
-                    ),
-                  ),
-                ),
+                child: ShowExerciseWidget(
+                    key: UniqueKey(), exerciseId: _exercises![index].id!),
               );
             },
           ),

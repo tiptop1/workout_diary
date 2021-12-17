@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:workout_diary/src/utils.dart';
 
 import '../config.dart';
 import '../repository.dart';
@@ -16,7 +17,7 @@ class WorkoutDiaryWidget extends StatefulWidget {
 }
 
 class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, NavigatorUtils {
   TabController? _tabController;
 
   @override
@@ -59,18 +60,7 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
           var index = _tabController?.index;
           // TODO: Calculate the indexes
           if (index == 1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Configuration(
-                  sharedPreferences: sharedPrefs,
-                  child: Repository(
-                    database: db,
-                    child: AddExerciseWidget(key: UniqueKey()),
-                  ),
-                ),
-              ),
-            ).then((exerciseAdded) {
+            push(context, child: AddExerciseWidget(key: UniqueKey())).then((exerciseAdded) {
               if (exerciseAdded) {
                 setState(() {});
               }
