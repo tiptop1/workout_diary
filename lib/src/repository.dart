@@ -69,6 +69,12 @@ class ExercisesDao {
     }
     return updatedExercise;
   }
+
+  Future<int> delete(int exerciseId) async {
+    return _database.delete(Exercise.table,
+        where: '${Exercise.colId} = ?', whereArgs: [exerciseId]);
+  }
+  
 }
 
 class WorkoutsDao {
@@ -94,10 +100,26 @@ class WorkoutsDao {
   }
 }
 
+class WorkoutEntriesDao {
+  final Database _database;
+  
+  const WorkoutEntriesDao(this._database);
+
+  Future<int> countByExercise(int exerciseId) async {
+    const countAlias = 'entriesCount';
+    List<Map<String, Object?>> result = await _database.rawQuery(
+        'SELECT count(*) AS \'$countAlias\' FROM ${WorkoutEntry.table} WHERE ${WorkoutEntry.colExerciseId} = ?',
+        [exerciseId]);
+    return result.first[countAlias] as int;
+  }
+}
+
 class Repository extends InheritedWidget {
   final ExercisesDao _exercisesDao;
 
   final WorkoutsDao _workoutDao;
+  
+  final WorkoutEntriesDao _workoutEntriesDao;
 
   final Database database;
 
@@ -105,6 +127,7 @@ class Repository extends InheritedWidget {
       : database = database,
         _exercisesDao = ExercisesDao(database),
         _workoutDao = WorkoutsDao(database),
+        _workoutEntriesDao = WorkoutEntriesDao(database),
         super(key: key, child: child);
 
   static Repository of(BuildContext context) {
@@ -135,5 +158,13 @@ class Repository extends InheritedWidget {
 
   Future<Exercise?> updateExercise(Exercise updatedExercise) async {
     return _exercisesDao.update(updatedExercise);
+  }
+  
+  Future<int> deleteExercise(int id) async {
+    return _exercisesDao.delete(id);
+  }
+  
+  Future<int> countWorkoutExercisesByExercise(int exerciseId) {
+    return _workoutEntriesDao.countByExercise(exerciseId);
   }
 }
