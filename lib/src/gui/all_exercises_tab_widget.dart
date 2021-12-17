@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:workout_diary/src/config.dart';
 
 import '../domain.dart';
 import '../repository.dart';
@@ -53,6 +52,11 @@ class _AllExercisesState extends State<AllExercisesTabWidget>
               icon: Icon(Icons.menu_rounded),
               onSelected: (ExerciseAction result) {
                 if (result == ExerciseAction.modify) {
+                  push(
+                    context,
+                    child: ModifyExerciseWidget(
+                        key: UniqueKey(), exerciseId: _exercises![index].id!),
+                  );
                 } else if (result == ExerciseAction.delete) {}
               },
               itemBuilder: (BuildContext context) =>
@@ -68,8 +72,6 @@ class _AllExercisesState extends State<AllExercisesTabWidget>
               ],
             ),
             onTap: () {
-              var sharedPrefs = Configuration.of(context).sharedPreferences;
-              var db = Repository.of(context).database;
               push(
                 context,
                 child: ShowExerciseWidget(
