@@ -2,12 +2,8 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:workout_diary/src/utils.dart';
 
-import '../config.dart';
-import '../repository.dart';
 import 'all_exercises_tab_widget.dart';
 import 'all_workouts_tab_widget.dart';
 import 'exercise_widgets.dart';
@@ -54,9 +50,6 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          SharedPreferences sharedPrefs =
-              Configuration.of(context).sharedPreferences;
-          Database db = Repository.of(context).database;
           var index = _tabController?.index;
           // TODO: Calculate the indexes
           if (index == 1) {
