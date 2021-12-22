@@ -15,9 +15,3 @@ void main() {
       onGenerateTitle: (BuildContext ctx) => AppLocalizations.of(ctx)!.appTitle,
       home: AppInitializationWidget()));
 }
-
-class RouteName {
-  static const appInitialization = '/appInitialization';
-  static const allWorkouts = '/allWorkouts';
-  static const addExercise = '/addExercise';
-}
