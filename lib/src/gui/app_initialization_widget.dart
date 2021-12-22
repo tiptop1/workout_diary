@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:sqflite/sqlite_api.dart';
 
 import '../config.dart';
 import '../domain.dart';
