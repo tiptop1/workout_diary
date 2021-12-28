@@ -17,5 +17,7 @@
   "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
   "modify": "Modyfikuj",
-  "delete": "Usu\u0144"
+  "delete": "Usu\u0144",
+  "cancel" : "Anuluj",
+  "ok" : "OK"
 }
