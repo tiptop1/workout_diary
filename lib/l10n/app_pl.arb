@@ -18,6 +18,6 @@
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
   "modify": "Modyfikuj",
   "delete": "Usu\u0144",
-  "cancel" : "Anuluj",
-  "ok" : "OK"
+  "no" : "Nie",
+  "yes" : "Tak"
 }

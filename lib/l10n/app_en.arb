@@ -99,12 +99,12 @@
     "type": "text",
     "placeholders": {}
   },
-  "cancel" : "Cancel",
+  "no" : "No",
   "@cancel": {
     "type": "text",
     "placeholders": {}
   },
-  "ok" : "OK",
+  "yes" : "Yes",
   "@ok": {
     "type": "text",
     "placeholders": {}
