@@ -25,6 +25,29 @@
     "type": "text",
     "placeholders": {}
   },
+  "deleteExerciseTitle": "Delete exercise",
+  "@deleteExerciseTitle": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteExerciseInfo": "The exercise wasn't used in workout entries.\nDelete operation is safe.\nDelete it?",
+  "@deleteExerciseInfo": {
+    "type": "text",
+    "placeholders": {}
+  },
+  "deleteExerciseWarning1": "The exercise was used in 1 workout entry.\nIt will remove from the workout entry.\nDelete it anyway?",
+  "@deleteExerciseWarning1": {
+    "type": "text",
+    "placeholders": {}
+  },
+    "deleteExerciseWarning2": "The exercise was used in {number} workout entries.\nIt will remove from all related entries.\nDelete it anyway?",
+    "@deleteExerciseWarning2": {
+      "type": "text",
+      "placeholders": {
+        "number": {
+          "type": "int"
+        }
+      },
   "exerciseName": "Name",
   "@exerciseName": {
     "type": "text",
