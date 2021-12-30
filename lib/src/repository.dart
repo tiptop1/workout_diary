@@ -13,7 +13,7 @@ class ExercisesDao {
   /// Find all [Exercise] summaries - just id and name.
   /// Useful to show list of all exercises.
   Future<List<Exercise>> findAllSummaries() async {
-    List<Map<String, dynamic>> records = await _database.query(Exercise.table);
+    List<Map<String, dynamic>> records = await _database.query(Exercise.table, orderBy: Exercise.colName);
     return List.generate(records.length, (i) {
       return Exercise(
         id: records[i][Exercise.colId] as int?,
@@ -24,8 +24,11 @@ class ExercisesDao {
 
   /// Find details of [Exercise] with given [id].
   Future<Exercise?> findDetails(int id) async {
-    List<Map<String, dynamic>> records = await _database
-        .query(Exercise.table, where: '${Exercise.colId} = ?', whereArgs: [id]);
+    List<Map<String, dynamic>> records = await _database.query(
+      Exercise.table,
+      where: '${Exercise.colId} = ?',
+      whereArgs: [id],
+    );
     var exercise;
     if (records.length == 1) {
       var record = records[0];
@@ -74,7 +77,6 @@ class ExercisesDao {
     return _database.delete(Exercise.table,
         where: '${Exercise.colId} = ?', whereArgs: [exerciseId]);
   }
-  
 }
 
 class WorkoutsDao {
@@ -83,7 +85,10 @@ class WorkoutsDao {
   const WorkoutsDao(this._database);
 
   Future<List<Workout>> findAllSummaries() async {
-    List<Map<String, dynamic>> records = await _database.query(Workout.table);
+    List<Map<String, dynamic>> records = await _database.query(
+      Workout.table,
+      orderBy: '${Workout.colId} DESC',
+    );
     return List.generate(records.length, (i) {
       var startTimeMillis = records[i][Workout.colStartTime];
       var endTimeMillis = records[i][Workout.colEndTime];
@@ -102,7 +107,7 @@ class WorkoutsDao {
 
 class WorkoutEntriesDao {
   final Database _database;
-  
+
   const WorkoutEntriesDao(this._database);
 
   Future<int> countByExercise(int exerciseId) async {
@@ -118,7 +123,7 @@ class Repository extends InheritedWidget {
   final ExercisesDao _exercisesDao;
 
   final WorkoutsDao _workoutDao;
-  
+
   final WorkoutEntriesDao _workoutEntriesDao;
 
   final Database database;
@@ -159,11 +164,11 @@ class Repository extends InheritedWidget {
   Future<Exercise?> updateExercise(Exercise updatedExercise) async {
     return _exercisesDao.update(updatedExercise);
   }
-  
+
   Future<int> deleteExercise(int id) async {
     return _exercisesDao.delete(id);
   }
-  
+
   Future<int> countWorkoutExercisesByExercise(int exerciseId) {
     return _workoutEntriesDao.countByExercise(exerciseId);
   }
