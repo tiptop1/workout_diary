@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:workout_diary/src/utils.dart';
 
-import 'all_exercises_tab_widget.dart';
-import 'all_workouts_tab_widget.dart';
 import 'exercise_widgets.dart';
+import 'exercises_tab_widget.dart';
+import 'workouts_tab_widget.dart';
 
 class WorkoutDiaryWidget extends StatefulWidget {
   State<WorkoutDiaryWidget> createState() => _WorkoutDiaryWidgetState();
@@ -14,7 +14,7 @@ class WorkoutDiaryWidget extends StatefulWidget {
 
 class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
     with SingleTickerProviderStateMixin, NavigatorUtils {
-  TabController? _tabController;
+  late TabController _tabController;
 
   @override
   void initState() {
@@ -24,17 +24,28 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
 
   @override
   void dispose() {
-    _tabController?.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    var appLocalizations = AppLocalizations.of(context)!;
     var tabs = {
-      AppLocalizations.of(context)!.workoutsTab: AllWorkoutsTabWidget(),
-      AppLocalizations.of(context)!.exercisesTab:
-          AllExercisesTabWidget(key: UniqueKey()),
+      appLocalizations.workoutsTab: AllWorkoutsTabWidget(),
+      appLocalizations.exercisesTab: AllExercisesTabWidget(key: UniqueKey()),
     } as LinkedHashMap;
+
+    var currentTab = tabs.keys.elementAt(_tabController.index);
+    var tabWidget;
+    var fabTooltip;
+    if (currentTab == appLocalizations.workoutsTab) {
+      tabWidget = AllWorkoutsTabWidget();
+    } else if (currentTab == appLocalizations.exercisesTab) {
+      tabWidget = AddExerciseWidget(key: UniqueKey());
+    } else {
+      assert(false, 'Tab $currentTab not supported.');
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -49,16 +60,13 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
         children: [...tabs.values],
       ),
       floatingActionButton: FloatingActionButton(
+        tooltip: fabTooltip,
         onPressed: () {
-          var index = _tabController?.index;
-          // TODO: Calculate the indexes
-          if (index == 1) {
-            push(context, child: AddExerciseWidget(key: UniqueKey())).then((exerciseAdded) {
-              if (exerciseAdded) {
+            push(context, child: tabWidget).then((result) {
+              if (result) {
                 setState(() {});
               }
             });
-          }
         },
         child: const Icon(Icons.add),
       ),
