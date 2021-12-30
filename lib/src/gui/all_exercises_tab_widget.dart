@@ -87,7 +87,7 @@ class _AllExercisesState extends State<AllExercisesTabWidget>
               push(
                 context,
                 child: ShowExerciseWidget(
-                    key: UniqueKey(), exerciseId: _exercises![index].id!),
+                    key: UniqueKey(), exerciseId: exercise.id!),
               );
             },
           ),
