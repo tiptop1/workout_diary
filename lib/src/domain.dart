@@ -1,15 +1,20 @@
-class Exercise {
+abstract class Entity {
+  final int? id;
+
+  const Entity({this.id});
+}
+
+class Exercise extends Entity {
   static const table = 'exercises';
 
   static const colId = 'id';
   static const colName = 'name';
   static const colDescription = 'description';
 
-  final int? id;
   final String name;
   final String? description;
 
-  Exercise({this.id, required this.name, this.description});
+  Exercise({int? id, required this.name, this.description}) : super(id: id);
 
   @override
   String toString() {
@@ -17,7 +22,7 @@ class Exercise {
   }
 }
 
-class WorkoutEntry {
+class WorkoutEntry extends Entity {
   static const table = 'workout_entries';
 
   static const colId = 'id';
@@ -25,16 +30,16 @@ class WorkoutEntry {
   static const colWorkoutId = 'workout_id';
   static const colDetails = 'details';
 
-  final int? id;
   final Exercise exercise;
   final Workout workout;
   final String details;
 
   WorkoutEntry(
-      {this.id,
+      {int? id,
       required this.exercise,
       required this.workout,
-      required this.details});
+      required this.details})
+      : super(id: id);
 
   @override
   String toString() {
@@ -42,7 +47,7 @@ class WorkoutEntry {
   }
 }
 
-class Workout {
+class Workout extends Entity {
   static const table = 'workouts';
 
   static const colId = 'id';
@@ -52,7 +57,6 @@ class Workout {
   static const colPreComment = 'preComment';
   static const colPostComment = 'postComment';
 
-  final int? id;
   final DateTime? startTime;
   final DateTime? endTime;
   final List<WorkoutEntry> entries;
@@ -61,13 +65,14 @@ class Workout {
   final String? postComment;
 
   Workout(
-      {this.id,
+      {int? id,
       this.startTime,
       this.endTime,
       this.entries = const [],
       required this.title,
       this.preComment,
-      this.postComment});
+      this.postComment})
+      : super(id: id);
 
   @override
   String toString() {
