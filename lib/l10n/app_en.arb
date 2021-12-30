@@ -1,45 +1,13 @@
 {
   "@@last_modified": "2021-10-16T23:44:56.283461",
   "appTitle": "Workout diary",
-  "@appTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exercisesTab": "Exercises",
-  "@exercisesTab": {
-    "type": "text",
-    "placeholders": {}
-  },
   "workoutsTab": "Workouts",
-  "@workoutsTab": {
-    "type": "text",
-    "placeholders": {}
-  },
   "addExerciseTitle": "Add exercise",
-  "@addExerciseTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "modifyExerciseTitle": "Modify exercise",
-  "@modifyExerciseTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "deleteExerciseTitle": "Delete exercise",
-  "@deleteExerciseTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "deleteExerciseInfo": "The exercise wasn't used in workout entries.\nDelete operation is safe.\nDelete it?",
-  "@deleteExerciseInfo": {
-    "type": "text",
-    "placeholders": {}
-  },
   "deleteExerciseWarning1": "The exercise was used in 1 workout entry.\nIt will remove from the workout entry.\nDelete it anyway?",
-  "@deleteExerciseWarning1": {
-    "type": "text",
-    "placeholders": {}
-  },
   "deleteExerciseWarning2": "The exercise was used in {number} workout entries.\nIt will remove from all related entries.\nDelete it anyway?",
   "@deleteExerciseWarning2": {
     "type": "text",
@@ -50,63 +18,15 @@
     }
   },
   "exerciseName": "Name",
-  "@exerciseName": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exerciseNameHint": "Mandatory exercise name",
-  "@exerciseNameHint": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exerciseDescription": "Description",
-  "@exerciseDescription": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exerciseDescriptionHint": "Optional exercise description",
-  "@exerciseDescriptionHint": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exerciseEmptyNameWarning": "Exercise not added - empty name.",
-  "@exerciseEmptyNameWarning": {
-    "type": "text",
-    "placeholders": {}
-  },
   "showExerciseTitle": "Exercise",
-  "@showExerciseTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "modifyExerciseTitle": "Modify exercise",
-  "@modifyExerciseTitle": {
-    "type": "text",
-    "placeholders": {}
-  },
   "exerciseNotModifiedWarning": "Exercise not modified - the same name and description.",
-  "@exerciseNotModifiedWarning": {
-    "type": "text",
-    "placeholders": {}
-  },
   "modify" : "Modify",
-  "@modify": {
-    "type": "text",
-    "placeholders": {}
-  },
   "delete" : "Delete",
-  "@delete": {
-    "type": "text",
-    "placeholders": {}
-  },
   "no" : "No",
-  "@cancel": {
-    "type": "text",
-    "placeholders": {}
-  },
-  "yes" : "Yes",
-  "@ok": {
-    "type": "text",
-    "placeholders": {}
-  }
+  "yes" : "Yes"
 }
