@@ -25,8 +25,15 @@
   "showExerciseTitle": "Exercise",
   "modifyExerciseTitle": "Modify exercise",
   "exerciseNotModifiedWarning": "Exercise not modified - the same name and description.",
+  "addWorkoutTitle": "Add workout",
+  "workoutPrecomment": "Before workout conditions",
+  "workoutPrecommentHint" :  "Describe conditions before workout.",
+  "workoutPostcomment" : "Workout summary",
+  "workoutPostcommentHint" : "Summarize workout.",
   "modify" : "Modify",
   "delete" : "Delete",
   "no" : "No",
-  "yes" : "Yes"
+  "yes" : "Yes",
+  "start" : "Start",
+  "end" : "End"
 }

@@ -16,8 +16,15 @@
   "showExerciseTitle": "Ćwiczenie",
   "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
+  "addWorkoutTitle": "Dodaj trening",
+  "workoutPrecomment": "Warunki wst\u0119pne",
+  "workoutPrecommentHint" : "Opisz warunki przed treningiem.",
+  "workoutPostcomment" : "Podsumowanie treningu",
+  "workoutPostcommentHint" : "Podsumuj trening.",
   "modify": "Modyfikuj",
   "delete": "Usu\u0144",
   "no" : "Nie",
-  "yes" : "Tak"
+  "yes" : "Tak",
+  "start" : "Start",
+  "end" : "Koniec"
 }
