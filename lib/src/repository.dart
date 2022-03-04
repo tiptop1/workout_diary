@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -13,7 +14,8 @@ class ExercisesDao {
   /// Find all [Exercise] summaries - just id and name.
   /// Useful to show list of all exercises.
   Future<List<Exercise>> findAllSummaries() async {
-    List<Map<String, dynamic>> records = await _database.query(Exercise.table, orderBy: Exercise.colName);
+    List<Map<String, dynamic>> records =
+        await _database.query(Exercise.table, orderBy: Exercise.colName);
     return List.generate(records.length, (i) {
       return Exercise(
         id: records[i][Exercise.colId] as int?,
@@ -103,6 +105,33 @@ class WorkoutsDao {
           title: records[i][Workout.colTitle]);
     });
   }
+
+  Future<Workout> insert(Workout newWorkout) async {
+    var title = newWorkout.title;
+    var startTime = newWorkout.startTime;
+    var endTime = newWorkout.endTime;
+    var preComment = newWorkout.preComment;
+    var postComment = newWorkout.postComment;
+
+    var id = await _database.insert(
+      Workout.table,
+      {
+        Workout.colTitle: title,
+        Workout.colStartTime: startTime,
+        Workout.colEndTime: endTime,
+        Workout.colPreComment: preComment,
+        Workout.colPostComment: postComment,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return Workout(
+        id: id,
+        title: title,
+        startTime: startTime,
+        endTime: endTime,
+        preComment: preComment,
+        postComment: postComment);
+  }
 }
 
 class WorkoutEntriesDao {
@@ -116,6 +145,31 @@ class WorkoutEntriesDao {
         'SELECT count(*) AS \'$countAlias\' FROM ${WorkoutEntry.table} WHERE ${WorkoutEntry.colExerciseId} = ?',
         [exerciseId]);
     return result.first[countAlias] as int;
+  }
+
+  Future<WorkoutEntry> insert(WorkoutEntry newEntry) async {
+    var exercise = newEntry.exercise;
+    var workout = newEntry.workout;
+    var details = newEntry.details;
+    var id = await _database.insert(
+      WorkoutEntry.table,
+      {
+        WorkoutEntry.colExerciseId: exercise.id,
+        WorkoutEntry.colWorkoutId: workout.id,
+        WorkoutEntry.colDetails: details,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    return WorkoutEntry(
+        id: id, exercise: exercise, workout: workout, details: details);
+  }
+
+  Future<List<WorkoutEntry>> insertAll(List<WorkoutEntry> newEntries) async {
+    var insertedEntries = <WorkoutEntry>[];
+    for (var e in newEntries) {
+      insertedEntries.add(await insert(e));
+    }
+    return insertedEntries;
   }
 }
 
@@ -145,31 +199,44 @@ class Repository extends InheritedWidget {
   @override
   bool updateShouldNotify(Repository oldRepository) => false;
 
-  Future<List<Exercise>> finaAllExerciseSummaries() async {
+  Future<List<Exercise>> findAllExerciseSummaries() {
     return _exercisesDao.findAllSummaries();
   }
 
-  Future<List<Workout>> findAllWorkoutSummaries() async {
+  Future<List<Workout>> findAllWorkoutSummaries() {
     return _workoutDao.findAllSummaries();
   }
 
-  Future<Exercise?> findExerciseDetails(int id) async {
+  Future<Exercise?> findExerciseDetails(int id) {
     return _exercisesDao.findDetails(id);
   }
 
-  Future<Exercise> insertExercise(Exercise newExercise) async {
+  Future<Exercise> insertExercise(Exercise newExercise) {
     return _exercisesDao.insert(newExercise);
   }
 
-  Future<Exercise?> updateExercise(Exercise updatedExercise) async {
+  Future<Exercise?> updateExercise(Exercise updatedExercise) {
     return _exercisesDao.update(updatedExercise);
   }
 
-  Future<int> deleteExercise(int id) async {
+  Future<int> deleteExercise(int id) {
     return _exercisesDao.delete(id);
   }
 
   Future<int> countWorkoutExercisesByExercise(int exerciseId) {
     return _workoutEntriesDao.countByExercise(exerciseId);
+  }
+
+  Future<Workout> insertWorkout(Workout newWorkout) {
+    return _workoutDao.insert(newWorkout);
+  }
+
+  Future<WorkoutEntry> insertWorkoutEntry(WorkoutEntry newWorkoutEntry) {
+    return _workoutEntriesDao.insert(newWorkoutEntry);
+  }
+
+  Future<List<WorkoutEntry>> insertAllWorkoutEntries(
+      List<WorkoutEntry> newWorkoutEntries) {
+    return _workoutEntriesDao.insertAll(newWorkoutEntries);
   }
 }
