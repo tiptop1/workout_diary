@@ -17,6 +17,8 @@
   "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
   "addWorkoutTitle": "Dodaj trening",
+  "workoutTitle": "Tytu\u0142",
+  "workoutTitleHint": "Tytu\u0142 treningu",
   "workoutPrecomment": "Warunki wst\u0119pne",
   "workoutPrecommentHint" : "Opisz warunki przed treningiem.",
   "workoutPostcomment" : "Podsumowanie treningu",

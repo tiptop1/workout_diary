@@ -26,6 +26,8 @@
   "modifyExerciseTitle": "Modify exercise",
   "exerciseNotModifiedWarning": "Exercise not modified - the same name and description.",
   "addWorkoutTitle": "Add workout",
+  "workoutTitle": "Title",
+  "workoutTitleHint": "Workout title",
   "workoutPrecomment": "Before workout conditions",
   "workoutPrecommentHint" :  "Describe conditions before workout.",
   "workoutPostcomment" : "Workout summary",
