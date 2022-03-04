@@ -38,7 +38,6 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
 
     var currentTab = tabs.keys.elementAt(_tabController.index);
     var tabWidget;
-    var fabTooltip;
     if (currentTab == appLocalizations.workoutsTab) {
       tabWidget = AllWorkoutsTabWidget();
     } else if (currentTab == appLocalizations.exercisesTab) {
@@ -60,7 +59,6 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
         children: [...tabs.values],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: fabTooltip,
         onPressed: () {
             push(context, child: tabWidget).then((result) {
               if (result) {
