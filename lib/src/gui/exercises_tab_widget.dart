@@ -19,7 +19,7 @@ class _AllExercisesState extends ListOnTabState<AllExercisesTabWidget> {
   @override
   void loadEntities(BuildContext context) {
     Repository.of(context)
-        .finaAllExerciseSummaries()
+        .findAllExerciseSummaries()
         .then((List<Exercise> exercises) {
       setState(() {
         entities = exercises;
