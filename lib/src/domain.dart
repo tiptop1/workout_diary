@@ -59,7 +59,6 @@ class Workout extends Entity {
 
   final DateTime? startTime;
   final DateTime? endTime;
-  final List<WorkoutEntry> entries;
   final String? title;
   final String? preComment;
   final String? postComment;
@@ -68,7 +67,6 @@ class Workout extends Entity {
       {int? id,
       this.startTime,
       this.endTime,
-      this.entries = const [],
       required this.title,
       this.preComment,
       this.postComment})
@@ -76,13 +74,6 @@ class Workout extends Entity {
 
   @override
   String toString() {
-    var entriesStr = '';
-    for (var i = 0; i < entries.length; i++) {
-      entriesStr += entries[i].toString();
-      if (i < entries.length - 1) {
-        entriesStr += ',';
-      }
-    }
-    return 'Workout{id: $id, startTime: $startTime, endTime: $endTime, entries: [$entriesStr], title: $title, preComment: $preComment, postComment: $postComment}';
+    return 'Workout{id: $id, startTime: $startTime, endTime: $endTime, title: $title, preComment: $preComment, postComment: $postComment}';
   }
 }
