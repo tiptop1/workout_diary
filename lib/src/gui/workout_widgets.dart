@@ -6,6 +6,11 @@ import 'package:workout_diary/src/domain.dart';
 import 'package:workout_diary/src/gui/progress_widget.dart';
 import 'package:workout_diary/src/repository.dart';
 
+const String dateLackMarker = '-';
+
+String dateTimeStr(Locale locale, DateTime dateTime) =>
+    '${DateFormat.yMMMMd(locale).format(dateTime)} ${DateFormat.jm(locale).format(dateTime)}';
+
 class AddWorkoutWidget extends StatefulWidget {
   @override
   State<AddWorkoutWidget> createState() => _AddWorkoutState();
@@ -13,7 +18,6 @@ class AddWorkoutWidget extends StatefulWidget {
 
 // TODO: Ensure that at least one Exercise has been added to database.
 class _AddWorkoutState extends State<AddWorkoutWidget> {
-  static const String dateLackMarker = '-';
 
   bool _inProgress = false;
   DateTime? _startTime;
@@ -103,8 +107,8 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
   Widget _createTimeBar(BuildContext context, AppLocalizations appLocalizations,
       DateTime? start, DateTime? end) {
     var locale = Localizations.localeOf(context);
-    var startStr = start != null ? _dateTimeStr(locale, start) : dateLackMarker;
-    var endStr = end != null ? _dateTimeStr(locale, end) : dateLackMarker;
+    var startStr = start != null ? dateTimeStr(locale, start) : dateLackMarker;
+    var endStr = end != null ? dateTimeStr(locale, end) : dateLackMarker;
 
     return Row(
       children: [
@@ -128,8 +132,7 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
     );
   }
 
-  String _dateTimeStr(Locale locale, DateTime dateTime) =>
-      '${DateFormat.yMMMMd(locale).format(dateTime)} ${DateFormat.jm(locale).format(dateTime)}';
+
 
   void _backButtonCallback(BuildContext context) {
     var workout = Workout(
@@ -153,9 +156,13 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
   }
 
   Widget _createWorkoutEntryWidget(BuildContext context) {
-    return ListView(children: [
-      for (var t in _entryTuples) _createWorkoutEntryListTile(t)
-    ],);
+    var listTiles = <Widget>[];
+    for (var i = 0; i < _entryTuples.length; i++) {
+      listTiles.add(_createWorkoutEntryListTile(i, _entryTuples[i]));
+    }
+    return ListView(
+      children: listTiles,
+    );
   }
 
   Widget _createPrecommentWidget(
@@ -201,7 +208,31 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
     return entries;
   }
 
-  Widget _createWorkoutEntryListTile(Tuple2<Exercise, TextEditingController> tuple2) {
-    throw UnimplementedError("Not implemented yet!");
+  Widget _createWorkoutEntryListTile(
+      int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+    return ListTile(
+      leading: _createDropDownButton(index, workoutEntryTuple),
+      title: TextField(controller: workoutEntryTuple.item2),
+    );
+  }
+
+  Widget _createDropDownButton(
+      int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+    return DropdownButton<int>(
+        items: _exercises!.map((e) => _createDropdownMenuItem(e)).toList(),
+        value: workoutEntryTuple.item1.id,
+        onChanged: (int? newExerciseId) {
+          setState(() {
+            _entryTuples[index] = workoutEntryTuple.withItem1(_exercises!
+                .firstWhere((exercise) => exercise.id == newExerciseId));
+          });
+        });
+  }
+
+  DropdownMenuItem<int> _createDropdownMenuItem(Exercise exercise) {
+    return DropdownMenuItem<int>(
+      value: exercise.id,
+      child: Text(exercise.name),
+    );
   }
 }
