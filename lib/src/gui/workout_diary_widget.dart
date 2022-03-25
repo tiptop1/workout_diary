@@ -41,7 +41,10 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
     if (currentTab == appLocalizations.workoutsTab) {
       tabWidget = AllWorkoutsTabWidget();
     } else if (currentTab == appLocalizations.exercisesTab) {
-      tabWidget = AddExerciseWidget(key: UniqueKey());
+      tabWidget = ExerciseWidget(
+        key: UniqueKey(),
+        modifiable: true,
+      );
     } else {
       assert(false, 'Tab $currentTab not supported.');
     }
@@ -60,11 +63,11 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-            push(context, child: tabWidget).then((result) {
-              if (result) {
-                setState(() {});
-              }
-            });
+          push(context, child: tabWidget).then((result) {
+            if (result) {
+              setState(() {});
+            }
+          });
         },
         child: const Icon(Icons.add),
       ),
