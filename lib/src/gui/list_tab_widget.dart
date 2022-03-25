@@ -11,9 +11,9 @@ abstract class ListOnTabWidget extends StatefulWidget {
   ListOnTabWidget({Key? key}) : super(key: key);
 }
 
-abstract class ListOnTabState<T extends ListOnTabWidget> extends State<T>
+abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> extends State<T>
     with NavigatorUtils {
-  List<Entity>? entities;
+  List<E>? entities;
   bool entitiesReady = false;
 
   @override
@@ -37,11 +37,11 @@ abstract class ListOnTabState<T extends ListOnTabWidget> extends State<T>
       padding: const EdgeInsets.all(8),
       itemCount: entities!.length,
       itemBuilder: (BuildContext context, int index) {
-        Entity entity = entities![index];
+        E entity = entities![index];
         return Card(
           child: ListTile(
-            title: listTileTitleWidget(context, entity),
-            leading: listTitleLeadingWidget(context, entity),
+            title: listItemTitle(context, entity),
+            leading: listItemLeadingWidget(context, entity),
             // trailing: Icon(Icons.menu_rounded),
             trailing: PopupMenuButton<ListItemAction>(
               icon: Icon(Icons.menu_rounded),
@@ -75,13 +75,13 @@ abstract class ListOnTabState<T extends ListOnTabWidget> extends State<T>
 
   void loadEntities(BuildContext context);
 
-  Widget? listTileTitleWidget(BuildContext context, Entity entity);
+  Widget listItemTitle(BuildContext context, E entity);
 
-  Widget? listTitleLeadingWidget(BuildContext context, Entity entity);
+  Widget? listItemLeadingWidget(BuildContext context, E entity) => null;
 
-  void listItemModifyAction(BuildContext context, Entity entity);
+  void listItemModifyAction(BuildContext context, E entity);
 
-  void listItemDeleteAction(BuildContext context, Entity entity);
+  void listItemDeleteAction(BuildContext context, E entity);
 
-  void listItemShowAction(BuildContext context, Entity entity);
+  void listItemShowAction(BuildContext context, E entity);
 }
