@@ -15,7 +15,8 @@ class AllExercisesTabWidget extends ListOnTabWidget {
   State<AllExercisesTabWidget> createState() => _AllExercisesState();
 }
 
-class _AllExercisesState extends ListOnTabState<AllExercisesTabWidget> {
+class _AllExercisesState
+    extends ListOnTabState<AllExercisesTabWidget, Exercise> {
   @override
   void loadEntities(BuildContext context) {
     Repository.of(context)
@@ -28,20 +29,19 @@ class _AllExercisesState extends ListOnTabState<AllExercisesTabWidget> {
     });
   }
 
-  Widget? listTileTitleWidget(BuildContext context, Entity entity) =>
-      Text((entity as Exercise).name);
+  Widget listItemTitle(BuildContext context, Exercise exercise) =>
+      Text(exercise.name);
 
-  Widget? listTitleLeadingWidget(BuildContext contet, Entity entity) => null;
-
-  void listItemModifyAction(BuildContext context, Entity entity) {
+  void listItemModifyAction(BuildContext context, Exercise exercise) {
     push(
       context,
-      child: ModifyExerciseWidget(key: UniqueKey(), exerciseId: entity.id!),
+      child: ExerciseWidget(
+          key: UniqueKey(), exerciseId: exercise.id!, modifiable: true),
     );
   }
 
-  void listItemDeleteAction(BuildContext context, Entity entity) {
-    int exerciseId = entity.id!;
+  void listItemDeleteAction(BuildContext context, Exercise exercise) {
+    int exerciseId = exercise.id!;
     Repository.of(context)
         .countWorkoutExercisesByExercise(exerciseId)
         .then((count) {
@@ -49,10 +49,10 @@ class _AllExercisesState extends ListOnTabState<AllExercisesTabWidget> {
     });
   }
 
-  void listItemShowAction(BuildContext context, Entity entity) {
+  void listItemShowAction(BuildContext context, Exercise exercise) {
     push(
       context,
-      child: ShowExerciseWidget(key: UniqueKey(), exerciseId: entity.id!),
+      child: ExerciseWidget(key: UniqueKey(), exerciseId: exercise.id!),
     );
   }
 
