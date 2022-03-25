@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -5,34 +7,80 @@ import '../domain.dart';
 import '../repository.dart';
 import 'progress_widget.dart';
 
-mixin ExerciseMixin {
+class ExerciseWidget extends StatefulWidget {
+  final bool _modifiable;
+  final int? _exerciseId;
+
+  ExerciseWidget({Key? key, int? exerciseId, bool modifiable = false})
+      : _modifiable = modifiable,
+        _exerciseId = exerciseId,
+        super(key: key);
+
+  @override
+  State<ExerciseWidget> createState() => ExerciseWidgetState();
+}
+
+class ExerciseWidgetState extends State<ExerciseWidget> {
+  Exercise? _exercise;
   late final TextEditingController _nameTextController;
   late final TextEditingController _descriptionTextController;
 
-  void initTextControllers() {
+  @override
+  void initState() {
+    super.initState();
     _nameTextController = TextEditingController();
     _descriptionTextController = TextEditingController();
   }
 
-  void disposeTextControllers() {
-    _descriptionTextController.dispose();
-    _nameTextController.dispose();
+  @override
+  void dispose() {
+    _descriptionTextController?.dispose();
+    _nameTextController?.dispose();
+    super.dispose();
   }
 
-  Widget buildExerciseWidget(BuildContext context, String title,
-      {String? initName, String? initDescription, bool editable = false}) {
-    if (initName != null) {
-      _nameTextController.text = initName;
+  @override
+  Widget build(BuildContext context) {
+    Widget? buildWidget;
+    var exerciseId = widget._exerciseId;
+    if (exerciseId != null) {
+      // Exercise is already created and in database - show or modify it.
+      if (_exercise == null) {
+        // Load already existed exercise from database.
+        Repository.of(context).findExerciseDetails(exerciseId).then((e) {
+          setState(() {
+            _exercise = e;
+          });
+        }).catchError((err) {
+          log('Can not load exercise (id: $exerciseId) from database.');
+        });
+        // Until load will complete show progress widget.
+        buildWidget = ProgressWidget();
+      } else {
+        // Exercise is already loaded from database,
+        // so initiate text controllers with values from the exercise.
+        _nameTextController.text = _exercise!.name;
+        var exerciseDescr = _exercise!.description;
+        if (exerciseDescr != null) {
+          _descriptionTextController.text = exerciseDescr;
+        }
+      }
     }
+    return buildWidget ??
+        buildExerciseWidget(context, _nameTextController,
+            _descriptionTextController, widget._modifiable, exerciseId == null);
+  }
 
-    if (initDescription != null) {
-      _descriptionTextController.text = initDescription;
-    }
-
+  Widget buildExerciseWidget(
+      BuildContext context,
+      TextEditingController nameTextController,
+      TextEditingController descriptionTextController,
+      bool modifiable,
+      bool addExercise) {
     var appLocalizations = AppLocalizations.of(context)!;
 
     var nameTextField = TextField(
-      enabled: editable,
+      enabled: modifiable,
       controller: _nameTextController,
       decoration: InputDecoration(
           labelText: appLocalizations.exerciseName,
@@ -41,7 +89,7 @@ mixin ExerciseMixin {
     );
 
     var descriptionTextField = TextField(
-      enabled: editable,
+      enabled: modifiable,
       controller: _descriptionTextController,
       decoration: InputDecoration(
           labelText: appLocalizations.exerciseDescription,
@@ -51,63 +99,63 @@ mixin ExerciseMixin {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(title),
+          title:
+              Text(_calculateTitle(appLocalizations, modifiable, addExercise)),
           leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
-                backButtonCallback(context);
+                backButtonCallback(context, modifiable, addExercise);
               }),
         ),
         body: Column(
           children: [
             SizedBox(height: 10),
             nameTextField,
-            if (editable || initDescription != null) SizedBox(height: 10),
-            if (editable || initDescription != null) descriptionTextField,
+            if (modifiable || descriptionTextController.text.isNotEmpty)
+              SizedBox(height: 10),
+            if (modifiable || descriptionTextController.text.isNotEmpty)
+              descriptionTextField,
           ],
         ));
   }
 
-  void backButtonCallback(BuildContext context);
-}
+  bool shouldAddExercise(bool modifiable, bool addExercise) =>
+      modifiable && addExercise;
 
-class AddExerciseWidget extends StatefulWidget {
-  AddExerciseWidget({Key? key}) : super(key: key);
+  bool shouldModifyExercise(bool modifiable, bool addExercise) =>
+      modifiable && !addExercise;
 
-  @override
-  State<AddExerciseWidget> createState() => AddExerciseState();
-}
-
-class AddExerciseState extends State<AddExerciseWidget> with ExerciseMixin {
-  Exercise? _exercise;
-
-  @override
-  void initState() {
-    super.initState();
-    initTextControllers();
-  }
-
-  @override
-  void dispose() {
-    disposeTextControllers();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var widget;
-    if (_exercise == null) {
-      widget = buildExerciseWidget(
-          context, AppLocalizations.of(context)!.addExerciseTitle,
-          editable: true);
+  String _calculateTitle(
+      AppLocalizations appLocalizations, bool modifiable, bool addExercise) {
+    var title;
+    if (shouldAddExercise(modifiable, addExercise)) {
+      // Add new exercise
+      title = appLocalizations.addExerciseTitle;
+    } else if (shouldModifyExercise(modifiable, addExercise)) {
+      // Modify already existed exercise
+      title = appLocalizations.modifyExerciseTitle;
     } else {
-      widget = ProgressWidget();
+      // Just show (without modification) exercise
+      title = appLocalizations.showExerciseTitle;
     }
-    return widget;
+    return title;
   }
 
-  @override
-  void backButtonCallback(BuildContext context) {
+  void backButtonCallback(
+      BuildContext context, bool modifiable, bool addExercise) {
+    if (shouldAddExercise(modifiable, addExercise)) {
+      // Add new exercise
+      addExerciseCallback(context);
+    } else if (modifiable && !addExercise) {
+      // Modify already existed exercise
+      modifyExerciseCallback(context);
+    } else {
+      // Just show (without modification) exercise
+      showExerciseCallback(context);
+    }
+  }
+
+  void addExerciseCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
     if (exerciseName == '') {
@@ -125,117 +173,17 @@ class AddExerciseState extends State<AddExerciseWidget> with ExerciseMixin {
       );
       Repository.of(context)
           .insertExercise(exercise)
-          .then((Exercise ex) => Navigator.pop(context, true));
-      setState(() {
-        _exercise = exercise;
+          .then((Exercise ex) => Navigator.pop(context, true))
+          .catchError((error) {
+        log("Can not add new exercise. Error: $error.");
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
+        ));
       });
     }
   }
-}
 
-class ShowExerciseWidget extends StatefulWidget {
-  final int exerciseId;
-
-  ShowExerciseWidget({Key? key, required this.exerciseId}) : super(key: key);
-
-  @override
-  State<ShowExerciseWidget> createState() => ShowExerciseState();
-}
-
-class ShowExerciseState extends State<ShowExerciseWidget> with ExerciseMixin {
-  Exercise? _exercise;
-
-  @override
-  void initState() {
-    super.initState();
-    initTextControllers();
-  }
-
-  @override
-  void dispose() {
-    disposeTextControllers();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var newWidget;
-    if (_exercise == null) {
-      // Load exercise from database
-      Repository.of(context)
-          .findExerciseDetails(widget.exerciseId)
-          .then((exercise) {
-        setState(() {
-          _exercise = exercise;
-        });
-      });
-      // Progress widget
-      newWidget = ProgressWidget();
-    } else {
-      newWidget = buildExerciseWidget(
-          context, AppLocalizations.of(context)!.showExerciseTitle,
-          initName: _exercise!.name, initDescription: _exercise!.description);
-    }
-    return newWidget;
-  }
-
-  @override
-  void backButtonCallback(BuildContext context) =>
-      Navigator.pop(context, false);
-}
-
-class ModifyExerciseWidget extends StatefulWidget {
-  final int exerciseId;
-
-  ModifyExerciseWidget({Key? key, required this.exerciseId}) : super(key: key);
-
-  @override
-  State<ModifyExerciseWidget> createState() => ModifyExerciseState();
-}
-
-class ModifyExerciseState extends State<ModifyExerciseWidget>
-    with ExerciseMixin {
-  Exercise? _currExercise;
-  Exercise? _modifiedExercise;
-
-  @override
-  void initState() {
-    super.initState();
-    initTextControllers();
-  }
-
-  @override
-  void dispose() {
-    disposeTextControllers();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var newWidget;
-    if (_currExercise == null && _modifiedExercise == null) {
-      Repository.of(context)
-          .findExerciseDetails(widget.exerciseId)
-          .then((exercise) {
-        setState(() {
-          _currExercise = exercise;
-        });
-      });
-    } else if (_currExercise != null && _modifiedExercise == null) {
-      newWidget = buildExerciseWidget(
-        context,
-        AppLocalizations.of(context)!.modifyExerciseTitle,
-        initName: _currExercise!.name,
-        initDescription: _currExercise!.description,
-        editable: true,
-      );
-    }
-
-    return (newWidget != null ? newWidget : ProgressWidget());
-  }
-
-  @override
-  void backButtonCallback(BuildContext context) {
+  void modifyExerciseCallback(BuildContext context) {
     var modifiedName = _nameTextController.value.text;
     var modifiedDescription = _descriptionTextController.value.text;
 
@@ -245,8 +193,8 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
       ));
       // Exercise not modified, so return false
       Navigator.pop(context, false);
-    } else if (modifiedName == _currExercise!.name &&
-        modifiedDescription == _currExercise!.description) {
+    } else if (modifiedName == _exercise!.name &&
+        modifiedDescription == _exercise!.description) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseNotModifiedWarning),
       ));
@@ -254,7 +202,7 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
       Navigator.pop(context, false);
     } else {
       var modifiedExercise = Exercise(
-        id: _currExercise!.id,
+        id: _exercise!.id,
         name: modifiedName,
         description:
             (modifiedDescription.trim() == '' ? null : modifiedDescription),
@@ -266,9 +214,9 @@ class ModifyExerciseState extends State<ModifyExerciseWidget>
             ex != null, "Exercise with id:${modifiedExercise.id} not updated.");
         Navigator.pop(context, true);
       });
-      setState(() {
-        _modifiedExercise = modifiedExercise;
-      });
     }
   }
+
+  void showExerciseCallback(BuildContext context) =>
+      Navigator.pop(context, false);
 }
