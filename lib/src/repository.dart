@@ -117,8 +117,8 @@ class WorkoutsDao {
       Workout.table,
       {
         Workout.colTitle: title,
-        Workout.colStartTime: startTime,
-        Workout.colEndTime: endTime,
+        Workout.colStartTime: startTime?.millisecondsSinceEpoch,
+        Workout.colEndTime: endTime?.millisecondsSinceEpoch,
         Workout.colPreComment: preComment,
         Workout.colPostComment: postComment,
       },
