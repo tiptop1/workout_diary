@@ -34,8 +34,8 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
 
   @override
   void dispose() {
-    _descriptionTextController?.dispose();
-    _nameTextController?.dispose();
+    _descriptionTextController.dispose();
+    _nameTextController.dispose();
     super.dispose();
   }
 
