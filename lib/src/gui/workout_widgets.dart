@@ -9,16 +9,15 @@ import 'package:workout_diary/src/repository.dart';
 const String dateLackMarker = '-';
 
 String dateTimeStr(Locale locale, DateTime dateTime) =>
-    '${DateFormat.yMMMMd(locale).format(dateTime)} ${DateFormat.jm(locale).format(dateTime)}';
+    '${DateFormat.yMd(locale.toLanguageTag()).format(dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
 
-class AddWorkoutWidget extends StatefulWidget {
+class WorkoutWidget extends StatefulWidget {
   @override
-  State<AddWorkoutWidget> createState() => _AddWorkoutState();
+  State<WorkoutWidget> createState() => _AddWorkoutState();
 }
 
 // TODO: Ensure that at least one Exercise has been added to database.
-class _AddWorkoutState extends State<AddWorkoutWidget> {
-
+class _AddWorkoutState extends State<WorkoutWidget> {
   bool _inProgress = false;
   DateTime? _startTime;
   DateTime? _endTime;
@@ -26,7 +25,7 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
   late TextEditingController _preCommentController;
   late TextEditingController _postCommentController;
   late List<Tuple2<Exercise, TextEditingController>> _entryTuples;
-  late List<Exercise>? _exercises;
+  List<Exercise>? _exercises;
 
   @override
   void initState() {
@@ -119,20 +118,24 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
           isEnabled:
               (start != null && end != null) || (start == null && end == null),
           onPress: () {
-            _startTime = DateTime.now();
-            _endTime = null;
+            setState(() {
+              _startTime = DateTime.now();
+              _endTime = null;
+            });
           },
         ),
         _createTimeControlButton(
           icon: Icons.stop,
           isEnabled: start != null,
-          onPress: () => _endTime = DateTime.now(),
+          onPress: () {
+            setState(() {
+              _endTime = DateTime.now();
+            });
+          },
         ),
       ],
     );
   }
-
-
 
   void _backButtonCallback(BuildContext context) {
     var workout = Workout(
@@ -142,15 +145,10 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
         preComment: _preCommentController.value.text,
         postComment: _postCommentController.value.text);
     var repo = Repository.of(context);
-    repo.insertWorkout(workout).then((insertedWorkout) {
-      repo
-          .insertAllWorkoutEntries(
-              _createWorkoutEntriesList(insertedWorkout, _entryTuples))
-          .then((insertedEntriesList) {
-        Navigator.pop(context, true);
-      });
-      // TODO: Add error handling for workout entries insert.
-    });
+    repo.insertWorkout(workout).then((insertedWorkout) => repo
+        .insertAllWorkoutEntries(
+            _createWorkoutEntriesList(insertedWorkout, _entryTuples))
+        .then((insertedEntriesList) => Navigator.pop(context, true)));
     // TODO: Add error handling for workout insert.
     setState(() => _inProgress = true);
   }
@@ -160,8 +158,10 @@ class _AddWorkoutState extends State<AddWorkoutWidget> {
     for (var i = 0; i < _entryTuples.length; i++) {
       listTiles.add(_createWorkoutEntryListTile(i, _entryTuples[i]));
     }
-    return ListView(
-      children: listTiles,
+    return Expanded(
+      child: ListView(
+        children: listTiles,
+      ),
     );
   }
 
