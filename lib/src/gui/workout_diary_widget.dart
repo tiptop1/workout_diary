@@ -6,6 +6,7 @@ import 'package:workout_diary/src/utils.dart';
 
 import 'exercise_widgets.dart';
 import 'exercises_tab_widget.dart';
+import 'workout_widgets.dart';
 import 'workouts_tab_widget.dart';
 
 class WorkoutDiaryWidget extends StatefulWidget {
@@ -39,7 +40,7 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
     var currentTab = tabs.keys.elementAt(_tabController.index);
     var tabWidget;
     if (currentTab == appLocalizations.workoutsTab) {
-      tabWidget = AllWorkoutsTabWidget();
+      tabWidget = WorkoutWidget();
     } else if (currentTab == appLocalizations.exercisesTab) {
       tabWidget = ExerciseWidget(
         key: UniqueKey(),
