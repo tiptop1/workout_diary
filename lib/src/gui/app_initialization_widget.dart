@@ -72,7 +72,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
         db.execute(
             'CREATE TABLE ${WorkoutEntry.table}(${WorkoutEntry.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntry.colExerciseId} INTEGER NOT NULL, ${WorkoutEntry.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntry.colDetails} TEXT, FOREIGN KEY (${WorkoutEntry.colExerciseId}) REFERENCES ${Exercise.table}(${Exercise.colId}), FOREIGN KEY (${WorkoutEntry.colWorkoutId}) REFERENCES ${Workout.table}(${Workout.colId}))');
         db.execute(
-            'CREATE TABLE ${Workout.table}(${Workout.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Workout.colStartTime} INTEGER, ${Workout.colEndTime} INTEGER, ${Workout.colTitle} TEXT, ${Workout.colPreComment} TEXT, ${Workout.colPostComment} TEXT)');
+            'CREATE TABLE ${Workout.table}(${Workout.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Workout.colStartTime} INTEGER, ${Workout.colEndTime} INTEGER, ${Workout.colTitle} TEXT NOT NULL, ${Workout.colPreComment} TEXT, ${Workout.colPostComment} TEXT)');
       },
       version: 1,
     );
