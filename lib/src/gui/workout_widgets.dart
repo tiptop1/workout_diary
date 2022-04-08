@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
@@ -8,8 +9,11 @@ import 'package:workout_diary/src/repository.dart';
 
 const String dateLackMarker = '-';
 
+String dateStr(Locale locale, DateTime dateTime) =>
+    DateFormat.yMd(locale.toLanguageTag()).format(dateTime);
+
 String dateTimeStr(Locale locale, DateTime dateTime) =>
-    '${DateFormat.yMd(locale.toLanguageTag()).format(dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
+    '${dateStr(locale, dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
 
 class WorkoutWidget extends StatefulWidget {
   @override
@@ -61,6 +65,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     if (_inProgress) {
       widget = ProgressWidget();
     } else {
+      Locale locale = Localizations.localeOf(context);
       widget = Scaffold(
         appBar: AppBar(
           title: Text(appLocalizations.addWorkoutTitle),
@@ -73,7 +78,19 @@ class _AddWorkoutState extends State<WorkoutWidget> {
         body: Column(
           children: [
             _createTitleWidget(context, appLocalizations),
-            _createTimeBar(context, appLocalizations, _startTime, _endTime),
+            _createDateTimeRow(
+                context, locale, appLocalizations.start, null, _startTime, (dateTime) {
+                  setState(() {
+                    _startTime = dateTime;
+                    _endTime = null;
+                  });
+            }),
+            _createDateTimeRow(
+                context, locale, appLocalizations.end, _startTime, _endTime, (dateTime) {
+                  setState(() {
+                    _endTime = dateTime;
+                  });
+            }),
             _createPrecommentWidget(context, appLocalizations),
             _createWorkoutEntryWidget(context),
             _createPostcommentWidget(context, appLocalizations),
@@ -100,40 +117,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           labelText: appLocalizations.workoutTitle,
           border: OutlineInputBorder(),
           hintText: appLocalizations.workoutTitleHint),
-    );
-  }
-
-  Widget _createTimeBar(BuildContext context, AppLocalizations appLocalizations,
-      DateTime? start, DateTime? end) {
-    var locale = Localizations.localeOf(context);
-    var startStr = start != null ? dateTimeStr(locale, start) : dateLackMarker;
-    var endStr = end != null ? dateTimeStr(locale, end) : dateLackMarker;
-
-    return Row(
-      children: [
-        Text(
-            '${appLocalizations.start}: $startStr, ${appLocalizations.end}: $endStr'),
-        _createTimeControlButton(
-          icon: Icons.play_arrow,
-          isEnabled:
-              (start != null && end != null) || (start == null && end == null),
-          onPress: () {
-            setState(() {
-              _startTime = DateTime.now();
-              _endTime = null;
-            });
-          },
-        ),
-        _createTimeControlButton(
-          icon: Icons.stop,
-          isEnabled: start != null,
-          onPress: () {
-            setState(() {
-              _endTime = DateTime.now();
-            });
-          },
-        ),
-      ],
     );
   }
 
@@ -189,14 +172,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createTimeControlButton(
-      {required IconData icon,
-      required bool isEnabled,
-      required VoidCallback onPress}) {
-    return ElevatedButton(
-        onPressed: isEnabled ? onPress : null, child: Icon(icon));
-  }
-
   List<WorkoutEntry> _createWorkoutEntriesList(Workout workout,
       List<Tuple2<Exercise, TextEditingController>> entryTuples) {
     var entries = <WorkoutEntry>[];
@@ -234,5 +209,41 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       value: exercise.id,
       child: Text(exercise.name),
     );
+  }
+
+  Widget _createDateTimeRow(BuildContext context, Locale locale,
+      String fieldName, DateTime? minTime, DateTime? initTime, Function dateTimePickerCallback) {
+    return Row(
+      children: [
+        Text(
+            '$fieldName: ${initTime != null ? dateTimeStr(locale, initTime) : ""}'),
+        IconButton(
+            onPressed: () {
+              DatePicker.showDateTimePicker(
+                context,
+                showTitleActions: true,
+                minTime: minTime,
+                onConfirm: (dateTime) => dateTimePickerCallback(dateTime),
+                currentTime: initTime,
+                locale: toLocaleType(locale),
+              );
+            },
+            icon: Icon(Icons.access_time)),
+      ],
+    );
+  }
+
+  LocaleType toLocaleType(Locale locale) {
+    var localeCountry = locale.languageCode;
+    var localeType;
+    for (var lt in LocaleType.values) {
+      var localeTypeCountry =
+          lt.toString().substring(lt.toString().indexOf('.') + 1);
+      if (localeCountry == localeTypeCountry) {
+        localeType = lt;
+        break;
+      }
+    }
+    return localeType != null ? localeType : LocaleType.en;
   }
 }
