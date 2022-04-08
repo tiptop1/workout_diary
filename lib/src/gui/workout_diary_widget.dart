@@ -37,19 +37,6 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
       appLocalizations.exercisesTab: AllExercisesTabWidget(key: UniqueKey()),
     } as LinkedHashMap;
 
-    var currentTab = tabs.keys.elementAt(_tabController.index);
-    var tabWidget;
-    if (currentTab == appLocalizations.workoutsTab) {
-      tabWidget = WorkoutWidget();
-    } else if (currentTab == appLocalizations.exercisesTab) {
-      tabWidget = ExerciseWidget(
-        key: UniqueKey(),
-        modifiable: true,
-      );
-    } else {
-      assert(false, 'Tab $currentTab not supported.');
-    }
-
     return Scaffold(
       appBar: AppBar(
         bottom: TabBar(
@@ -64,10 +51,17 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          push(context, child: tabWidget).then((result) {
-            if (result) {
+          var currentTab = tabs.keys.elementAt(_tabController.index);
+          var tabWidget;
+          if (currentTab == appLocalizations.workoutsTab) {
+            tabWidget = WorkoutWidget();
+          } else if (currentTab == appLocalizations.exercisesTab) {
+            tabWidget = ExerciseWidget(key: UniqueKey(), modifiable: true,);
+          } else {
+            assert(false, 'Tab $currentTab not supported.');
+          }
+          push(context, child: tabWidget).then((_) {
               setState(() {});
-            }
           });
         },
         child: const Icon(Icons.add),
