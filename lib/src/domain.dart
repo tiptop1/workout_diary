@@ -59,7 +59,7 @@ class Workout extends Entity {
 
   final DateTime? startTime;
   final DateTime? endTime;
-  final String? title;
+  final String title;
   final String? preComment;
   final String? postComment;
 
