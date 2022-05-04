@@ -29,29 +29,32 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
     });
   }
 
+  @override
   Widget listItemTitle(BuildContext context, Workout workout) {
     var startTime = workout.startTime;
-    var endTime = workout.endTime;
-    var locale = Localizations.localeOf(context);
-    var startTimeStr =
-        startTime != null ? dateTimeStr(locale, startTime) : dateLackMarker;
-    var endTimeStr =
-        endTime != null ? dateTimeStr(locale, endTime) : dateLackMarker;
-    return Text('$startTimeStr $endTimeStr');
+    var startTimeStr = startTime != null
+        ? dateTimeStr(Localizations.localeOf(context), startTime)
+        : dateLackMarker;
+
+    return Text(
+        startTime != null ? '${workout.title} ($startTimeStr)' : workout.title);
   }
 
+  @override
   void listItemModifyAction(BuildContext context, Workout workout) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Workout modify action not implemented yet!'),
     ));
   }
 
+  @override
   void listItemDeleteAction(BuildContext context, Workout workout) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Workout delete action not implemented yet!'),
     ));
   }
 
+  @override
   void listItemShowAction(BuildContext context, Workout workout) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Workout show action not implemented yet!'),
