@@ -10,9 +10,27 @@
   "deleteExerciseTitle": "Usu\u0144 \u0107wiczenie",
   "exerciseName": "Nazwa",
   "exerciseNameHint": "Wymagan\u0105 nazw\u0119 \u0107wiczenia",
+  "exerciseNameValidation_required": "Nazwa jest wymagana.",
+  "exerciseNameValidation_tooLong": "Nazwa d\u0142u\u017Csza ni\u017C {length} znak\u00F3w.",
+  "@exerciseNameValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "exerciseDescription": "Opis",
   "exerciseDescriptionHint": "Opcjonalny opis \u0107wiczenia",
-  "exerciseEmptyNameWarning": "\u0106wiczenie nie dodane - pusta nazwa.",
+  "exerciseDescriptionValidation_tooLong": "Opis d\u0142u\u017Cszy ni\u017C {length} znak\u00F3w.",
+  "@exerciseDescriptionValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "showExerciseTitle": "Ćwiczenie",
   "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",

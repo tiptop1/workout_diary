@@ -19,9 +19,27 @@
   },
   "exerciseName": "Name",
   "exerciseNameHint": "Mandatory exercise name",
+  "exerciseNameValidation_required": "Name is required.",
+  "exerciseNameValidation_tooLong": "Name longer than {length} characters.",
+  "@exerciseNameValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "exerciseDescription": "Description",
   "exerciseDescriptionHint": "Optional exercise description",
-  "exerciseEmptyNameWarning": "Exercise not added - empty name.",
+  "exerciseDescriptionValidation_tooLong": "Description longer than {length} characters.",
+  "@exerciseDescriptionValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "showExerciseTitle": "Exercise",
   "modifyExerciseTitle": "Modify exercise",
   "exerciseNotModifiedWarning": "Exercise not modified - the same name and description.",
