@@ -21,15 +21,20 @@ class ExerciseWidget extends StatefulWidget {
 }
 
 class ExerciseWidgetState extends State<ExerciseWidget> {
+  static const int nameMaxLength = 100;
+  static const int descriptionMaxLength = 500;
+
   Exercise? _exercise;
   late final TextEditingController _nameTextController;
   late final TextEditingController _descriptionTextController;
+  late final GlobalKey<FormState> _formKey;
 
   @override
   void initState() {
     super.initState();
     _nameTextController = TextEditingController();
     _descriptionTextController = TextEditingController();
+    _formKey = GlobalKey<FormState>();
   }
 
   @override
@@ -79,22 +84,36 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       bool addExercise) {
     var appLocalizations = AppLocalizations.of(context)!;
 
-    var nameTextField = TextField(
+    var nameTextField = TextFormField(
       enabled: modifiable,
       controller: _nameTextController,
       decoration: InputDecoration(
           labelText: appLocalizations.exerciseName,
           border: OutlineInputBorder(),
           hintText: appLocalizations.exerciseNameHint),
+      validator: (value) {
+        var msg;
+        if (value == null || value.isEmpty) {
+          msg = appLocalizations.exerciseNameValidation_required;
+        } else if (value.length > nameMaxLength) {
+          msg = appLocalizations.exerciseNameValidation_tooLong(nameMaxLength);
+        }
+        return msg;
+      },
     );
 
-    var descriptionTextField = TextField(
+    var descriptionTextField = TextFormField(
       enabled: modifiable,
       controller: _descriptionTextController,
       decoration: InputDecoration(
-          labelText: appLocalizations.exerciseDescription,
-          border: OutlineInputBorder(),
-          hintText: appLocalizations.exerciseDescriptionHint),
+        labelText: appLocalizations.exerciseDescription,
+        border: OutlineInputBorder(),
+        hintText: appLocalizations.exerciseDescriptionHint,
+      ),
+      validator: (value) => value != null && value.length > descriptionMaxLength
+          ? appLocalizations
+              .exerciseDescriptionValidation_tooLong(descriptionMaxLength)
+          : null,
     );
 
     return Scaffold(
@@ -102,20 +121,29 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
           title:
               Text(_calculateTitle(appLocalizations, modifiable, addExercise)),
           leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                backButtonCallback(context, modifiable, addExercise);
-              }),
-        ),
-        body: Column(
-          children: [
-            SizedBox(height: 10),
-            nameTextField,
-            if (modifiable || descriptionTextController.text.isNotEmpty)
-              SizedBox(height: 10),
-            if (modifiable || descriptionTextController.text.isNotEmpty)
-              descriptionTextField,
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => _backButtonCallback(context),
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () =>
+                  _saveButtonCallback(context, modifiable, addExercise),
+            ),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              nameTextField,
+              if (modifiable || descriptionTextController.text.isNotEmpty)
+                SizedBox(height: 10),
+              if (modifiable || descriptionTextController.text.isNotEmpty)
+                descriptionTextField,
+            ],
+          ),
         ));
   }
 
@@ -141,27 +169,30 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
     return title;
   }
 
-  void backButtonCallback(
+  void _saveButtonCallback(
       BuildContext context, bool modifiable, bool addExercise) {
-    if (shouldAddExercise(modifiable, addExercise)) {
-      // Add new exercise
-      addExerciseCallback(context);
-    } else if (modifiable && !addExercise) {
-      // Modify already existed exercise
-      modifyExerciseCallback(context);
-    } else {
-      // Just show (without modification) exercise
-      showExerciseCallback(context);
+    if (_formKey.currentState!.validate()) {
+      if (shouldAddExercise(modifiable, addExercise)) {
+        // Add new exercise
+        addExerciseCallback(context);
+      } else if (modifiable && !addExercise) {
+        // Modify already existed exercise
+        modifyExerciseCallback(context);
+      } else {
+        // Just show (without modification) exercise
+        showExerciseCallback(context);
+      }
     }
+  }
+
+  void _backButtonCallback(BuildContext context) {
+    Navigator.pop(context, false);
   }
 
   void addExerciseCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
     if (exerciseName == '') {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
-      ));
       // New exercise not added, so return false
       Navigator.pop(context, false);
     } else {
@@ -176,9 +207,6 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
           .then((Exercise ex) => Navigator.pop(context, true))
           .catchError((error) {
         log("Can not add new exercise. Error: $error.");
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
-        ));
       });
     }
   }
@@ -188,9 +216,6 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
     var modifiedDescription = _descriptionTextController.value.text;
 
     if (modifiedName == '') {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(AppLocalizations.of(context)!.exerciseEmptyNameWarning),
-      ));
       // Exercise not modified, so return false
       Navigator.pop(context, false);
     } else if (modifiedName == _exercise!.name &&
