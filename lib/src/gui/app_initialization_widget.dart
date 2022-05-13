@@ -70,7 +70,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
           'CREATE TABLE ${Exercise.table}(${Exercise.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Exercise.colName} TEXT NOT NULL, ${Exercise.colDescription} TEXT)',
         );
         db.execute(
-            'CREATE TABLE ${WorkoutEntry.table}(${WorkoutEntry.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntry.colExerciseId} INTEGER NOT NULL, ${WorkoutEntry.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntry.colDetails} TEXT, FOREIGN KEY (${WorkoutEntry.colExerciseId}) REFERENCES ${Exercise.table}(${Exercise.colId}), FOREIGN KEY (${WorkoutEntry.colWorkoutId}) REFERENCES ${Workout.table}(${Workout.colId}))');
+            'CREATE TABLE ${WorkoutEntry.table}(${WorkoutEntry.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntry.colExerciseId} INTEGER NOT NULL, ${WorkoutEntry.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntry.colDetails} TEXT, FOREIGN KEY (${WorkoutEntry.colExerciseId}) REFERENCES ${Exercise.table}(${Exercise.colId}) ON DELETE CASCADE, FOREIGN KEY (${WorkoutEntry.colWorkoutId}) REFERENCES ${Workout.table}(${Workout.colId}) ON DELETA CASCADE)');
         db.execute(
             'CREATE TABLE ${Workout.table}(${Workout.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Workout.colStartTime} INTEGER, ${Workout.colEndTime} INTEGER, ${Workout.colTitle} TEXT NOT NULL, ${Workout.colPreComment} TEXT, ${Workout.colPostComment} TEXT)');
       },
