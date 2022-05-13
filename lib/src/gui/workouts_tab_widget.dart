@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:workout_diary/src/gui/list_tab_widget.dart';
 import 'package:workout_diary/src/gui/workout_widgets.dart';
 
@@ -49,9 +50,7 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
 
   @override
   void listItemDeleteAction(BuildContext context, Workout workout) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Workout delete action not implemented yet!'),
-    ));
+    _showDeleteDialog(context, workout.id!);
   }
 
   @override
@@ -59,5 +58,60 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Workout show action not implemented yet!'),
     ));
+  }
+
+  void _showDeleteDialog(BuildContext context, int workoutId) {
+    AppLocalizations appLocalizations = AppLocalizations.of(context)!;
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return AlertDialog(
+            title: Text(appLocalizations.workoutDeleteTitle),
+            content: _buildDialogContent(appLocalizations),
+            actions: <Widget>[
+              TextButton(
+                child: Text(appLocalizations.yes),
+                onPressed: () {
+                  Repository.of(context)
+                      .deleteWorkout(workoutId)
+                      .then((deletedCount) {
+                    if (deletedCount > 0) {
+                      setState(() {
+                        entities = null;
+                        entitiesReady = false;
+                      });
+                    }
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text(appLocalizations.no),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  Widget _buildDialogContent(AppLocalizations appLocalizations) {
+    return Row(children: [
+      Expanded(
+          flex: 20,
+          child: FittedBox(
+              fit: BoxFit.fill,
+              child: Icon(
+                Icons.help,
+                color: Colors.yellow,
+              ))),
+      Spacer(flex: 2),
+      Expanded(
+        flex: 60,
+        child: Text(appLocalizations.workoutDeleteInfo),
+      ),
+    ]);
   }
 }
