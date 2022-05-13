@@ -43,7 +43,7 @@ class _AllExercisesState
   void listItemDeleteAction(BuildContext context, Exercise exercise) {
     int exerciseId = exercise.id!;
     Repository.of(context)
-        .countWorkoutExercisesByExercise(exerciseId)
+        .countWorkoutEntriesByExercise(exerciseId)
         .then((count) {
       _showDialogAndDeleteExercise(context, count, exerciseId);
     });
@@ -114,11 +114,17 @@ class _AllExercisesState
 
     return Row(children: [
       Expanded(
-          flex: 20,
-          child:
-              FittedBox(fit: BoxFit.fill, child: Icon(icon, color: iconColor))),
+        flex: 20,
+        child: FittedBox(
+          fit: BoxFit.fill,
+          child: Icon(icon, color: iconColor),
+        ),
+      ),
       Spacer(flex: 2),
-      Expanded(flex: 60, child: Text(msg)),
+      Expanded(
+        flex: 60,
+        child: Text(msg),
+      ),
     ]);
   }
 }
