@@ -132,6 +132,11 @@ class WorkoutsDao {
         preComment: preComment,
         postComment: postComment);
   }
+
+  Future<int> delete(int workoutId) async {
+    return _database.delete(Workout.table,
+        where: '${Workout.colId} = ?', whereArgs: [workoutId]);
+  }
 }
 
 class WorkoutEntriesDao {
@@ -223,12 +228,16 @@ class Repository extends InheritedWidget {
     return _exercisesDao.delete(id);
   }
 
-  Future<int> countWorkoutExercisesByExercise(int exerciseId) {
+  Future<int> countWorkoutEntriesByExercise(int exerciseId) {
     return _workoutEntriesDao.countByExercise(exerciseId);
   }
 
   Future<Workout> insertWorkout(Workout newWorkout) {
     return _workoutDao.insert(newWorkout);
+  }
+  
+  Future<int> deleteWorkout(int workoutId) {
+    return _workoutDao.delete(workoutId);
   }
 
   Future<WorkoutEntry> insertWorkoutEntry(WorkoutEntry newWorkoutEntry) {
