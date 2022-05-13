@@ -161,10 +161,10 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       title = appLocalizations.addExerciseTitle;
     } else if (shouldModifyExercise(modifiable, addExercise)) {
       // Modify already existed exercise
-      title = appLocalizations.modifyExerciseTitle;
+      title = appLocalizations.exerciseModifyTitle;
     } else {
       // Just show (without modification) exercise
-      title = appLocalizations.showExerciseTitle;
+      title = appLocalizations.exerciseShowTitle;
     }
     return title;
   }
