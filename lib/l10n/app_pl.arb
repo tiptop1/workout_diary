@@ -3,7 +3,7 @@
   "exercisesTab": "\u0106wiczenia",
   "workoutsTab": "Treningi",
   "addExerciseTitle": "Dodaj \u0107wiczenie",
-  "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
+  "exerciseModifyTitle": "Modyfikuj \u0107wiczenie",
   "deleteExerciseInfo": "To \u0107wiczenie nie zosta\u0142o u\u017Cyte w \u017Cadnym wpisie treningowym.\nOperacja usuni\u0119cia jest bezpieczna.\nUsun\u0105\u0107?",
   "deleteExerciseWarning1": "To \u0107wiczenie zosta\u0142o u\u017Cyte w 1 wpisie treningowym.\nZostanie ono usuni\u0119ze z tego wpisu.\nUsun\u0105\u0107 pomimo to?",
   "deleteExerciseWarning2": "To \u0107wiczenie zosta\u0142o u\u017Cyte w {number} wpisach treningowych.\nZostanie ono usuni\u0119ze ze wszystkich powi\u0105zanych wpis\u00F3w.\nUsun\u0105\u0107 pomimo to?",
@@ -31,8 +31,8 @@
       }
     }
   },
-  "showExerciseTitle": "Ćwiczenie",
-  "modifyExerciseTitle": "Modyfikuj \u0107wiczenie",
+  "exerciseShowTitle": "Ćwiczenie",
+  "exerciseModifyTitle": "Modyfikuj \u0107wiczenie",
   "exerciseNotModifiedWarning": "\u0106wiczenie nie zmodyfikowane - taka sama nazwa i opis.",
   "addWorkoutTitle": "Dodaj trening",
   "workoutTitle": "Tytu\u0142",
