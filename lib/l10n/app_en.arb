@@ -60,6 +60,8 @@
   "workoutPrecommentHint": "Optional preconditions - e.g. your mood.",
   "workoutPostcomment": "Summary",
   "workoutPostcommentHint": "Optional summary - e.g. workout rating.",
+  "workoutDeleteTitle": "Delete workout",
+  "workoutDeleteInfo": "Delete workout?",
   "modify": "Modify",
   "delete": "Delete",
   "no": "No",

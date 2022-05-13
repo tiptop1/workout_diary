@@ -51,6 +51,8 @@
   "workoutPrecommentHint": "Opcjonalne waruniki wst\u0119pne - np. Twoje samopoczucie.",
   "workoutPostcomment": "Podsumowanie",
   "workoutPostcommentHint": "Opcjonalne podsumowanie - np. Twoja ocena treningu.",
+  "workoutDeleteTitle": "Usuwanie treningu",
+  "workoutDeleteInfo": "Usun\u0105\u0107 trening?",
   "modify": "Modyfikuj",
   "delete": "Usu\u0144",
   "no" : "Nie",
