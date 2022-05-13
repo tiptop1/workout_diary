@@ -22,6 +22,7 @@ class WorkoutWidget extends StatefulWidget {
 
 // TODO: Ensure that at least one Exercise has been added to database.
 class _AddWorkoutState extends State<WorkoutWidget> {
+  static const int titleMaxLength = 500;
   bool _inProgress = false;
   DateTime? _startTime;
   DateTime? _endTime;
@@ -30,6 +31,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   late TextEditingController _postCommentController;
   late List<Tuple2<Exercise, TextEditingController>> _entryTuples;
   List<Exercise>? _exercises;
+  late final GlobalKey<FormState> _formKey;
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     _preCommentController = TextEditingController();
     _postCommentController = TextEditingController();
     _entryTuples = [];
+    _formKey = GlobalKey<FormState>();
   }
 
   @override
@@ -70,31 +73,41 @@ class _AddWorkoutState extends State<WorkoutWidget> {
         appBar: AppBar(
           title: Text(appLocalizations.addWorkoutTitle),
           leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                _backButtonCallback(context);
-              }),
-        ),
-        body: Column(
-          children: [
-            _createTitleWidget(context, appLocalizations),
-            _createDateTimeRow(
-                context, locale, appLocalizations.start, null, _startTime, (dateTime) {
-                  setState(() {
-                    _startTime = dateTime;
-                    _endTime = null;
-                  });
-            }),
-            _createDateTimeRow(
-                context, locale, appLocalizations.end, _startTime, _endTime, (dateTime) {
-                  setState(() {
-                    _endTime = dateTime;
-                  });
-            }),
-            _createPrecommentWidget(context, appLocalizations),
-            _createWorkoutEntryWidget(context),
-            _createPostcommentWidget(context, appLocalizations),
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => _backButtonCallback(context),
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () => _saveButtonCallback(context),
+            ),
           ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _createTitleWidget(context, appLocalizations),
+              _createDateTimeRow(
+                  context, locale, appLocalizations.start, null, _startTime,
+                  (dateTime) {
+                setState(() {
+                  _startTime = dateTime;
+                  _endTime = null;
+                });
+              }),
+              _createDateTimeRow(
+                  context, locale, appLocalizations.end, _startTime, _endTime,
+                  (dateTime) {
+                setState(() {
+                  _endTime = dateTime;
+                });
+              }),
+              _createPrecommentWidget(context, appLocalizations),
+              _createWorkoutEntryWidget(context),
+              _createPostcommentWidget(context, appLocalizations),
+            ],
+          ),
         ),
         floatingActionButton: FloatingActionButton(
             onPressed: () {
@@ -111,7 +124,16 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   Widget _createTitleWidget(
       BuildContext context, AppLocalizations appLocalizations) {
-    return TextField(
+    return TextFormField(
+      validator: (value) {
+        var msg;
+        if (value == null || value.isEmpty) {
+          msg = appLocalizations.workoutTitleValidation_required;
+        } else if (value.length > titleMaxLength) {
+          msg = appLocalizations.workoutTitleValidation_tooLong(titleMaxLength);
+        }
+        return msg;
+      },
       controller: _titleController,
       decoration: InputDecoration(
           labelText: appLocalizations.workoutTitle,
@@ -121,19 +143,26 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   void _backButtonCallback(BuildContext context) {
-    var workout = Workout(
-        startTime: _startTime,
-        endTime: _endTime,
-        title: _titleController.value.text,
-        preComment: _preCommentController.value.text,
-        postComment: _postCommentController.value.text);
-    var repo = Repository.of(context);
-    repo.insertWorkout(workout).then((insertedWorkout) => repo
-        .insertAllWorkoutEntries(
-            _createWorkoutEntriesList(insertedWorkout, _entryTuples))
-        .then((insertedEntriesList) => Navigator.pop(context, true)));
-    // TODO: Add error handling for workout insert.
-    setState(() => _inProgress = true);
+    Navigator.pop(context, false);
+  }
+
+  void _saveButtonCallback(BuildContext context) {
+    if (_formKey.currentState!.validate()) {
+      var workout = Workout(
+          startTime: _startTime,
+          endTime: _endTime,
+          title: _titleController.value.text,
+          preComment: _preCommentController.value.text,
+          postComment: _postCommentController.value.text);
+      var repo = Repository.of(context);
+      repo.insertWorkout(workout).then((insertedWorkout) =>
+          repo
+              .insertAllWorkoutEntries(
+              _createWorkoutEntriesList(insertedWorkout, _entryTuples))
+              .then((insertedEntriesList) => Navigator.pop(context, true)));
+      // TODO: Add error handling for workout insert.
+      setState(() => _inProgress = true);
+    }
   }
 
   Widget _createWorkoutEntryWidget(BuildContext context) {
@@ -150,7 +179,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   Widget _createPrecommentWidget(
       BuildContext context, AppLocalizations appLocalizations) {
-    return TextField(
+    return TextFormField(
       controller: _preCommentController,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
@@ -162,7 +191,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   Widget _createPostcommentWidget(
       BuildContext context, AppLocalizations appLocalizations) {
-    return TextField(
+    return TextFormField(
       controller: _postCommentController,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
@@ -186,15 +215,15 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   Widget _createWorkoutEntryListTile(
       int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return ListTile(
-      leading: _createDropDownButton(index, workoutEntryTuple),
-      title: TextField(controller: workoutEntryTuple.item2),
+      leading: _createExerciseDropDownButton(index, workoutEntryTuple),
+      title: TextFormField(controller: workoutEntryTuple.item2),
     );
   }
 
-  Widget _createDropDownButton(
+  Widget _createExerciseDropDownButton(
       int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return DropdownButton<int>(
-        items: _exercises!.map((e) => _createDropdownMenuItem(e)).toList(),
+        items: _exercises!.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
         value: workoutEntryTuple.item1.id,
         onChanged: (int? newExerciseId) {
           setState(() {
@@ -204,15 +233,20 @@ class _AddWorkoutState extends State<WorkoutWidget> {
         });
   }
 
-  DropdownMenuItem<int> _createDropdownMenuItem(Exercise exercise) {
+  DropdownMenuItem<int> _createExerciseDropdownMenuItem(Exercise exercise) {
     return DropdownMenuItem<int>(
       value: exercise.id,
       child: Text(exercise.name),
     );
   }
 
-  Widget _createDateTimeRow(BuildContext context, Locale locale,
-      String fieldName, DateTime? minTime, DateTime? initTime, Function dateTimePickerCallback) {
+  Widget _createDateTimeRow(
+      BuildContext context,
+      Locale locale,
+      String fieldName,
+      DateTime? minTime,
+      DateTime? initTime,
+      Function dateTimePickerCallback) {
     return Row(
       children: [
         Text(
