@@ -46,6 +46,16 @@
   "addWorkoutTitle": "Add workout",
   "workoutTitle": "Title",
   "workoutTitleHint": "Mandatory title - e.g. workout place.",
+  "workoutTitleValidation_required": "Title is required.",
+  "workoutTitleValidation_tooLong": "Title longer than {length} characters.",
+  "@workoutTitleValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "workoutPrecomment": "Preconditions",
   "workoutPrecommentHint": "Optional preconditions - e.g. your mood.",
   "workoutPostcomment": "Summary",

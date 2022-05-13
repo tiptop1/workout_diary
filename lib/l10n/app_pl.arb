@@ -37,6 +37,16 @@
   "addWorkoutTitle": "Dodaj trening",
   "workoutTitle": "Tytu\u0142",
   "workoutTitleHint": "Wymagany tytu\u0142 - np. miejsce treningu.",
+  "workoutTitleValidation_required": "Tytu\u0142 jest wymagany.",
+  "workoutTitleValidation_tooLong": "Tytu\u0142 d\u0142u\u017Cszy ni\u017C {length} znak\u00F3w.",
+  "@workoutTitleValidation_tooLong": {
+    "type": "text",
+    "placeholders": {
+      "length": {
+        "type": "int"
+      }
+    }
+  },
   "workoutPrecomment": "Warunki wst\u0119pne",
   "workoutPrecommentHint": "Opcjonalne waruniki wst\u0119pne - np. Twoje samopoczucie.",
   "workoutPostcomment": "Podsumowanie",
