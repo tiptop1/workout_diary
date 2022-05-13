@@ -34,44 +34,46 @@ abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> exten
 
   Widget _buildTabContent(BuildContext context) {
     AppLocalizations appLocalizations = AppLocalizations.of(context)!;
-    return ListView.builder(
-      itemExtent: itemExtent,
-      padding: const EdgeInsets.all(8),
-      itemCount: entities!.length,
-      itemBuilder: (BuildContext context, int index) {
-        E entity = entities![index];
-        return Card(
-          child: ListTile(
-            title: listItemTitle(context, entity),
-            leading: listItemLeadingWidget(context, entity),
-            // trailing: Icon(Icons.menu_rounded),
-            trailing: PopupMenuButton<ListItemAction>(
-              icon: Icon(Icons.menu_rounded),
-              onSelected: (ListItemAction result) {
-                if (result == ListItemAction.modify) {
-                  listItemModifyAction(context, entity);
-                } else if (result == ListItemAction.delete) {
-                  listItemDeleteAction(context, entity);
-                }
+    return Scrollbar(
+      child: ListView.builder(
+        itemExtent: itemExtent,
+        padding: const EdgeInsets.all(8),
+        itemCount: entities!.length,
+        itemBuilder: (BuildContext context, int index) {
+          E entity = entities![index];
+          return Card(
+            child: ListTile(
+              title: listItemTitle(context, entity),
+              leading: listItemLeadingWidget(context, entity),
+              // trailing: Icon(Icons.menu_rounded),
+              trailing: PopupMenuButton<ListItemAction>(
+                icon: Icon(Icons.menu_rounded),
+                onSelected: (ListItemAction result) {
+                  if (result == ListItemAction.modify) {
+                    listItemModifyAction(context, entity);
+                  } else if (result == ListItemAction.delete) {
+                    listItemDeleteAction(context, entity);
+                  }
+                },
+                itemBuilder: (BuildContext context) =>
+                    <PopupMenuEntry<ListItemAction>>[
+                  PopupMenuItem<ListItemAction>(
+                    value: ListItemAction.modify,
+                    child: Text(appLocalizations.modify),
+                  ),
+                  PopupMenuItem<ListItemAction>(
+                    value: ListItemAction.delete,
+                    child: Text(appLocalizations.delete),
+                  ),
+                ],
+              ),
+              onTap: () {
+                listItemShowAction(context, entity);
               },
-              itemBuilder: (BuildContext context) =>
-                  <PopupMenuEntry<ListItemAction>>[
-                PopupMenuItem<ListItemAction>(
-                  value: ListItemAction.modify,
-                  child: Text(appLocalizations.modify),
-                ),
-                PopupMenuItem<ListItemAction>(
-                  value: ListItemAction.delete,
-                  child: Text(appLocalizations.delete),
-                ),
-              ],
             ),
-            onTap: () {
-              listItemShowAction(context, entity);
-            },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
