@@ -13,6 +13,7 @@ abstract class ListOnTabWidget extends StatefulWidget {
 
 abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> extends State<T>
     with NavigatorUtils {
+  static const double itemExtent = 60.0;
   List<E>? entities;
   bool entitiesReady = false;
 
@@ -34,6 +35,7 @@ abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> exten
   Widget _buildTabContent(BuildContext context) {
     AppLocalizations appLocalizations = AppLocalizations.of(context)!;
     return ListView.builder(
+      itemExtent: itemExtent,
       padding: const EdgeInsets.all(8),
       itemCount: entities!.length,
       itemBuilder: (BuildContext context, int index) {
