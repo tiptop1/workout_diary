@@ -16,6 +16,8 @@ String dateTimeStr(Locale locale, DateTime dateTime) =>
     '${dateStr(locale, dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
 
 class WorkoutWidget extends StatefulWidget {
+  const WorkoutWidget({Key? key}) : super(key: key);
+
   @override
   State<WorkoutWidget> createState() => _AddWorkoutState();
 }
@@ -155,11 +157,10 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           preComment: _preCommentController.value.text,
           postComment: _postCommentController.value.text);
       var repo = Repository.of(context);
-      repo.insertWorkout(workout).then((insertedWorkout) =>
-          repo
-              .insertAllWorkoutEntries(
+      repo.insertWorkout(workout).then((insertedWorkout) => repo
+          .insertAllWorkoutEntries(
               _createWorkoutEntriesList(insertedWorkout, _entryTuples))
-              .then((insertedEntriesList) => Navigator.pop(context, true)));
+          .then((insertedEntriesList) => Navigator.pop(context, true)));
       // TODO: Add error handling for workout insert.
       setState(() => _inProgress = true);
     }
@@ -223,7 +224,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   Widget _createExerciseDropDownButton(
       int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return DropdownButton<int>(
-        items: _exercises!.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
+        items:
+            _exercises!.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
         value: workoutEntryTuple.item1.id,
         onChanged: (int? newExerciseId) {
           setState(() {

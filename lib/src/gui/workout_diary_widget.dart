@@ -9,6 +9,8 @@ import 'workout_widgets.dart';
 import 'workouts_tab_widget.dart';
 
 class WorkoutDiaryWidget extends StatefulWidget {
+  const WorkoutDiaryWidget({Key? key}) : super(key: key);
+
   State<WorkoutDiaryWidget> createState() => _WorkoutDiaryWidgetState();
 }
 

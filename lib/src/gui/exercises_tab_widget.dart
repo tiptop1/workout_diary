@@ -9,7 +9,7 @@ import 'exercise_widgets.dart';
 enum ExerciseAction { modify, delete }
 
 class AllExercisesTabWidget extends ListOnTabWidget {
-  AllExercisesTabWidget({Key? key}) : super(key: key);
+  const AllExercisesTabWidget({Key? key}) : super(key: key);
 
   @override
   State<AllExercisesTabWidget> createState() => _AllExercisesState();

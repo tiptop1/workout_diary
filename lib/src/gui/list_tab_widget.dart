@@ -7,7 +7,7 @@ import 'progress_widget.dart';
 enum ListItemAction { modify, delete }
 
 abstract class ListOnTabWidget extends StatefulWidget {
-  ListOnTabWidget({Key? key}) : super(key: key);
+  const ListOnTabWidget({Key? key}) : super(key: key);
 }
 
 abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> extends State<T> {

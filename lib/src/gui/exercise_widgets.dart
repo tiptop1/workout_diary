@@ -11,7 +11,7 @@ class ExerciseWidget extends StatefulWidget {
   final bool _modifiable;
   final int? _exerciseId;
 
-  ExerciseWidget({Key? key, int? exerciseId, bool modifiable = false})
+  const ExerciseWidget({Key? key, int? exerciseId, bool modifiable = false})
       : _modifiable = modifiable,
         _exerciseId = exerciseId,
         super(key: key);

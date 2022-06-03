@@ -9,7 +9,7 @@ import '../domain.dart';
 import '../repository.dart';
 
 class AllWorkoutsTabWidget extends ListOnTabWidget {
-  AllWorkoutsTabWidget({Key? key}) : super(key: key);
+  const AllWorkoutsTabWidget({Key? key}) : super(key: key);
 
   @override
   State<AllWorkoutsTabWidget> createState() => _AllWorkoutsState();
