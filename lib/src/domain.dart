@@ -5,16 +5,12 @@ abstract class Entity {
 }
 
 class Exercise extends Entity {
-  static const table = 'exercises';
-
-  static const colId = 'id';
-  static const colName = 'name';
-  static const colDescription = 'description';
-
   final String name;
   final String? description;
 
-  Exercise({int? id, required this.name, this.description}) : super(id: id);
+  Exercise({int? id, required this.name, this.description})
+      : assert(name.isNotEmpty),
+        super(id: id);
 
   @override
   String toString() {
@@ -23,18 +19,11 @@ class Exercise extends Entity {
 }
 
 class WorkoutEntry extends Entity {
-  static const table = 'workout_entries';
-
-  static const colId = 'id';
-  static const colExerciseId = 'exercise_id';
-  static const colWorkoutId = 'workout_id';
-  static const colDetails = 'details';
-
   final Exercise exercise;
   final Workout workout;
   final String details;
 
-  WorkoutEntry(
+  const WorkoutEntry(
       {int? id,
       required this.exercise,
       required this.workout,
@@ -48,15 +37,6 @@ class WorkoutEntry extends Entity {
 }
 
 class Workout extends Entity {
-  static const table = 'workouts';
-
-  static const colId = 'id';
-  static const colStartTime = 'startTime';
-  static const colEndTime = 'endTime';
-  static const colTitle = 'title';
-  static const colPreComment = 'preComment';
-  static const colPostComment = 'postComment';
-
   final DateTime? startTime;
   final DateTime? endTime;
   final String title;
@@ -70,7 +50,8 @@ class Workout extends Entity {
       required this.title,
       this.preComment,
       this.postComment})
-      : super(id: id);
+      : assert(title.isNotEmpty),
+        super(id: id);
 
   @override
   String toString() {

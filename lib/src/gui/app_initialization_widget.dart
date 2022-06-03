@@ -6,10 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../config.dart';
-import '../domain.dart';
 import '../repository.dart';
 import 'progress_widget.dart';
-import 'workout_diary_widget.dart';
 
 class AppInitializationWidget extends StatefulWidget {
   final Widget _child;
@@ -72,12 +70,12 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
       join(await getDatabasesPath(), 'workout_diary.db'),
       onCreate: (db, version) {
         db.execute(
-          'CREATE TABLE ${Exercise.table}(${Exercise.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Exercise.colName} TEXT NOT NULL, ${Exercise.colDescription} TEXT)',
+          'CREATE TABLE ${ExercisesDao.table}(${ExercisesDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${ExercisesDao.colName} TEXT NOT NULL, ${ExercisesDao.colDescription} TEXT)',
         );
         db.execute(
-            'CREATE TABLE ${WorkoutEntry.table}(${WorkoutEntry.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntry.colExerciseId} INTEGER NOT NULL, ${WorkoutEntry.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntry.colDetails} TEXT, FOREIGN KEY (${WorkoutEntry.colExerciseId}) REFERENCES ${Exercise.table}(${Exercise.colId}) ON DELETE CASCADE, FOREIGN KEY (${WorkoutEntry.colWorkoutId}) REFERENCES ${Workout.table}(${Workout.colId}) ON DELETA CASCADE)');
+            'CREATE TABLE ${WorkoutEntriesDao.table}(${WorkoutEntriesDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntriesDao.colExerciseId} INTEGER NOT NULL, ${WorkoutEntriesDao.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntriesDao.colDetails} TEXT, FOREIGN KEY (${WorkoutEntriesDao.colExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}) ON DELETE CASCADE, FOREIGN KEY (${WorkoutEntriesDao.colWorkoutId}) REFERENCES ${WorkoutsDao.table}(${WorkoutsDao.colId}) ON DELETA CASCADE)');
         db.execute(
-            'CREATE TABLE ${Workout.table}(${Workout.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${Workout.colStartTime} INTEGER, ${Workout.colEndTime} INTEGER, ${Workout.colTitle} TEXT NOT NULL, ${Workout.colPreComment} TEXT, ${Workout.colPostComment} TEXT)');
+            'CREATE TABLE ${WorkoutsDao.table}(${WorkoutsDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colStartTime} INTEGER, ${WorkoutsDao.colEndTime} INTEGER, ${WorkoutsDao.colTitle} TEXT NOT NULL, ${WorkoutsDao.colPreComment} TEXT, ${WorkoutsDao.colPostComment} TEXT)');
       },
       version: 1,
     );

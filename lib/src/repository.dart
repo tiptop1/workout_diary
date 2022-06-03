@@ -7,6 +7,12 @@ import 'package:sqflite/sqflite.dart';
 import 'domain.dart';
 
 class ExercisesDao {
+  static const table = 'exercises';
+
+  static const colId = 'id';
+  static const colName = 'name';
+  static const colDescription = 'description';
+  
   final Database _database;
 
   const ExercisesDao(this._database);
@@ -15,11 +21,11 @@ class ExercisesDao {
   /// Useful to show list of all exercises.
   Future<List<Exercise>> findAllSummaries() async {
     List<Map<String, dynamic>> records =
-        await _database.query(Exercise.table, orderBy: Exercise.colName);
+        await _database.query(table, orderBy: colName);
     return List.generate(records.length, (i) {
       return Exercise(
-        id: records[i][Exercise.colId] as int?,
-        name: records[i][Exercise.colName] as String,
+        id: records[i][colId] as int?,
+        name: records[i][colName] as String,
       );
     });
   }
@@ -27,17 +33,17 @@ class ExercisesDao {
   /// Find details of [Exercise] with given [id].
   Future<Exercise?> findDetails(int id) async {
     List<Map<String, dynamic>> records = await _database.query(
-      Exercise.table,
-      where: '${Exercise.colId} = ?',
+      table,
+      where: '$colId = ?',
       whereArgs: [id],
     );
     var exercise;
     if (records.length == 1) {
       var record = records[0];
       exercise = Exercise(
-        id: record[Exercise.colId] as int?,
-        name: record[Exercise.colName] as String,
-        description: record[Exercise.colDescription] as String?,
+        id: record[colId] as int?,
+        name: record[colName] as String,
+        description: record[colDescription] as String?,
       );
     }
     return exercise;
@@ -47,10 +53,10 @@ class ExercisesDao {
     var name = exercise.name;
     var description = exercise.description;
     var id = await _database.insert(
-      Exercise.table,
+      table,
       {
-        Exercise.colName: name,
-        Exercise.colDescription: description,
+        colName: name,
+        colDescription: description,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -65,9 +71,9 @@ class ExercisesDao {
     var id = exercise.id;
     var name = exercise.name;
     var description = exercise.description;
-    var recordsCount = await _database.update(Exercise.table,
-        {Exercise.colName: name, Exercise.colDescription: description},
-        where: '${Exercise.colId} = ?', whereArgs: [id]);
+    var recordsCount = await _database.update(table,
+        {colName: name, colDescription: description},
+        where: '$colId = ?', whereArgs: [id]);
     var updatedExercise;
     if (recordsCount == 1) {
       updatedExercise = Exercise(id: id, name: name, description: description);
@@ -76,33 +82,41 @@ class ExercisesDao {
   }
 
   Future<int> delete(int exerciseId) async {
-    return _database.delete(Exercise.table,
-        where: '${Exercise.colId} = ?', whereArgs: [exerciseId]);
+    return _database.delete(table,
+        where: '$colId = ?', whereArgs: [exerciseId]);
   }
 }
 
 class WorkoutsDao {
+  static const table = 'workouts';
+
+  static const colId = 'id';
+  static const colStartTime = 'startTime';
+  static const colEndTime = 'endTime';
+  static const colTitle = 'title';
+  static const colPreComment = 'preComment';
+  static const colPostComment = 'postComment';
   final Database _database;
 
   const WorkoutsDao(this._database);
 
   Future<List<Workout>> findAllSummaries() async {
     List<Map<String, dynamic>> records = await _database.query(
-      Workout.table,
-      orderBy: '${Workout.colId} DESC',
+      table,
+      orderBy: '$colId DESC',
     );
     return List.generate(records.length, (i) {
-      var startTimeMillis = records[i][Workout.colStartTime];
-      var endTimeMillis = records[i][Workout.colEndTime];
+      var startTimeMillis = records[i][colStartTime];
+      var endTimeMillis = records[i][colEndTime];
       return Workout(
-          id: records[i][Workout.colId] as int?,
+          id: records[i][colId] as int?,
           startTime: startTimeMillis != null
               ? DateTime.fromMillisecondsSinceEpoch(startTimeMillis)
               : null,
           endTime: endTimeMillis != null
               ? DateTime.fromMillisecondsSinceEpoch(endTimeMillis)
               : null,
-          title: records[i][Workout.colTitle]);
+          title: records[i][colTitle]);
     });
   }
 
@@ -114,13 +128,13 @@ class WorkoutsDao {
     var postComment = newWorkout.postComment;
 
     var id = await _database.insert(
-      Workout.table,
+      table,
       {
-        Workout.colTitle: title,
-        Workout.colStartTime: startTime?.millisecondsSinceEpoch,
-        Workout.colEndTime: endTime?.millisecondsSinceEpoch,
-        Workout.colPreComment: preComment,
-        Workout.colPostComment: postComment,
+        colTitle: title,
+        colStartTime: startTime?.millisecondsSinceEpoch,
+        colEndTime: endTime?.millisecondsSinceEpoch,
+        colPreComment: preComment,
+        colPostComment: postComment,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -134,12 +148,19 @@ class WorkoutsDao {
   }
 
   Future<int> delete(int workoutId) async {
-    return _database.delete(Workout.table,
-        where: '${Workout.colId} = ?', whereArgs: [workoutId]);
+    return _database.delete(table,
+        where: '$colId = ?', whereArgs: [workoutId]);
   }
 }
 
 class WorkoutEntriesDao {
+  static const table = 'workout_entries';
+
+  static const colId = 'id';
+  static const colExerciseId = 'exercise_id';
+  static const colWorkoutId = 'workout_id';
+  static const colDetails = 'details';
+  
   final Database _database;
 
   const WorkoutEntriesDao(this._database);
@@ -147,7 +168,7 @@ class WorkoutEntriesDao {
   Future<int> countByExercise(int exerciseId) async {
     const countAlias = 'entriesCount';
     List<Map<String, Object?>> result = await _database.rawQuery(
-        'SELECT count(*) AS \'$countAlias\' FROM ${WorkoutEntry.table} WHERE ${WorkoutEntry.colExerciseId} = ?',
+        'SELECT count(*) AS \'$countAlias\' FROM $table WHERE $colExerciseId = ?',
         [exerciseId]);
     return result.first[countAlias] as int;
   }
@@ -157,11 +178,11 @@ class WorkoutEntriesDao {
     var workout = newEntry.workout;
     var details = newEntry.details;
     var id = await _database.insert(
-      WorkoutEntry.table,
+      table,
       {
-        WorkoutEntry.colExerciseId: exercise.id,
-        WorkoutEntry.colWorkoutId: workout.id,
-        WorkoutEntry.colDetails: details,
+        colExerciseId: exercise.id,
+        colWorkoutId: workout.id,
+        colDetails: details,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
