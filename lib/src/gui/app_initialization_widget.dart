@@ -12,9 +12,14 @@ import 'progress_widget.dart';
 import 'workout_diary_widget.dart';
 
 class AppInitializationWidget extends StatefulWidget {
+  final Widget _child;
+
+  const AppInitializationWidget({Key? key, required Widget child})
+      : _child = child,
+        super(key: key);
+
   @override
-  State<AppInitializationWidget> createState() =>
-      _AppInitializationWidgetState();
+  State<AppInitializationWidget> createState() => _AppInitializationWidgetState();
 }
 
 class _AppInitializationWidgetState extends State<AppInitializationWidget> {
@@ -48,16 +53,16 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
+    Widget w;
     if (_initializationComplete()) {
-      widget = Configuration(
+      w = Configuration(
         sharedPreferences: _sharedPreferences!,
-        child: Repository(database: _database!, child: WorkoutDiaryWidget()),
+        child: Repository(database: _database!, child: widget._child),
       );
     } else {
-      widget = ProgressWidget();
+      w = ProgressWidget();
     }
-    return widget;
+    return w;
   }
 
   // Usually the _database will be completed.
