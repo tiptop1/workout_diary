@@ -2,7 +2,6 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:workout_diary/src/utils.dart';
 
 import 'exercise_widgets.dart';
 import 'exercises_tab_widget.dart';
@@ -14,7 +13,7 @@ class WorkoutDiaryWidget extends StatefulWidget {
 }
 
 class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
-    with SingleTickerProviderStateMixin, NavigatorUtils {
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -56,12 +55,17 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
           if (currentTab == appLocalizations.workoutsTab) {
             tabWidget = WorkoutWidget();
           } else if (currentTab == appLocalizations.exercisesTab) {
-            tabWidget = ExerciseWidget(key: UniqueKey(), modifiable: true,);
+            tabWidget = ExerciseWidget(
+              key: UniqueKey(),
+              modifiable: true,
+            );
           } else {
             assert(false, 'Tab $currentTab not supported.');
           }
-          push(context, child: tabWidget).then((_) {
-              setState(() {});
+          Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => tabWidget))
+              .then((_) {
+            setState(() {});
           });
         },
         child: const Icon(Icons.add),

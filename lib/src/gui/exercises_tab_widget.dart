@@ -33,10 +33,12 @@ class _AllExercisesState
       Text(exercise.name);
 
   void listItemModifyAction(BuildContext context, Exercise exercise) {
-    push(
+    Navigator.push(
       context,
-      child: ExerciseWidget(
-          key: UniqueKey(), exerciseId: exercise.id!, modifiable: true),
+      MaterialPageRoute(
+        builder: (context) => ExerciseWidget(
+            key: UniqueKey(), exerciseId: exercise.id!, modifiable: true),
+      ),
     );
   }
 
@@ -50,9 +52,12 @@ class _AllExercisesState
   }
 
   void listItemShowAction(BuildContext context, Exercise exercise) {
-    push(
+    Navigator.push(
       context,
-      child: ExerciseWidget(key: UniqueKey(), exerciseId: exercise.id!),
+      MaterialPageRoute(
+        builder: (context) =>
+            ExerciseWidget(key: UniqueKey(), exerciseId: exercise.id!),
+      ),
     );
   }
 

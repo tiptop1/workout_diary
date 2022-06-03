@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../domain.dart';
-import '../utils.dart';
 import 'progress_widget.dart';
 
 enum ListItemAction { modify, delete }
@@ -11,8 +10,7 @@ abstract class ListOnTabWidget extends StatefulWidget {
   ListOnTabWidget({Key? key}) : super(key: key);
 }
 
-abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> extends State<T>
-    with NavigatorUtils {
+abstract class ListOnTabState<T extends ListOnTabWidget, E extends Entity> extends State<T> {
   static const double itemExtent = 60.0;
   List<E>? entities;
   bool entitiesReady = false;
