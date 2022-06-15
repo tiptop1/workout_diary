@@ -12,7 +12,7 @@ class ExercisesDao {
   static const colId = 'id';
   static const colName = 'name';
   static const colDescription = 'description';
-  
+
   final Database _database;
 
   const ExercisesDao(this._database);
@@ -71,8 +71,8 @@ class ExercisesDao {
     var id = exercise.id;
     var name = exercise.name;
     var description = exercise.description;
-    var recordsCount = await _database.update(table,
-        {colName: name, colDescription: description},
+    var recordsCount = await _database.update(
+        table, {colName: name, colDescription: description},
         where: '$colId = ?', whereArgs: [id]);
     var updatedExercise;
     if (recordsCount == 1) {
@@ -82,8 +82,8 @@ class ExercisesDao {
   }
 
   Future<int> delete(int exerciseId) async {
-    return _database.delete(table,
-        where: '$colId = ?', whereArgs: [exerciseId]);
+    return _database
+        .delete(table, where: '$colId = ?', whereArgs: [exerciseId]);
   }
 }
 
@@ -148,8 +148,7 @@ class WorkoutsDao {
   }
 
   Future<int> delete(int workoutId) async {
-    return _database.delete(table,
-        where: '$colId = ?', whereArgs: [workoutId]);
+    return _database.delete(table, where: '$colId = ?', whereArgs: [workoutId]);
   }
 }
 
@@ -160,7 +159,7 @@ class WorkoutEntriesDao {
   static const colExerciseId = 'exercise_id';
   static const colWorkoutId = 'workout_id';
   static const colDetails = 'details';
-  
+
   final Database _database;
 
   const WorkoutEntriesDao(this._database);
@@ -229,10 +228,6 @@ class Repository extends InheritedWidget {
     return _exercisesDao.findAllSummaries();
   }
 
-  Future<List<Workout>> findAllWorkoutSummaries() {
-    return _workoutDao.findAllSummaries();
-  }
-
   Future<Exercise?> findExerciseDetails(int id) {
     return _exercisesDao.findDetails(id);
   }
@@ -249,24 +244,33 @@ class Repository extends InheritedWidget {
     return _exercisesDao.delete(id);
   }
 
+  Future<List<Workout>> findAllWorkoutSummaries() {
+    return _workoutDao.findAllSummaries();
+  }
+
   Future<int> countWorkoutEntriesByExercise(int exerciseId) {
     return _workoutEntriesDao.countByExercise(exerciseId);
   }
 
-  Future<Workout> insertWorkout(Workout newWorkout) {
-    return _workoutDao.insert(newWorkout);
+  Future<Workout> insertWorkout(Workout workout) async {
+    assert(workout.id == null);
+    var newWorkout = await _workoutDao.insert(workout);
+    var newEntries = await _workoutEntriesDao.insert(newWorkout.id, workout.entities);
+    newEntries.forEach((e) => newWorkout.addEntry(e));
+    return newWorkout;
   }
   
-  Future<int> deleteWorkout(int workoutId) {
-    return _workoutDao.delete(workoutId);
+  Future<Workout> updateWorkout(Workout workout) async {
+    assert(workout.id != null);
+    var updatedWorkout = await _workoutDao.update(workout);
+    // Insert workout entities if added new
+    // Update workout entries if changed already existed
+    // Delete workout entries if deleted from workout
+
+    return updatedWorkout;
   }
 
-  Future<WorkoutEntry> insertWorkoutEntry(WorkoutEntry newWorkoutEntry) {
-    return _workoutEntriesDao.insert(newWorkoutEntry);
-  }
-
-  Future<List<WorkoutEntry>> insertAllWorkoutEntries(
-      List<WorkoutEntry> newWorkoutEntries) {
-    return _workoutEntriesDao.insertAll(newWorkoutEntries);
+  Future<int> deleteWorkout(int id) {
+    return _workoutDao.delete(id);
   }
 }
