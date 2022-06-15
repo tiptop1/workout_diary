@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sqflite/sqflite.dart';
@@ -18,19 +19,20 @@ class ExercisesDao {
   const ExercisesDao(this._database);
 
   /// Find all [Exercise] summaries - just id and name.
-  /// Useful to show list of all exercises.
+  /// Returns list of found [Exercise]s.
   Future<List<Exercise>> findAllSummaries() async {
     List<Map<String, dynamic>> records =
         await _database.query(table, orderBy: colName);
-    return List.generate(records.length, (i) {
+    return List.generate(records.length, (index) {
       return Exercise(
-        id: records[i][colId] as int?,
-        name: records[i][colName] as String,
+        id: records[index][colId] as int?,
+        name: records[index][colName] as String,
       );
     });
   }
 
   /// Find details of [Exercise] with given [id].
+  /// Returns [Exercise] if found otherwise null.
   Future<Exercise?> findDetails(int id) async {
     List<Map<String, dynamic>> records = await _database.query(
       table,
@@ -39,7 +41,7 @@ class ExercisesDao {
     );
     var exercise;
     if (records.length == 1) {
-      var record = records[0];
+      var record = records.first;
       exercise = Exercise(
         id: record[colId] as int?,
         name: record[colName] as String,
@@ -49,7 +51,10 @@ class ExercisesDao {
     return exercise;
   }
 
+  /// Insert [Excercise] into repository.
+  /// Returns [Excercise] with id.
   Future<Exercise> insert(Exercise exercise) async {
+    assert(exercise.id == null);
     var name = exercise.name;
     var description = exercise.description;
     var id = await _database.insert(
@@ -67,6 +72,8 @@ class ExercisesDao {
     );
   }
 
+  /// Update [Excrcise] in repository.
+  /// Returns updated [Exercise] or null it nothing was updated.
   Future<Exercise?> update(Exercise exercise) async {
     var id = exercise.id;
     var name = exercise.name;
@@ -74,16 +81,15 @@ class ExercisesDao {
     var recordsCount = await _database.update(
         table, {colName: name, colDescription: description},
         where: '$colId = ?', whereArgs: [id]);
-    var updatedExercise;
-    if (recordsCount == 1) {
-      updatedExercise = Exercise(id: id, name: name, description: description);
-    }
-    return updatedExercise;
+    return recordsCount == 1
+        ? Exercise(id: id, name: name, description: description)
+        : null;
   }
 
-  Future<int> delete(int exerciseId) async {
-    return _database
-        .delete(table, where: '$colId = ?', whereArgs: [exerciseId]);
+  /// Delete [Exercise] with given [id].
+  /// Returns count of deleted [Exercise]s.
+  Future<int> delete(int id) async {
+    return _database.delete(table, where: '$colId = ?', whereArgs: [id]);
   }
 }
 
@@ -147,8 +153,42 @@ class WorkoutsDao {
         postComment: postComment);
   }
 
-  Future<int> delete(int workoutId) async {
-    return _database.delete(table, where: '$colId = ?', whereArgs: [workoutId]);
+  /// Update [Workout].
+  /// Returns updated [Workout] if successful otherwise null.
+  Future<Workout?> update(Workout workout) async {
+    assert(workout.id != null);
+    var id = workout.id;
+    var title = workout.title;
+    var startTime = workout.startTime;
+    var endTime = workout.endTime;
+    var preComment = workout.preComment;
+    var postComment = workout.postComment;
+    var recordsCount = await _database.update(
+        table,
+        {
+          colTitle: title,
+          colStartTime: startTime?.millisecondsSinceEpoch,
+          colEndTime: endTime?.millisecondsSinceEpoch,
+          colPreComment: preComment,
+          colPostComment: postComment,
+        },
+        where: '$colId = ?',
+        whereArgs: [id]);
+    return recordsCount == 1
+        ? Workout(
+            id: id,
+            title: title,
+            startTime: startTime,
+            endTime: endTime,
+            preComment: preComment,
+            postComment: postComment)
+        : null;
+  }
+
+  /// Delete [Workout] with given [id].
+  /// Returns number of deleted [Workout]s.
+  Future<int> delete(int id) async {
+    return _database.delete(table, where: '$colId = ?', whereArgs: [id]);
   }
 }
 
@@ -172,29 +212,28 @@ class WorkoutEntriesDao {
     return result.first[countAlias] as int;
   }
 
-  Future<WorkoutEntry> insert(WorkoutEntry newEntry) async {
-    var exercise = newEntry.exercise;
-    var workout = newEntry.workout;
-    var details = newEntry.details;
+  Future<List<int>> findIdsByWorkoutId(int workoutId) async {
+    List<Map<String, dynamic>> records = await _database.query(table, distinct: true, columns: [colId], where: '$colWorkoutId = ?', whereArgs: [workoutId], orderBy: '$colId asc');
+    return List.generate(records.length, (index) => records[index][colId]);
+  }
+
+  Future<WorkoutEntry> insert(
+      {required int workoutId, required WorkoutEntry entry}) async {
     var id = await _database.insert(
       table,
       {
-        colExerciseId: exercise.id,
-        colWorkoutId: workout.id,
-        colDetails: details,
+        colExerciseId: entry.exercise.id,
+        colWorkoutId: workoutId,
+        colDetails: entry.details,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    return WorkoutEntry(
-        id: id, exercise: exercise, workout: workout, details: details);
-  }
 
-  Future<List<WorkoutEntry>> insertAll(List<WorkoutEntry> newEntries) async {
-    var insertedEntries = <WorkoutEntry>[];
-    for (var e in newEntries) {
-      insertedEntries.add(await insert(e));
-    }
-    return insertedEntries;
+    return WorkoutEntry(
+      id: id,
+      exercise: entry.exercise,
+      details: entry.details,
+    );
   }
 }
 
@@ -255,17 +294,40 @@ class Repository extends InheritedWidget {
   Future<Workout> insertWorkout(Workout workout) async {
     assert(workout.id == null);
     var newWorkout = await _workoutDao.insert(workout);
-    var newEntries = await _workoutEntriesDao.insert(newWorkout.id, workout.entities);
-    newEntries.forEach((e) => newWorkout.addEntry(e));
+    assert(newWorkout.id != null);
+    var group = FutureGroup();
+    workout.entities.forEach((e) => group.add(_workoutEntriesDao.insert(workoutId: newWorkout.id!, entry: e)));
+    group.close();
+    var newEntities = await group.future;
+    newEntities.forEach((e) => newWorkout.addWorkoutEntry(e));
     return newWorkout;
   }
-  
-  Future<Workout> updateWorkout(Workout workout) async {
+
+  Future<Workout?> updateWorkout(Workout workout) async {
     assert(workout.id != null);
     var updatedWorkout = await _workoutDao.update(workout);
-    // Insert workout entities if added new
-    // Update workout entries if changed already existed
-    // Delete workout entries if deleted from workout
+    if (updatedWorkout != null) {
+      var updatedWorkoutId = updatedWorkout.id;
+      assert(updatedWorkoutId != null);
+      var oldEntityIds = await _workoutEntriesDao.findIdsByWorkoutId(updatedWorkoutId!);
+      var newEntities = workout.entities;
+      var group = FutureGroup();
+      newEntities.forEach((e) {
+        if (e.id == null) {
+          group.add(_workoutEntriesDao.insert(workoutId: updatedWorkoutId, entry: e));
+        } else {
+          group.add(_workoutEntriesDao.update(e));
+        }
+      });
+      oldEntityIds.forEach((oldId) {
+        if (newEntities.map((e) => e.id).firstWhere((newId) => newId == oldId) == null) {
+          group.add(_workoutEntriesDao.delete(oldId));
+        }
+      });
+      group.close();
+      var results = await group.future;
+
+    }
 
     return updatedWorkout;
   }
