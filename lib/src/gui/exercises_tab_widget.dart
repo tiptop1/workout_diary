@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:workout_diary/src/gui/list_tab_widget.dart';
 
-import '../domain.dart';
-import '../repository.dart';
+import '../model/exercise.dart';
+import '../repository/repository.dart';
 import 'exercise_widgets.dart';
 
 enum ExerciseAction { modify, delete }

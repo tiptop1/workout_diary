@@ -3,9 +3,11 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
-import 'package:workout_diary/src/domain.dart';
 import 'package:workout_diary/src/gui/progress_widget.dart';
-import 'package:workout_diary/src/repository.dart';
+import 'package:workout_diary/src/repository/repository.dart';
+
+import '../model/exercise.dart';
+import '../model/workout.dart';
 
 const String dateLackMarker = '-';
 
@@ -157,10 +159,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           preComment: _preCommentController.value.text,
           postComment: _postCommentController.value.text);
       var repo = Repository.of(context);
-      repo.insertWorkout(workout).then((insertedWorkout) => repo
-          .insertAllWorkoutEntries(
-              _createWorkoutEntriesList(insertedWorkout, _entryTuples))
-          .then((insertedEntriesList) => Navigator.pop(context, true)));
+      repo
+          .insertWorkout(workout)
+          .then((insertedWorkout) => Navigator.pop(context, true));
       // TODO: Add error handling for workout insert.
       setState(() => _inProgress = true);
     }
@@ -200,17 +201,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           border: OutlineInputBorder(),
           hintText: appLocalizations.workoutPostcommentHint),
     );
-  }
-
-  List<WorkoutEntry> _createWorkoutEntriesList(Workout workout,
-      List<Tuple2<Exercise, TextEditingController>> entryTuples) {
-    var entries = <WorkoutEntry>[];
-    _entryTuples.forEach((t) => entries.add(WorkoutEntry(
-          exercise: t.item1,
-          workout: workout,
-          details: t.item2.value.text,
-        )));
-    return entries;
   }
 
   Widget _createWorkoutEntryListTile(

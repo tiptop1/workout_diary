@@ -6,7 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../config.dart';
-import '../repository.dart';
+import '../repository/exercise_dao.dart';
+import '../repository/repository.dart';
+import '../repository/workout_entries_dao.dart';
+import '../repository/workouts_dao.dart';
 import 'progress_widget.dart';
 
 class AppInitializationWidget extends StatefulWidget {
