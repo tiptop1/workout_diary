@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
+import 'package:workout_diary/src/model/db/sqlite_result_codes.dart';
 
-import '../model/exercise.dart';
+import '../exercise.dart';
 
 class ExercisesDao {
   static const table = 'exercises';
@@ -9,15 +10,11 @@ class ExercisesDao {
   static const colName = 'name';
   static const colDescription = 'description';
 
-  final Database _database;
-
-  const ExercisesDao(this._database);
-
   /// Find all [Exercise] summaries - just id and name.
   /// Returns list of found [Exercise]s.
-  Future<List<Exercise>> findAllSummaries() async {
+  Future<List<Exercise>> findAllSummaries(Transaction txn) async {
     List<Map<String, dynamic>> records =
-        await _database.query(table, orderBy: colName);
+        await txn.query(table, orderBy: colName);
     return List.generate(records.length, (index) {
       return Exercise(
         id: records[index][colId] as int?,
@@ -28,8 +25,8 @@ class ExercisesDao {
 
   /// Find details of [Exercise] with given [id].
   /// Returns [Exercise] if found otherwise null.
-  Future<Exercise?> findDetails(int id) async {
-    List<Map<String, dynamic>> records = await _database.query(
+  Future<Exercise?> findDetails(int id, Transaction txn) async {
+    List<Map<String, dynamic>> records = await txn.query(
       table,
       where: '$colId = ?',
       whereArgs: [id],
@@ -48,36 +45,45 @@ class ExercisesDao {
 
   /// Insert [Excercise] into repository.
   /// Returns [Excercise] with id.
-  Future<Exercise> insert(Exercise exercise) async {
+  Future<Exercise> insert(Exercise exercise, Transaction txn) async {
     assert(exercise.id == null);
     var name = exercise.name;
     var description = exercise.description;
-    var id = await _database.insert(
+    var id = await txn.insert(
       table,
       {
         colName: name,
         colDescription: description,
       },
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.rollback,
     );
-    return Exercise(
-      id: id,
-      name: name,
-      description: description,
-    );
+    if (id == SqliteResultCodes.sqliteConstraint.code) {
+      throw Exception('Could not insert exercise - result code: $id.');
+    } else {
+      return Exercise(
+        id: id,
+        name: name,
+        description: description,
+      );
+    }
   }
 
   /// Update [Excrcise] in repository.
   /// Returns count of updated exercise records.
-  Future<int> update(Exercise exercise) {
-    return _database.update(
+  Future<Exercise> update(Exercise exercise, Transaction txn) async {
+    var resultCode = await txn.update(
         table, {colName: exercise.name, colDescription: exercise.description},
-        where: '$colId = ?', whereArgs: [exercise.id]);
+        where: '$colId = ?', whereArgs: [exercise.id], conflictAlgorithm: ConflictAlgorithm.rollback);
+    if (resultCode != 1) {
+      throw Exception('Could not update exercise with id:${exercise.id} - result code: $resultCode.');
+    } else {
+      return exercise;
+    }
   }
 
   /// Delete [Exercise] with given [id].
   /// Returns count of deleted [Exercise]s.
-  Future<int> delete(int id) async {
-    return _database.delete(table, where: '$colId = ?', whereArgs: [id]);
+  Future<int> delete(int id, Transaction txn) {
+    return txn.delete(table, where: '$colId = ?', whereArgs: [id]);
   }
 }

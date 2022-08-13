@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../model/exercise.dart';
-import '../repository/repository.dart';
+import '../model/repository.dart';
 import 'progress_widget.dart';
 
 class ExerciseWidget extends StatefulWidget {

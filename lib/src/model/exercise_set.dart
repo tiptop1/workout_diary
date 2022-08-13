@@ -1,17 +1,17 @@
 import 'entity.dart';
 import 'exercise.dart';
 
-class WorkoutEntry extends Entity {
+class ExerciseSet extends Entity {
   static const exerciseField = 'exercise';
   static const detailsField = 'details';
 
   final Exercise exercise;
   final String details;
 
-  const WorkoutEntry({int? id, required this.exercise, required this.details})
+  const ExerciseSet({int? id, required this.exercise, required this.details})
       : super(id: id);
 
-  WorkoutEntry.fromJson(Map<String, dynamic> json)
+  ExerciseSet.fromJson(Map<String, dynamic> json)
       : this(
             id: json[Entity.idField],
             exercise: Exercise.fromJson(json),

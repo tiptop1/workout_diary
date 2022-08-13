@@ -1,4 +1,4 @@
-import 'package:workout_diary/src/model/workout_entry.dart';
+import 'package:workout_diary/src/model/exercise_set.dart';
 
 import 'entity.dart';
 
@@ -8,14 +8,13 @@ class Workout extends Entity {
   static const titleField = 'title';
   static const preCommentField = 'preComment';
   static const postCommentField = 'postComment';
-  static const entitiesField = 'entities';
 
   final DateTime? startTime;
   final DateTime? endTime;
   final String title;
   final String? preComment;
   final String? postComment;
-  final List<WorkoutEntry> _entities = [];
+  final List<ExerciseSet> _exerciseSets;
 
   Workout(
       {int? id,
@@ -23,8 +22,10 @@ class Workout extends Entity {
       this.endTime,
       required this.title,
       this.preComment,
-      this.postComment})
+      this.postComment,
+      List<ExerciseSet> exerciseSets = const []})
       : assert(title.isNotEmpty),
+        _exerciseSets = List.unmodifiable(exerciseSets),
         super(id: id);
 
   Workout.formJson(Map<String, dynamic> json)
@@ -36,12 +37,7 @@ class Workout extends Entity {
             preComment: json[preCommentField],
             postComment: json[postCommentField]);
 
-  List<WorkoutEntry> get entities => List.unmodifiable(_entities);
-
-  void addWorkoutEntry(WorkoutEntry entry) => _entities.add(entry);
-
-  void removeWorkoutEntry(WorkoutEntry entry) =>
-      _entities.remove(_entities.firstWhere((e) => entry.id == e.id));
+  List<ExerciseSet> get exerciseSets => _exerciseSets;
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = super.toJson();
@@ -50,7 +46,7 @@ class Workout extends Entity {
     json[titleField] = title;
     json[preCommentField] = preComment;
     json[postCommentField] = postComment;
-    json[entitiesField] = _entities;
+    json['exerciseSets'] = _exerciseSets;
     return json;
   }
 

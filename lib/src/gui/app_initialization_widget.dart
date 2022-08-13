@@ -6,10 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../config.dart';
-import '../repository/exercise_dao.dart';
-import '../repository/repository.dart';
-import '../repository/workout_entries_dao.dart';
-import '../repository/workouts_dao.dart';
+import '../model/db/exercise_set_dao.dart';
+import '../model/db/exercises_dao.dart';
+import '../model/db/workouts_dao.dart';
+import '../model/repository.dart';
 import 'progress_widget.dart';
 
 class AppInitializationWidget extends StatefulWidget {
@@ -76,7 +76,7 @@ class _AppInitializationWidgetState extends State<AppInitializationWidget> {
           'CREATE TABLE ${ExercisesDao.table}(${ExercisesDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${ExercisesDao.colName} TEXT NOT NULL, ${ExercisesDao.colDescription} TEXT)',
         );
         db.execute(
-            'CREATE TABLE ${WorkoutEntriesDao.table}(${WorkoutEntriesDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutEntriesDao.colExerciseId} INTEGER NOT NULL, ${WorkoutEntriesDao.colWorkoutId} INTEGER NOT NULL, ${WorkoutEntriesDao.colDetails} TEXT, FOREIGN KEY (${WorkoutEntriesDao.colExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}) ON DELETE CASCADE, FOREIGN KEY (${WorkoutEntriesDao.colWorkoutId}) REFERENCES ${WorkoutsDao.table}(${WorkoutsDao.colId}) ON DELETA CASCADE)');
+            'CREATE TABLE ${ExerciseSetsDao.table}(${ExerciseSetsDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${ExerciseSetsDao.colExerciseId} INTEGER NOT NULL, ${ExerciseSetsDao.colWorkoutId} INTEGER NOT NULL, ${ExerciseSetsDao.colDetails} TEXT, FOREIGN KEY (${ExerciseSetsDao.colExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}) ON DELETE CASCADE, FOREIGN KEY (${ExerciseSetsDao.colWorkoutId}) REFERENCES ${WorkoutsDao.table}(${WorkoutsDao.colId}) ON DELETE CASCADE)');
         db.execute(
             'CREATE TABLE ${WorkoutsDao.table}(${WorkoutsDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colStartTime} INTEGER, ${WorkoutsDao.colEndTime} INTEGER, ${WorkoutsDao.colTitle} TEXT NOT NULL, ${WorkoutsDao.colPreComment} TEXT, ${WorkoutsDao.colPostComment} TEXT)');
       },

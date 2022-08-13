@@ -6,7 +6,7 @@ import 'package:workout_diary/src/gui/list_tab_widget.dart';
 import 'package:workout_diary/src/gui/workout_widgets.dart';
 
 import '../model/workout.dart';
-import '../repository/repository.dart';
+import '../model/repository.dart';
 
 class AllWorkoutsTabWidget extends ListOnTabWidget {
   const AllWorkoutsTabWidget({Key? key}) : super(key: key);
