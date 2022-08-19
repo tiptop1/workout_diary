@@ -2,6 +2,7 @@ import 'entity.dart';
 import 'exercise.dart';
 
 class ExerciseSet extends Entity {
+  // TODO: Add order column
   static const exerciseField = 'exercise';
   static const detailsField = 'details';
 

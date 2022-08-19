@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'exercise.dart';
+import 'exercise_set.dart';
 import 'workout.dart';
 
 class Repository {
@@ -29,16 +30,15 @@ class Repository {
   static const _colWorkoutPreComment = 'wr_preComment';
   static const _colWorkoutPostComment = 'wr_postComment';
 
-  late final Database _db;
-  static const _dbVersion = 1;
-  static const _dbName = 'workout_diary.db';
+  static late final Database _db;
   static const _sqliteConstraintResultCode = 19;
 
   Repository._internal();
 
-  Future<Repository> init() async {
+  static Future<Repository> init(
+      {String dbName = 'workout_diary.db', int dbVersion = 1}) async {
     _db = await openDatabase(
-      join(await getDatabasesPath(), _dbName),
+      join(await getDatabasesPath(), dbName),
       onCreate: (db, version) {
         db.execute(
           'CREATE TABLE $_tableExercises($_colExerciseId INTEGER PRIMARY KEY AUTOINCREMENT, $_colExerciseName TEXT NOT NULL, $_colExerciseDescription TEXT)',
@@ -48,10 +48,13 @@ class Repository {
         db.execute(
             'CREATE TABLE $_tableWorkouts($_colWorkoutId INTEGER PRIMARY KEY AUTOINCREMENT, $_colWorkoutStartTime INTEGER, $_colWorkoutEndTime INTEGER, $_colWorkoutTitle TEXT NOT NULL, $_colWorkoutPreComment TEXT, $_colWorkoutPostComment TEXT)');
       },
-      version: _dbVersion,
+      version: dbVersion,
     );
+
     return Repository._internal();
   }
+
+  void dispose() => _db.close();
 
   Future<List<Exercise>> findAllExerciseSummaries() async {
     List<Map<String, dynamic>> records =
@@ -88,10 +91,7 @@ class Repository {
     var description = exercise.description;
     var id = await _db.insert(
       _tableExercises,
-      {
-        _colExerciseName: name,
-        _colExerciseDescription: description,
-      },
+      _exerciseToMap(exercise),
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
     if (id == _sqliteConstraintResultCode) {
@@ -107,11 +107,7 @@ class Repository {
 
   Future<Exercise?> updateExercise(Exercise exercise) async {
     var affectedRowsCount = await _db.update(
-        _tableExercises,
-        {
-          _colExerciseName: exercise.name,
-          _colExerciseDescription: exercise.description
-        },
+        _tableExercises, _exerciseToMap(exercise),
         where: '$_colExerciseId = ?',
         whereArgs: [exercise.id],
         conflictAlgorithm: ConflictAlgorithm.fail);
@@ -154,7 +150,9 @@ class Repository {
 
   Future<int> countExerciseSets(int exerciseId) async {
     const countAlias = 'entriesCount';
-    List<Map<String, Object?>> result = await _db.rawQuery('SELECT count(*) AS \'$countAlias\' FROM $_tableExerciseSets WHERE $_colExerciseSetExerciseId = ?', [exerciseId]);
+    List<Map<String, Object?>> result = await _db.rawQuery(
+        'SELECT count(*) AS \'$countAlias\' FROM $_tableExerciseSets WHERE $_colExerciseSetExerciseId = ?',
+        [exerciseId]);
     int count = 0;
     if (result.length > 0) {
       var firstResult = result.first;
@@ -166,51 +164,186 @@ class Repository {
   }
 
   Future<Workout> insertWorkout(Workout workout) async {
-    _db.transaction((txn) async {
-       var workoutId = await txn.insert(_tableWorkouts,
-        {
-          _colWorkoutStartTime: workout.startTime,
-          _colWorkoutEndTime: workout.endTime,
-          _colWorkoutTitle: workout.title,
-          _colWorkoutPreComment: workout.preComment,
-          _colWorkoutPostComment: workout.postComment
-        },
+    assert(workout.id == null,
+        'Could not insert already inserted (having id) workout.');
+    var workoutId;
+    List<ExerciseSet> exerciseSets = await _db.transaction((txn) async {
+      workoutId = await txn.insert(
+        _tableWorkouts,
+        _workoutToMap(workout),
         conflictAlgorithm: ConflictAlgorithm.rollback,
       );
-      _insertExerciseSets(workoutId, exerciseSets, txn);
-    }
+      if (workoutId == _sqliteConstraintResultCode) {
+        throw Exception(
+            'Result code: $workoutId. Could not insert workout $workout.');
+      }
+      return await _insertExerciseSets(workoutId, workout.exerciseSets, txn);
+    });
+    return Workout(
+      id: workoutId,
+      startTime: workout.startTime,
+      endTime: workout.endTime,
+      title: workout.title,
+      preComment: workout.preComment,
+      postComment: workout.postComment,
+      exerciseSets: exerciseSets,
+    );
   }
 
-  Future<Workout> updateWorkout(Workout workout) {
-    return database.transaction((txn) => _workoutDao.update(workout, txn));
+  Future<Workout> updateWorkout(Workout workout) async {
+    assert(workout.id != null, 'Could not update workout without id.');
+    var insertedExerciseSets = <int, ExerciseSet>{};
+    var exerciseSetIdsToDelete =
+        await _findExerciseSetIdsByWorkoutId(workout.id!);
+    var results = await _db.transaction((txn) async {
+      var batch = txn.batch();
+      _updateWorkoutInBatch(workout, batch);
+      var i = 0;
+      for (var es in workout.exerciseSets) {
+        if (es.id == null) {
+          insertedExerciseSets[i++] = es;
+          _insertExerciseSetInBatch(es, workout.id!, batch);
+        } else {
+          _updateExerciseSetInBatch(es, workout.id!, batch);
+        }
+      }
+      _deleteExerciseSetsInBatch(exerciseSetIdsToDelete, batch);
+      batch.commit();
+    });
+    return _toWorkout(workout, insertedExerciseSets, results);
   }
 
-  Future<int> deleteWorkout(int id) {
-    return database.transaction((txn) => _workoutDao.delete(id, txn));
-  }
+  Future<int> deleteWorkout(int id) async =>
+      _db.delete(_tableWorkouts, where: '$_colWorkoutId = ?', whereArgs: [id]);
 
-  Future<List<ExerciseSet>> _insertExerciseSets(int workoutId,
-      List<ExerciseSet> exerciseSets, Transaction txn) async {
+  Future<List<ExerciseSet>> _insertExerciseSets(
+      int workoutId, List<ExerciseSet> exerciseSets, Transaction txn) async {
     var batch = txn.batch();
     for (var es in exerciseSets) {
       batch.insert(
-          table,
+          _tableExerciseSets,
           {
-            colExerciseId: es.exercise.id,
-            colWorkoutId: workoutId,
-            colDetails: es.details,
+            ..._exerciseSetToMap(es),
+            _colExerciseSetWorkoutId: workoutId,
           },
           conflictAlgorithm: ConflictAlgorithm.rollback);
     }
     var insertResult = await batch.commit();
     if (insertResult is int) {
       throw Exception(
-          'Could not insert exercise set because of error code: $insertResult.');
+          'Result code: $insertResult. Could not insert exercise sets.');
     } else if (insertResult is List<int>) {
       return _toExerciseSet(exerciseSets, insertResult);
     } else {
       throw Exception(
           'Insert result has unknown type: ${insertResult.runtimeType}.');
     }
+  }
+
+  List<ExerciseSet> _toExerciseSet(
+      List<ExerciseSet> exerciseSets, List<int> insertedIds) {
+    assert(exerciseSets.length == insertedIds.length,
+        'Exercise set list length (${exerciseSets.length} different than inserted ids list length (${insertedIds.length}).');
+    return List.generate(
+        exerciseSets.length,
+        (i) => ExerciseSet(
+              id: insertedIds[i],
+              exercise: exerciseSets[i].exercise,
+              details: exerciseSets[i].details,
+            ));
+  }
+
+  Future<List<int>> _findExerciseSetIdsByWorkoutId(int workoutId) async {
+    List<Map<String, dynamic>> records = await _db.query(_tableExerciseSets,
+        distinct: true,
+        columns: [_colExerciseSetId],
+        where: '$_colExerciseSetWorkoutId = ?',
+        whereArgs: [workoutId],
+        orderBy: '$_colExerciseSetId asc');
+    return List.generate(
+        records.length, (index) => records[index][_colExerciseSetId]);
+  }
+
+  void _updateWorkoutInBatch(Workout workout, Batch batch) {
+    batch.update(_tableWorkouts, _workoutToMap(workout),
+        where: '$_colWorkoutId = ?',
+        whereArgs: [workout.id],
+        conflictAlgorithm: ConflictAlgorithm.rollback);
+  }
+
+  Map<String, Object?> _exerciseToMap(Exercise exercise) => {
+        _colExerciseName: exercise.name,
+        _colExerciseDescription: exercise.description,
+      };
+
+  Map<String, Object?> _workoutToMap(Workout workout) => {
+        _colWorkoutStartTime: workout.startTime,
+        _colWorkoutEndTime: workout.endTime,
+        _colWorkoutTitle: workout.title,
+        _colWorkoutPreComment: workout.preComment,
+        _colWorkoutPostComment: workout.postComment,
+      };
+
+  Map<String, Object?> _exerciseSetToMap(ExerciseSet exerciseSet) => {
+        _colExerciseSetExerciseId: exerciseSet.exercise.id,
+        _colExerciseSetDetails: exerciseSet.details,
+      };
+
+  void _insertExerciseSetInBatch(
+      ExerciseSet exerciseSet, int workoutId, Batch batch) {
+    batch.insert(
+        _tableExerciseSets,
+        {
+          ..._exerciseSetToMap(exerciseSet),
+          _colExerciseSetWorkoutId: workoutId,
+        },
+        conflictAlgorithm: ConflictAlgorithm.rollback);
+  }
+
+  void _updateExerciseSetInBatch(
+      ExerciseSet exerciseSet, int workoutId, Batch batch) {
+    batch.update(
+      _tableExerciseSets,
+      {
+        ..._exerciseSetToMap(exerciseSet),
+        _colExerciseSetWorkoutId: workoutId,
+      },
+      where: '$_colExerciseSetId = ?',
+      whereArgs: [exerciseSet.id!],
+      conflictAlgorithm: ConflictAlgorithm.rollback,
+    );
+  }
+
+  void _deleteExerciseSetsInBatch(List<int> exerciseSetIds, Batch batch) {
+    batch.delete(_tableExerciseSets,
+        where:
+            '$_colExerciseSetId in (${exerciseSetIds.map((e) => "?").join(",")})',
+        whereArgs: exerciseSetIds);
+  }
+
+  Workout _toWorkout(Workout workout,
+      Map<int, ExerciseSet> insertedExerciseSets, List<int> results) {
+    if (results.firstWhere((e) => e == _sqliteConstraintResultCode,
+            orElse: () => -1) <
+        0) {
+      throw Exception('Could not update workout $workout.');
+    }
+    var exerciseSets = List.generate(workout.exerciseSets.length, (i) {
+      var es = workout.exerciseSets[i];
+      if (es.id == null) {
+        es = ExerciseSet(
+            id: results[i + 1], exercise: es.exercise, details: es.details);
+      }
+      return es;
+    });
+    return Workout(
+      id: workout.id,
+      startTime: workout.startTime,
+      endTime: workout.endTime,
+      title: workout.title,
+      preComment: workout.preComment,
+      postComment: workout.postComment,
+      exerciseSets: exerciseSets,
+    );
   }
 }
