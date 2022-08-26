@@ -24,6 +24,19 @@ class Exercise extends Entity {
     return json;
   }
 
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Exercise &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          description == other.description;
+
+  @override
+  int get hashCode => id.hashCode ^ name.hashCode ^ description.hashCode;
+
   @override
   String toString() {
     return toJson().toString();
