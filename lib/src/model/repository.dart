@@ -8,6 +8,9 @@ import 'exercise_set.dart';
 import 'workout.dart';
 
 class Repository {
+  static const _defaultDbName = 'workout_diary.db';
+  static const _defaultDbVersion = 1;
+
   // Exercises
   static const _tableExercises = 'exercises';
   static const _colExerciseId = 'ex_id';
@@ -35,10 +38,10 @@ class Repository {
 
   Repository._internal();
 
-  static Future<Repository> init(
-      {String dbName = 'workout_diary.db', int dbVersion = 1}) async {
+  static Future<Repository> init({String? dbPath, int? dbVersion}) async {
     _db = await openDatabase(
-      join(await getDatabasesPath(), dbName),
+      dbPath ?? join(await getDatabasesPath(), _defaultDbName),
+      version: dbVersion ?? _defaultDbVersion,
       onCreate: (db, version) {
         db.execute(
           'CREATE TABLE $_tableExercises($_colExerciseId INTEGER PRIMARY KEY AUTOINCREMENT, $_colExerciseName TEXT NOT NULL, $_colExerciseDescription TEXT)',
@@ -48,7 +51,6 @@ class Repository {
         db.execute(
             'CREATE TABLE $_tableWorkouts($_colWorkoutId INTEGER PRIMARY KEY AUTOINCREMENT, $_colWorkoutStartTime INTEGER, $_colWorkoutEndTime INTEGER, $_colWorkoutTitle TEXT NOT NULL, $_colWorkoutPreComment TEXT, $_colWorkoutPostComment TEXT)');
       },
-      version: dbVersion,
     );
 
     return Repository._internal();
