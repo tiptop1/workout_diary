@@ -1,4 +1,4 @@
-import 'package:workout_diary/src/model/exercise_set.dart';
+import 'exercise_set.dart';
 
 import 'entity.dart';
 
