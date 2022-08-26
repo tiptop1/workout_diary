@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -34,11 +35,11 @@ class Repository {
   static const _colWorkoutPostComment = 'wr_postComment';
 
   static late final Database _db;
-  static const _sqliteConstraintResultCode = 19;
 
   Repository._internal();
 
   static Future<Repository> init({String? dbPath, int? dbVersion}) async {
+    WidgetsFlutterBinding.ensureInitialized();
     _db = await openDatabase(
       dbPath ?? join(await getDatabasesPath(), _defaultDbName),
       version: dbVersion ?? _defaultDbVersion,
@@ -96,33 +97,20 @@ class Repository {
       _exerciseToMap(exercise),
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
-    if (id == _sqliteConstraintResultCode) {
-      throw Exception('Result code: $id. Could not insert exercise $exercise.');
-    } else {
-      return Exercise(
-        id: id,
-        name: name,
-        description: description,
-      );
-    }
+    return Exercise(
+      id: id,
+      name: name,
+      description: description,
+    );
   }
 
   Future<Exercise?> updateExercise(Exercise exercise) async {
-    var affectedRowsCount = await _db.update(
+    var updatedRowsCount = await _db.update(
         _tableExercises, _exerciseToMap(exercise),
         where: '$_colExerciseId = ?',
         whereArgs: [exercise.id],
         conflictAlgorithm: ConflictAlgorithm.fail);
-    var updatedExercise;
-    if (affectedRowsCount > 1) {
-      if (affectedRowsCount == _sqliteConstraintResultCode) {
-        throw Exception(
-            'Result code: $affectedRowsCount. Could not update exercise $exercise.');
-      } else {
-        updatedExercise = exercise;
-      }
-    }
-    return updatedExercise;
+    return updatedRowsCount == 1 ? exercise : null;
   }
 
   Future<int> deleteExercise(int id) {
@@ -175,10 +163,6 @@ class Repository {
         _workoutToMap(workout),
         conflictAlgorithm: ConflictAlgorithm.rollback,
       );
-      if (workoutId == _sqliteConstraintResultCode) {
-        throw Exception(
-            'Result code: $workoutId. Could not insert workout $workout.');
-      }
       return await _insertExerciseSets(workoutId, workout.exerciseSets, txn);
     });
     return Workout(
@@ -192,7 +176,7 @@ class Repository {
     );
   }
 
-  Future<Workout> updateWorkout(Workout workout) async {
+  Future<Workout?> updateWorkout(Workout workout) async {
     assert(workout.id != null, 'Could not update workout without id.');
     var insertedExerciseSets = <int, ExerciseSet>{};
     var exerciseSetIdsToDelete =
@@ -325,11 +309,6 @@ class Repository {
 
   Workout _toWorkout(Workout workout,
       Map<int, ExerciseSet> insertedExerciseSets, List<int> results) {
-    if (results.firstWhere((e) => e == _sqliteConstraintResultCode,
-            orElse: () => -1) <
-        0) {
-      throw Exception('Could not update workout $workout.');
-    }
     var exerciseSets = List.generate(workout.exerciseSets.length, (i) {
       var es = workout.exerciseSets[i];
       if (es.id == null) {
