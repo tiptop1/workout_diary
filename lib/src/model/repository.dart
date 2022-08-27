@@ -163,7 +163,8 @@ class Repository {
         _workoutToMap(workout),
         conflictAlgorithm: ConflictAlgorithm.rollback,
       );
-      return await _insertExerciseSets(workoutId, workout.exerciseSets, txn);
+      return _toExerciseSet(workout.exerciseSets,
+          await _insertExerciseSets(workoutId, workout.exerciseSets, txn));
     });
     return Workout(
       id: workoutId,
@@ -202,7 +203,7 @@ class Repository {
   Future<int> deleteWorkout(int id) async =>
       _db.delete(_tableWorkouts, where: '$_colWorkoutId = ?', whereArgs: [id]);
 
-  Future<List<ExerciseSet>> _insertExerciseSets(
+  Future<List<Object?>> _insertExerciseSets(
       int workoutId, List<ExerciseSet> exerciseSets, Transaction txn) async {
     var batch = txn.batch();
     for (var es in exerciseSets) {
@@ -214,26 +215,17 @@ class Repository {
           },
           conflictAlgorithm: ConflictAlgorithm.rollback);
     }
-    var insertResult = await batch.commit();
-    if (insertResult is int) {
-      throw Exception(
-          'Result code: $insertResult. Could not insert exercise sets.');
-    } else if (insertResult is List<int>) {
-      return _toExerciseSet(exerciseSets, insertResult);
-    } else {
-      throw Exception(
-          'Insert result has unknown type: ${insertResult.runtimeType}.');
-    }
+    return batch.commit();
   }
 
   List<ExerciseSet> _toExerciseSet(
-      List<ExerciseSet> exerciseSets, List<int> insertedIds) {
+      List<ExerciseSet> exerciseSets, List<Object?> insertedIds) {
     assert(exerciseSets.length == insertedIds.length,
         'Exercise set list length (${exerciseSets.length} different than inserted ids list length (${insertedIds.length}).');
     return List.generate(
         exerciseSets.length,
         (i) => ExerciseSet(
-              id: insertedIds[i],
+              id: insertedIds[i] as int,
               exercise: exerciseSets[i].exercise,
               details: exerciseSets[i].details,
             ));
@@ -263,8 +255,8 @@ class Repository {
       };
 
   Map<String, Object?> _workoutToMap(Workout workout) => {
-        _colWorkoutStartTime: workout.startTime,
-        _colWorkoutEndTime: workout.endTime,
+        _colWorkoutStartTime: workout.startTime?.millisecondsSinceEpoch,
+        _colWorkoutEndTime: workout.endTime?.millisecondsSinceEpoch,
         _colWorkoutTitle: workout.title,
         _colWorkoutPreComment: workout.preComment,
         _colWorkoutPostComment: workout.postComment,
