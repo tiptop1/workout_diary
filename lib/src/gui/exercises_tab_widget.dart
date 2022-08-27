@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:workout_diary/src/gui/list_tab_widget.dart';
 
 import '../model/exercise.dart';
@@ -19,7 +20,7 @@ class _AllExercisesState
     extends ListOnTabState<AllExercisesTabWidget, Exercise> {
   @override
   void loadEntities(BuildContext context) {
-    Repository.of(context)
+    GetIt.I.get<Repository>()
         .findAllExerciseSummaries()
         .then((List<Exercise> exercises) {
       setState(() {
@@ -44,7 +45,7 @@ class _AllExercisesState
 
   void listItemDeleteAction(BuildContext context, Exercise exercise) {
     int exerciseId = exercise.id!;
-    Repository.of(context)
+    GetIt.I.get<Repository>()
         .countExerciseSets(exerciseId)
         .then((count) {
       _showDialogAndDeleteExercise(context, count, exerciseId);
@@ -75,7 +76,7 @@ class _AllExercisesState
               TextButton(
                 child: Text(appLocalizations.yes),
                 onPressed: () {
-                  Repository.of(context)
+                  GetIt.I.get<Repository>()
                       .deleteExercise(exerciseId)
                       .then((deletedCount) {
                     if (deletedCount > 0) {

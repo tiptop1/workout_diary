@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 import 'package:workout_diary/src/gui/progress_widget.dart';
@@ -62,7 +63,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     var widget;
     if (_exercises == null) {
       _inProgress = true;
-      Repository.of(context).findAllExerciseSummaries().then((exercises) {
+      GetIt.I.get<Repository>().findAllExerciseSummaries().then((exercises) {
         setState(() {
           _exercises = exercises;
           _inProgress = false;
@@ -158,7 +159,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           title: _titleController.value.text,
           preComment: _preCommentController.value.text,
           postComment: _postCommentController.value.text);
-      var repo = Repository.of(context);
+      var repo = GetIt.I.get<Repository>();
       repo
           .insertWorkout(workout)
           .then((insertedWorkout) => Navigator.pop(context, true));

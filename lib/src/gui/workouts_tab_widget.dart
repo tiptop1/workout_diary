@@ -2,11 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:workout_diary/src/gui/list_tab_widget.dart';
 import 'package:workout_diary/src/gui/workout_widgets.dart';
 
-import '../model/workout.dart';
 import '../model/repository.dart';
+import '../model/workout.dart';
 
 class AllWorkoutsTabWidget extends ListOnTabWidget {
   const AllWorkoutsTabWidget({Key? key}) : super(key: key);
@@ -18,7 +19,8 @@ class AllWorkoutsTabWidget extends ListOnTabWidget {
 class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
   @override
   void loadEntities(BuildContext context) {
-    Repository.of(context)
+    GetIt.I
+        .get<Repository>()
         .findAllWorkoutSummaries()
         .then((List<Workout> workouts) {
       setState(() {
@@ -73,7 +75,8 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
               TextButton(
                 child: Text(appLocalizations.yes),
                 onPressed: () {
-                  Repository.of(context)
+                  GetIt.I
+                      .get<Repository>()
                       .deleteWorkout(workoutId)
                       .then((deletedCount) {
                     if (deletedCount > 0) {

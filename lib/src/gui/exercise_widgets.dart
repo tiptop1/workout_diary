@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 
 import '../model/exercise.dart';
 import '../model/repository.dart';
@@ -52,7 +53,7 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       // Exercise is already created and in database - show or modify it.
       if (_exercise == null) {
         // Load already existed exercise from database.
-        Repository.of(context).findExerciseDetails(exerciseId).then((e) {
+        GetIt.I.get<Repository>().findExerciseDetails(exerciseId).then((e) {
           setState(() {
             _exercise = e;
           });
@@ -202,7 +203,8 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
             ? exerciseDescription
             : null),
       );
-      Repository.of(context)
+      GetIt.I
+          .get<Repository>()
           .insertExercise(exercise)
           .then((Exercise ex) => Navigator.pop(context, true))
           .catchError((error) {
@@ -232,7 +234,8 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
         description:
             (modifiedDescription.trim() == '' ? null : modifiedDescription),
       );
-      Repository.of(context)
+      GetIt.I
+          .get<Repository>()
           .updateExercise(modifiedExercise)
           .then((Exercise? ex) {
         assert(
