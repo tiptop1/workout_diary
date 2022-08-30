@@ -1,6 +1,5 @@
-import 'exercise_set.dart';
-
 import 'entity.dart';
+import 'exercise_set.dart';
 
 class Workout extends Entity {
   static const startTimeField = 'startTime';
@@ -27,6 +26,26 @@ class Workout extends Entity {
       : assert(title.isNotEmpty),
         _exerciseSets = List.unmodifiable(exerciseSets),
         super(id: id);
+
+  Workout copyWith({
+    int? id,
+    DateTime? startTime,
+    DateTime? endTime,
+    String? title,
+    String? preComment,
+    String? postComment,
+    List<ExerciseSet>? exerciseSets,
+  }) {
+    return Workout(
+      id: id ?? this.id,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      title: title ?? this.title,
+      preComment: preComment ?? this.preComment,
+      postComment: postComment ?? this.postComment,
+      exerciseSets: exerciseSets ?? this._exerciseSets,
+    );
+  }
 
   Workout.formJson(Map<String, dynamic> json)
       : this(

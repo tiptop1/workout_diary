@@ -24,6 +24,13 @@ class Exercise extends Entity {
     return json;
   }
 
+  Exercise copyWith({int? id, String? name, String? description}) {
+    return Exercise(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

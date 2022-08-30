@@ -90,18 +90,12 @@ class Repository {
 
   Future<Exercise> insertExercise(Exercise exercise) async {
     assert(exercise.id == null);
-    var name = exercise.name;
-    var description = exercise.description;
     var id = await _db.insert(
       _tableExercises,
       _exerciseToMap(exercise),
       conflictAlgorithm: ConflictAlgorithm.fail,
     );
-    return Exercise(
-      id: id,
-      name: name,
-      description: description,
-    );
+    return exercise.copyWith(id: id);
   }
 
   Future<Exercise?> updateExercise(Exercise exercise) async {
@@ -166,15 +160,7 @@ class Repository {
       return _toExerciseSet(workout.exerciseSets,
           await _insertExerciseSets(workoutId, workout.exerciseSets, txn));
     });
-    return Workout(
-      id: workoutId,
-      startTime: workout.startTime,
-      endTime: workout.endTime,
-      title: workout.title,
-      preComment: workout.preComment,
-      postComment: workout.postComment,
-      exerciseSets: exerciseSets,
-    );
+    return workout.copyWith(id: workoutId, exerciseSets: exerciseSets);
   }
 
   Future<Workout?> updateWorkout(Workout workout) async {
