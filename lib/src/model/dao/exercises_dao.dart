@@ -13,55 +13,45 @@ class ExercisesDao {
 
   ExercisesDao(Database db) : _db = db;
 
-  Future<List<Exercise>> findAllSummaries() async {
+  /// Returns list of all [Exercise]s.
+  Future<List<Exercise>> findAll() async {
     List<Map<String, dynamic>> records =
         await _db.query(table, orderBy: colName);
     return List.generate(records.length, (i) {
+      var record = records[i];
       return Exercise(
-        id: records[i][colId] as int,
-        name: records[i][colName] as String,
+        id: record[colId] as int,
+        name: record[colName] as String,
+        description: record[colDescription] as String,
       );
     });
   }
 
-  Future<Exercise?> findDetails(int id) async {
-    List<Map<String, dynamic>> records = await _db.query(
-      table,
-      where: '$colId = ?',
-      whereArgs: [id],
-    );
-    var exercise;
-    if (records.length == 1) {
-      var record = records.first;
-      exercise = Exercise(
-        id: record[colId] as int,
-        name: record[colName] as String,
-        description: record[colDescription] as String?,
-      );
-    }
-    return exercise;
-  }
-
-  Future<Exercise> insert(Exercise exercise) async {
+  /// Insert [exercise] and returns new id for it.
+  Future<int> insert(Exercise exercise) async {
     assert(exercise.id == null);
-    var id = await _db.insert(
+    return await _db.insert(
       table,
       _toMap(exercise),
       conflictAlgorithm: ConflictAlgorithm.rollback,
     );
-    return exercise.copyWith(id: id);
   }
 
-  Future<Exercise?> update(Exercise exercise) async {
+  /// Update [exercise] and returns true if successful.
+  Future<bool> update(Exercise exercise) async {
     var updatedRowsCount = await _db.update(table, _toMap(exercise),
         where: '$colId = ?',
         whereArgs: [exercise.id],
         conflictAlgorithm: ConflictAlgorithm.rollback);
-    return updatedRowsCount == 1 ? exercise : null;
+    return updatedRowsCount == 1;
   }
 
-  Future<int> delete(int id) =>
-      _db.delete(table, where: '$colId = ?', whereArgs: [id]);
+  /// Delete exercise with given [id] and returns true if successful.
+  Future<bool> delete(int id) async {
+    var deletedRowsCount =
+        await _db.delete(table, where: '$colId = ?', whereArgs: [id]);
+    return deletedRowsCount == 1;
+  }
 
   Map<String, Object?> _toMap(Exercise exercise) => {
         colName: exercise.name,
