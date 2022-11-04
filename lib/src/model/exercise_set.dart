@@ -7,9 +7,9 @@ class ExerciseSet extends Entity {
   static const detailsField = 'details';
 
   final Exercise exercise;
-  final String details;
+  final String? details;
 
-  const ExerciseSet({int? id, required this.exercise, required this.details})
+  const ExerciseSet({int? id, required this.exercise, this.details})
       : super(id: id);
 
   ExerciseSet.fromJson(Map<String, dynamic> json)
