@@ -7,9 +7,8 @@ class Exercise extends Entity {
   final String name;
   final String? description;
 
-  Exercise({int? id, required this.name, this.description})
-      : assert(name.isNotEmpty),
-        super(id: id);
+  const Exercise({int? id, required this.name, this.description})
+      : super(id: id);
 
   Exercise.fromJson(Map<String, dynamic> json)
       : this(
