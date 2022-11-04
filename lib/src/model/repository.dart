@@ -42,31 +42,19 @@ class Repository {
 
   void dispose() => _db.close();
 
-  Future<List<Exercise>> findAllExerciseSummaries() =>
-      _exercisesDao.findAllSummaries();
+  Future<List<Exercise>> findAllExercises() => _exercisesDao.findAll();
 
-  Future<Exercise?> findExerciseDetails(int id) =>
-      _exercisesDao.findDetails(id);
+  Future<int> insertExercise(Exercise exercise) => _exercisesDao.insert(exercise);
 
-  Future<Exercise> insertExercise(Exercise exercise) =>
-      _exercisesDao.insert(exercise);
+  Future<bool> updateExercise(Exercise exercise) => _exercisesDao.update(exercise);
 
-  Future<Exercise?> updateExercise(Exercise exercise) =>
-      _exercisesDao.update(exercise);
+  Future<bool> deleteExercise(int id) => _exercisesDao.delete(id);
 
-  Future<int> deleteExercise(int id) => _exercisesDao.delete(id);
+  Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) => _workoutsDao.findAll(exercises);
 
-  Future<List<Workout>> findAllWorkoutSummaries() =>
-      _workoutsDao.findAllWorkoutSummaries();
+  Future<int> insertWorkout(Workout workout) => _workoutsDao.insertWorkout(workout);
 
-  Future<int> countExerciseSets(int exerciseId) =>
-      _workoutsDao.countExerciseSets(exerciseId);
+  Future<bool> updateWorkout(Workout workout) => _workoutsDao.updateWorkout(workout);
 
-  Future<Workout> insertWorkout(Workout workout) =>
-      _workoutsDao.insertWorkout(workout);
-
-  Future<Workout?> updateWorkout(Workout workout) =>
-      _workoutsDao.updateWorkout(workout);
-
-  Future<int> deleteWorkout(int id) => _workoutsDao.deleteWorkout(id);
+  Future<bool> deleteWorkout(int id) => _workoutsDao.deleteWorkout(id);
 }
