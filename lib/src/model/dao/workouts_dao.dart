@@ -1,5 +1,6 @@
 import 'package:sqflite/sqlite_api.dart';
 
+import '../exercise.dart';
 import '../exercise_set.dart';
 import '../workout.dart';
 
@@ -24,42 +25,24 @@ class WorkoutsDao {
 
   WorkoutsDao(Database db) : _db = db;
 
-  Future<List<Workout>> findAllWorkoutSummaries() async {
-    List<Map<String, dynamic>> records = await _db.query(
+  Future<List<Workout>> findAll(List<Exercise> exercises) async {
+    List<Map<String, Object?>> workoutRecords = await _db.query(
       tableWorkouts,
       orderBy: '$colWorkoutId DESC',
     );
-    return List.generate(records.length, (i) {
-      var startTimeMillis = records[i][colWorkoutStartTime];
-      var endTimeMillis = records[i][colWorkoutEndTime];
-      return Workout(
-          id: records[i][colWorkoutId] as int?,
-          startTime: startTimeMillis != null
-              ? DateTime.fromMillisecondsSinceEpoch(startTimeMillis)
-              : null,
-          endTime: endTimeMillis != null
-              ? DateTime.fromMillisecondsSinceEpoch(endTimeMillis)
-              : null,
-          title: records[i][colWorkoutTitle]);
-    });
+
+    var batch = _db.batch();
+    workoutRecords.forEach((workoutRecord) => batch.query(tableExerciseSets,
+        where: '$colExerciseSetWorkoutId = ?',
+        orderBy: '$colExerciseSetId DESC',
+        whereArgs: [workoutRecord[colWorkoutId]]));
+    List<Map<String, Object?>> exerciseSetRecords =
+        await batch.commit() as List<Map<String, Object?>>;
+
+    return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
 
-  Future<int> countExerciseSets(int exerciseId) async {
-    const countAlias = 'entriesCount';
-    List<Map<String, Object?>> result = await _db.rawQuery(
-        'SELECT count(*) AS \'$countAlias\' FROM $tableExerciseSets WHERE $colExerciseSetExerciseId = ?',
-        [exerciseId]);
-    int count = 0;
-    if (result.length > 0) {
-      var firstResult = result.first;
-      if (firstResult.containsKey(countAlias)) {
-        count = firstResult[countAlias] as int;
-      }
-    }
-    return count;
-  }
-
-  Future<Workout> insertWorkout(Workout workout) async {
+  Future<int> insertWorkout(Workout workout) async {
     assert(workout.id == null,
         'Could not insert already inserted (having id) workout.');
     var workoutId;
@@ -72,10 +55,10 @@ class WorkoutsDao {
       return _toExerciseSet(workout.exerciseSets,
           await _insertExerciseSets(workoutId, workout.exerciseSets, txn));
     });
-    return workout.copyWith(id: workoutId, exerciseSets: exerciseSets);
+    return workoutId;
   }
 
-  Future<Workout?> updateWorkout(Workout workout) async {
+  Future<bool> updateWorkout(Workout workout) async {
     assert(workout.id != null, 'Could not update workout without id.');
     var insertedExerciseSets = <int, ExerciseSet>{};
     var exerciseSetIdsToDelete =
@@ -210,5 +193,52 @@ class WorkoutsDao {
       postComment: workout.postComment,
       exerciseSets: exerciseSets,
     );
+  }
+
+  List<Workout> _createWorkoutsList(List<Map<String, Object?>> workoutRecords,
+      List<Map<String, Object?>> exerciseSetRecords, List<Exercise> exercises) {
+    var workouts = <Workout>[];
+    workoutRecords.forEach((workoutRecord) => workouts.add(_createWorkout(
+        workoutRecord,
+        exerciseSetRecords.where((exerciseSetRecord) =>
+            exerciseSetRecord[colExerciseSetWorkoutId] ==
+            workoutRecord[colWorkoutId]),
+        exercises)));
+    return workouts;
+  }
+
+  Workout _createWorkout(
+      Map<String, Object?> workoutRecord,
+      Iterable<Map<String, Object?>> exerciseSetRecords,
+      List<Exercise> exercises) {
+    var startTime = workoutRecord[colWorkoutStartTime] as int?;
+    var endTime = workoutRecord[colWorkoutEndTime] as int?;
+    return Workout(
+      title: workoutRecord[colWorkoutTitle] as String,
+      id: workoutRecord[colWorkoutId] as int,
+      startTime: startTime != null
+          ? DateTime.fromMillisecondsSinceEpoch(startTime)
+          : null,
+      endTime:
+          endTime != null ? DateTime.fromMillisecondsSinceEpoch(endTime) : null,
+      preComment: workoutRecord[colWorkoutPreComment] as String,
+      postComment: workoutRecord[colWorkoutPostComment] as String,
+      exerciseSets: _createExerciseSetList(exerciseSetRecords, exercises),
+    );
+  }
+
+  List<ExerciseSet> _createExerciseSetList(
+      Iterable<Map<String, Object?>> exerciseSetRecords,
+      List<Exercise> exercises) {
+    var exerciseSet = <ExerciseSet>[];
+    var exercisesMapping =
+        Map.fromIterable(exercises, key: (e) => e.id, value: (e) => e);
+    exerciseSetRecords
+        .forEach((exerciseSetRecord) => exerciseSet.add(ExerciseSet(
+              exercise:
+                  exercisesMapping[exerciseSetRecord[colExerciseSetExerciseId]],
+              details: exerciseSetRecord[colExerciseSetDetails] as String?,
+            )));
+    return exerciseSet;
   }
 }
