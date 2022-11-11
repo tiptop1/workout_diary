@@ -21,7 +21,7 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
   void loadEntities(BuildContext context) {
     GetIt.I
         .get<Repository>()
-        .findAllWorkoutSummaries()
+        .findAllWorkouts()
         .then((List<Workout> workouts) {
       setState(() {
         entities = workouts;
