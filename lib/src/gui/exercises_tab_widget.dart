@@ -21,7 +21,7 @@ class _AllExercisesState
   @override
   void loadEntities(BuildContext context) {
     GetIt.I.get<Repository>()
-        .findAllExerciseSummaries()
+        .findAllExercises()
         .then((List<Exercise> exercises) {
       setState(() {
         entities = exercises;

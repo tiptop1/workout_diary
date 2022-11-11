@@ -63,7 +63,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     var widget;
     if (_exercises == null) {
       _inProgress = true;
-      GetIt.I.get<Repository>().findAllExerciseSummaries().then((exercises) {
+      GetIt.I.get<Repository>().findAllExercises().then((exercises) {
         setState(() {
           _exercises = exercises;
           _inProgress = false;
