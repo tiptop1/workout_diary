@@ -42,7 +42,7 @@ class WorkoutsDao {
     return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
 
-  Future<int> insertWorkout(Workout workout) async {
+  Future<Workout> insertWorkout(Workout workout) async {
     assert(workout.id == null,
         'Could not insert already inserted (having id) workout.');
     var workoutId;
@@ -55,10 +55,10 @@ class WorkoutsDao {
       return _toExerciseSet(workout.exerciseSets,
           await _insertExerciseSets(workoutId, workout.exerciseSets, txn));
     });
-    return workoutId;
+    return workout.copyWith(id: workoutId, exerciseSets: exerciseSets);
   }
 
-  Future<bool> updateWorkout(Workout workout) async {
+  Future<Workout> updateWorkout(Workout workout) async {
     assert(workout.id != null, 'Could not update workout without id.');
     var insertedExerciseSets = <int, ExerciseSet>{};
     var exerciseSetIdsToDelete =
@@ -81,8 +81,8 @@ class WorkoutsDao {
     return _toWorkout(workout, insertedExerciseSets, results);
   }
 
-  Future<int> deleteWorkout(int id) async =>
-      _db.delete(tableWorkouts, where: '$colWorkoutId = ?', whereArgs: [id]);
+  Future<bool> deleteWorkout(int id) async =>
+      await _db.delete(tableWorkouts, where: '$colWorkoutId = ?', whereArgs: [id]) == 1;
 
   Future<List<Object?>> _insertExerciseSets(
       int workoutId, List<ExerciseSet> exerciseSets, Transaction txn) async {

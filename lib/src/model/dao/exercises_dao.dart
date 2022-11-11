@@ -28,22 +28,25 @@ class ExercisesDao {
   }
 
   /// Insert [exercise] and returns new id for it.
-  Future<int> insert(Exercise exercise) async {
+  Future<Exercise> insert(Exercise exercise) async {
     assert(exercise.id == null);
-    return await _db.insert(
+    var exerciseId = await _db.insert(
       table,
       _toMap(exercise),
       conflictAlgorithm: ConflictAlgorithm.rollback,
     );
+    return exercise.copyWith(id: exerciseId);
   }
 
   /// Update [exercise] and returns true if successful.
-  Future<bool> update(Exercise exercise) async {
+  Future<Exercise> update(Exercise exercise) async {
     var updatedRowsCount = await _db.update(table, _toMap(exercise),
         where: '$colId = ?',
         whereArgs: [exercise.id],
         conflictAlgorithm: ConflictAlgorithm.rollback);
-    return updatedRowsCount == 1;
+    return updatedRowsCount == 1
+        ? exercise
+        : throw Exception('Could not update exercise with id: ${exercise.id}.');
   }
 
   /// Delete exercise with given [id] and returns true if successful.

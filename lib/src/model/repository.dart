@@ -23,7 +23,6 @@ class Repository {
         _workoutsDao = WorkoutsDao(db);
 
   static Future<Repository> init({String? dbPath, int? dbVersion}) async {
-    WidgetsFlutterBinding.ensureInitialized();
     var db = await openDatabase(
       dbPath ?? join(await getDatabasesPath(), _defaultDbName),
       version: dbVersion ?? _defaultDbVersion,
@@ -44,17 +43,17 @@ class Repository {
 
   Future<List<Exercise>> findAllExercises() => _exercisesDao.findAll();
 
-  Future<int> insertExercise(Exercise exercise) => _exercisesDao.insert(exercise);
+  Future<Exercise> insertExercise(Exercise exercise) => _exercisesDao.insert(exercise);
 
-  Future<bool> updateExercise(Exercise exercise) => _exercisesDao.update(exercise);
+  Future<Exercise> updateExercise(Exercise exercise) => _exercisesDao.update(exercise);
 
   Future<bool> deleteExercise(int id) => _exercisesDao.delete(id);
 
   Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) => _workoutsDao.findAll(exercises);
 
-  Future<int> insertWorkout(Workout workout) => _workoutsDao.insertWorkout(workout);
+  Future<Workout> insertWorkout(Workout workout) => _workoutsDao.insertWorkout(workout);
 
-  Future<bool> updateWorkout(Workout workout) => _workoutsDao.updateWorkout(workout);
+  Future<Workout> updateWorkout(Workout workout) => _workoutsDao.updateWorkout(workout);
 
   Future<bool> deleteWorkout(int id) => _workoutsDao.deleteWorkout(id);
 }
