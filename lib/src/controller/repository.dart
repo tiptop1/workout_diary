@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../model/exercise.dart';
+import '../model/workout.dart';
 import 'dao/exercises_dao.dart';
 import 'dao/workouts_dao.dart';
-import 'exercise.dart';
-import 'workout.dart';
 
 class Repository {
   static const _defaultDbName = 'workout_diary.db';
@@ -43,17 +42,22 @@ class Repository {
 
   Future<List<Exercise>> findAllExercises() => _exercisesDao.findAll();
 
-  Future<Exercise> insertExercise(Exercise exercise) => _exercisesDao.insert(exercise);
+  Future<Exercise> insertExercise(Exercise exercise) =>
+      _exercisesDao.insert(exercise);
 
-  Future<Exercise> updateExercise(Exercise exercise) => _exercisesDao.update(exercise);
+  Future<Exercise> updateExercise(Exercise exercise) =>
+      _exercisesDao.update(exercise);
 
   Future<bool> deleteExercise(int id) => _exercisesDao.delete(id);
 
-  Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) => _workoutsDao.findAll(exercises);
+  Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) =>
+      _workoutsDao.findAll(exercises);
 
-  Future<Workout> insertWorkout(Workout workout) => _workoutsDao.insertWorkout(workout);
+  Future<Workout> insertWorkout(Workout workout) =>
+      _workoutsDao.insertWorkout(workout);
 
-  Future<Workout> updateWorkout(Workout workout) => _workoutsDao.updateWorkout(workout);
+  Future<Workout> updateWorkout(Workout workout) =>
+      _workoutsDao.updateWorkout(workout);
 
   Future<bool> deleteWorkout(int id) => _workoutsDao.deleteWorkout(id);
 }

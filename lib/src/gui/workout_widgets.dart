@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 import 'package:workout_diary/src/gui/progress_widget.dart';
-import 'package:workout_diary/src/model/repository.dart';
+import 'package:workout_diary/src/controller/repository.dart';
 
 import '../model/exercise.dart';
 import '../model/workout.dart';

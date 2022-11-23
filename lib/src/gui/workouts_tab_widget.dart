@@ -2,11 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:get_it/get_it.dart';
 import 'package:workout_diary/src/gui/list_tab_widget.dart';
 import 'package:workout_diary/src/gui/workout_widgets.dart';
 
-import '../model/repository.dart';
+import '../controller/repository.dart';
 import '../model/workout.dart';
 
 class AllWorkoutsTabWidget extends ListOnTabWidget {

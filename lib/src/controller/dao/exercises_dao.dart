@@ -1,6 +1,6 @@
 import 'package:sqflite/sqlite_api.dart';
 
-import '../exercise.dart';
+import '../../model/exercise.dart';
 
 class ExercisesDao {
   static const table = 'exercises';

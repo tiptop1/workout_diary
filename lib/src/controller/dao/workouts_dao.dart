@@ -1,8 +1,8 @@
 import 'package:sqflite/sqlite_api.dart';
 
-import '../exercise.dart';
-import '../exercise_set.dart';
-import '../workout.dart';
+import '../../model/exercise.dart';
+import '../../model/exercise_set.dart';
+import '../../model/workout.dart';
 
 class WorkoutsDao {
   // ExerciseSets
@@ -82,7 +82,9 @@ class WorkoutsDao {
   }
 
   Future<bool> deleteWorkout(int id) async =>
-      await _db.delete(tableWorkouts, where: '$colWorkoutId = ?', whereArgs: [id]) == 1;
+      await _db
+          .delete(tableWorkouts, where: '$colWorkoutId = ?', whereArgs: [id]) ==
+      1;
 
   Future<List<Object?>> _insertExerciseSets(
       int workoutId, List<ExerciseSet> exerciseSets, Transaction txn) async {
