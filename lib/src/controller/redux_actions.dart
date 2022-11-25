@@ -1,52 +1,52 @@
 import '../model/exercise.dart';
 import '../model/workout.dart';
 
-class LoadExercises {
+class LoadExercisesAction {
   final List<Exercise>? exercises;
 
-  const LoadExercises({this.exercises});
+  const LoadExercisesAction({this.exercises});
 }
 
-class LoadWorkouts {
+class LoadWorkoutsAction {
   final List<Workout>? workouts;
 
-  const LoadWorkouts({this.workouts});
+  const LoadWorkoutsAction({this.workouts});
 }
 
-class AddExercise {
+class AddExerciseAction {
   final int? id;
   final Exercise? exercise;
 
-  const AddExercise({this.id, this.exercise});
+  const AddExerciseAction({this.id, this.exercise});
 }
 
-class AddWorkout {
+class AddWorkoutAction {
   final int? id;
   final Workout? workout;
 
-  const AddWorkout({this.id, this.workout});
+  const AddWorkoutAction({this.id, this.workout});
 }
 
-class ModifyExercise {
+class ModifyExerciseAction {
   final Exercise exercise;
 
-  const ModifyExercise({required this.exercise});
+  const ModifyExerciseAction({required this.exercise});
 }
 
-class ModifyWorkout {
+class ModifyWorkoutAction {
   final Workout workout;
 
-  const ModifyWorkout({required this.workout});
+  const ModifyWorkoutAction({required this.workout});
 }
 
-class RemoveExercise {
+class RemoveExerciseAction {
   final int id;
 
-  const RemoveExercise({required this.id});
+  const RemoveExerciseAction({required this.id});
 }
 
-class RemoveWorkout {
+class RemoveWorkoutAction {
   final int id;
 
-  const RemoveWorkout({required this.id});
+  const RemoveWorkoutAction({required this.id});
 }
