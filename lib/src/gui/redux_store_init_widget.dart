@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
+import '../controller/redux_reducers.dart';
 import '../controller/repository.dart';
 import '../model/app_state.dart';
 import 'progress_widget.dart';
@@ -61,7 +62,7 @@ class _ReduxStoreInitWidgetState extends State<ReduxStoreInitWidget> {
   Future<Store<AppState>> _createStore(Repository repo) async {
     var exercises = await repo.findAllExercises();
     var workouts = await repo.findAllWorkouts(exercises);
-    return Store(_createReducer(),
+    return Store(createReducer(),
         initialState: AppState(
           exercises: exercises,
           workouts: workouts,
