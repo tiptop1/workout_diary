@@ -14,17 +14,15 @@ class LoadWorkoutsAction {
 }
 
 class AddExerciseAction {
-  final int? id;
-  final Exercise? exercise;
+  final Exercise exercise;
 
-  const AddExerciseAction({this.id, this.exercise});
+  const AddExerciseAction({required this.exercise});
 }
 
 class AddWorkoutAction {
-  final int? id;
-  final Workout? workout;
+  final Workout workout;
 
-  const AddWorkoutAction({this.id, this.workout});
+  const AddWorkoutAction({required this.workout});
 }
 
 class ModifyExerciseAction {
@@ -40,13 +38,13 @@ class ModifyWorkoutAction {
 }
 
 class RemoveExerciseAction {
-  final int id;
+  final Exercise exercise;
 
-  const RemoveExerciseAction({required this.id});
+  const RemoveExerciseAction({required this.exercise});
 }
 
 class RemoveWorkoutAction {
-  final int id;
+  final Workout workout;
 
-  const RemoveWorkoutAction({required this.id});
+  const RemoveWorkoutAction({required this.workout});
 }
