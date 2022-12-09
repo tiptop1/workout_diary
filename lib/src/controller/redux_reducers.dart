@@ -6,14 +6,8 @@ typedef AppStateReducer = AppState Function(AppState state, dynamic action);
 
 AppStateReducer createReducer() {
   return combineReducers<AppState>([
-    TypedReducer<AppState, LoadExercisesAction>((state, action) =>
-        action.exercises != null
-            ? AppState(exercises: action.exercises!, workouts: state.workouts)
-            : state),
-    TypedReducer<AppState, LoadWorkoutsAction>((state, action) =>
-        action.workouts != null
-            ? AppState(exercises: state.exercises, workouts: action.workouts!)
-            : state),
+    TypedReducer<AppState, LoadExercisesAction>(_loadExercisesReducer),
+    TypedReducer<AppState, LoadWorkoutsAction>(_loadWorkoutsReducer),
     TypedReducer<AppState, AddExerciseAction>(_addExerciseReducer),
     TypedReducer<AppState, AddWorkoutAction>(_addWorkoutReducer),
     TypedReducer<AppState, ModifyExerciseAction>(_modifyExerciseReducer),
@@ -21,6 +15,14 @@ AppStateReducer createReducer() {
     TypedReducer<AppState, RemoveExerciseAction>(_removeExerciseReducer),
     TypedReducer<AppState, RemoveWorkoutAction>(_removeWorkoutReducer),
   ]);
+}
+
+AppState _loadExercisesReducer(AppState state, LoadExercisesAction action) {
+  return AppState(exercises: action.exercises ?? [], workouts: state.workouts);
+}
+
+AppState _loadWorkoutsReducer(AppState state, LoadWorkoutsAction action) {
+  return AppState(exercises: state.exercises, workouts: action.workouts ?? []);
 }
 
 AppState _addExerciseReducer(AppState state, AddExerciseAction action) {
@@ -41,9 +43,52 @@ AppState _addWorkoutReducer(AppState state, AddWorkoutAction action) {
   var addedWorkout = action.workout;
   var newState;
   if (addedWorkout?.id != null) {
-    newState = AppState(exercises: state.exercises, workouts: [...state.workouts, addedWorkout!]..sort((w1, w2) => w1.id! - w2.id!));
+    newState = AppState(
+        exercises: state.exercises,
+        workouts: [...state.workouts, addedWorkout!]
+          ..sort((w1, w2) => w1.id! - w2.id!));
   } else {
     newState = state;
   }
   return newState;
+}
+
+AppState _modifyExerciseReducer(AppState state, ModifyExerciseAction action) {
+  var modifiedExercise = action.exercise;
+  var prevExercises = state.exercises;
+  return AppState(
+      exercises: List.generate(
+          prevExercises.length,
+          (i) => prevExercises[i].id == modifiedExercise.id
+              ? modifiedExercise
+              : prevExercises[i]),
+      workouts: state.workouts);
+}
+
+AppState _modifyWorkoutReducer(AppState state, ModifyWorkoutAction action) {
+  var modifiedWorkout = action.workout;
+  var prevWorkouts = state.workouts;
+  return AppState(
+      exercises: state.exercises,
+      workouts: List.generate(
+          prevWorkouts.length,
+          (i) => prevWorkouts[i].id == modifiedWorkout.id
+              ? modifiedWorkout
+              : prevWorkouts[i]));
+}
+
+AppState _removeExerciseReducer(AppState state, RemoveExerciseAction action) {
+  var removedExercise = action.exercise;
+  return AppState(
+      exercises:
+          state.exercises.where((ex) => ex.id != removedExercise.id).toList(),
+      workouts: state.workouts);
+}
+
+AppState _removeWorkoutReducer(AppState state, RemoveWorkoutAction action) {
+  var removedWorkout = action.workout;
+  return AppState(
+      exercises: state.exercises,
+      workouts:
+          state.workouts.where((wr) => wr.id != removedWorkout.id).toList());
 }
