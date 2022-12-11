@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
 import '../controller/redux_reducers.dart';
+import '../controller/redux_middleware.dart';
 import '../controller/repository.dart';
 import '../model/app_state.dart';
 import 'progress_widget.dart';
@@ -67,6 +68,6 @@ class _ReduxStoreInitWidgetState extends State<ReduxStoreInitWidget> {
           exercises: exercises,
           workouts: workouts,
         ),
-        middleware: _createMiddleware());
+        middleware: createMiddleware(repo));
   }
 }
