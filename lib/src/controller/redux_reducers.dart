@@ -78,17 +78,15 @@ AppState _modifyWorkoutReducer(AppState state, ModifyWorkoutAction action) {
 }
 
 AppState _removeExerciseReducer(AppState state, RemoveExerciseAction action) {
-  var removedExercise = action.exercise;
   return AppState(
       exercises:
-          state.exercises.where((ex) => ex.id != removedExercise.id).toList(),
+          state.exercises.where((ex) => ex.id != action.exerciseId).toList(),
       workouts: state.workouts);
 }
 
 AppState _removeWorkoutReducer(AppState state, RemoveWorkoutAction action) {
-  var removedWorkout = action.workout;
   return AppState(
       exercises: state.exercises,
       workouts:
-          state.workouts.where((wr) => wr.id != removedWorkout.id).toList());
+          state.workouts.where((wr) => wr.id != action.workoutId).toList());
 }
