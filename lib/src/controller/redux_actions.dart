@@ -38,13 +38,13 @@ class ModifyWorkoutAction {
 }
 
 class RemoveExerciseAction {
-  final Exercise exercise;
+  final int exerciseId;
 
-  const RemoveExerciseAction({required this.exercise});
+  const RemoveExerciseAction({required this.exerciseId});
 }
 
 class RemoveWorkoutAction {
-  final Workout workout;
+  final int workoutId;
 
-  const RemoveWorkoutAction({required this.workout});
+  const RemoveWorkoutAction({required this.workoutId});
 }
