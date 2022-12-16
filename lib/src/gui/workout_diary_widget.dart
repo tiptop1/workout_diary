@@ -34,8 +34,8 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context)!;
     var tabs = {
-      appLocalizations.workoutsTab: AllWorkoutsTabWidget(key: UniqueKey()),
-      appLocalizations.exercisesTab: AllExercisesTabWidget(key: UniqueKey()),
+      appLocalizations.workoutsTab: WorkoutsTabWidget(key: UniqueKey()),
+      appLocalizations.exercisesTab: ExercisesTabWidget(key: UniqueKey()),
     } as LinkedHashMap;
 
     return Scaffold(
