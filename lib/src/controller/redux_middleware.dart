@@ -82,7 +82,7 @@ Middleware<AppState> _modifyWorkoutMiddleware(Repository repository) {
 
 Middleware<AppState> _deleteExerciseMiddleware(Repository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) async {
-    if (action is RemoveExerciseAction &&
+    if (action is DeleteExerciseAction &&
         await repository.deleteExercise(action.exerciseId)) {
       store.dispatch(action);
     }
@@ -92,7 +92,7 @@ Middleware<AppState> _deleteExerciseMiddleware(Repository repository) {
 
 Middleware<AppState> _deleteWorkoutMiddleware(Repository repository) {
   return (Store<AppState> store, dynamic action, NextDispatcher next) async {
-    if (action is RemoveWorkoutAction &&
+    if (action is DeleteWorkoutAction &&
         await repository.deleteWorkout(action.workoutId)) {
       store.dispatch(action);
     }
