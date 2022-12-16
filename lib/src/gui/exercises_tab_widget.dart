@@ -1,37 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:workout_diary/src/gui/list_tab_widget.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:workout_diary/src/controller/redux_actions.dart';
+import 'package:workout_diary/src/gui/list_widget.dart';
+import 'package:workout_diary/src/model/workout.dart';
 
+import '../model/app_state.dart';
 import '../model/exercise.dart';
-import '../controller/repository.dart';
 import 'exercise_widget.dart';
 
-enum ExerciseAction { modify, delete }
-
-class AllExercisesTabWidget extends ListOnTabWidget {
-  const AllExercisesTabWidget({Key? key}) : super(key: key);
+class ExercisesTabWidget extends ListWidget<Exercise> {
+  const ExercisesTabWidget({Key? key}) : super(key: key);
 
   @override
-  State<AllExercisesTabWidget> createState() => _AllExercisesState();
-}
+  List<Exercise> storeConnectorConverter(Store<AppState> store) =>
+      store.state.exercises;
 
-class _AllExercisesState
-    extends ListOnTabState<AllExercisesTabWidget, Exercise> {
   @override
-  void loadEntities(BuildContext context) {
-    GetIt.I.get<Repository>()
-        .findAllExercises()
-        .then((List<Exercise> exercises) {
-      setState(() {
-        entities = exercises;
-        entitiesReady = true;
-      });
-    });
-  }
-
   Widget listItemTitle(BuildContext context, Exercise exercise) =>
       Text(exercise.name);
 
+  @override
   void listItemModifyAction(BuildContext context, Exercise exercise) {
     Navigator.push(
       context,
@@ -42,13 +32,12 @@ class _AllExercisesState
     );
   }
 
+  @override
   void listItemDeleteAction(BuildContext context, Exercise exercise) {
-    int exerciseId = exercise.id!;
-    GetIt.I.get<Repository>()
-        .countExerciseSets(exerciseId)
-        .then((count) {
-      _showDialogAndDeleteExercise(context, count, exerciseId);
-    });
+    var exerciseId = exercise.id;
+    assert(exerciseId != null, "Deleting exercise without id isn't allowed.");
+    var relationsCount = countRelations(StoreProvider.of<AppState>(context).state.workouts, exerciseId!);
+    _showDialogAndDeleteExercise(context, relationsCount, exerciseId);
   }
 
   void listItemShowAction(BuildContext context, Exercise exercise) {
@@ -75,16 +64,7 @@ class _AllExercisesState
               TextButton(
                 child: Text(appLocalizations.yes),
                 onPressed: () {
-                  GetIt.I.get<Repository>()
-                      .deleteExercise(exerciseId)
-                      .then((deletedCount) {
-                    if (deletedCount > 0) {
-                      setState(() {
-                        entities = null;
-                        entitiesReady = false;
-                      });
-                    }
-                  });
+                  StoreProvider.of<AppState>(context).dispatch(DeleteExerciseAction(exerciseId: exerciseId));
                   Navigator.of(context).pop();
                 },
               ),
@@ -131,5 +111,13 @@ class _AllExercisesState
         child: Text(msg),
       ),
     ]);
+  }
+
+  int countRelations(List<Workout> workouts, int exerciseId) {
+    var count = 0;
+    for (var workout in workouts) {
+      count += workout.exerciseSets.where((es) => es.exercise.id == exerciseId).length;
+    }
+    return count;
   }
 }

@@ -1,35 +1,21 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:workout_diary/src/gui/list_tab_widget.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:workout_diary/src/controller/redux_actions.dart';
+import 'package:workout_diary/src/gui/list_widget.dart';
 import 'package:workout_diary/src/gui/workout_widgets.dart';
 
-import '../controller/repository.dart';
+import '../model/app_state.dart';
 import '../model/workout.dart';
 
-class AllWorkoutsTabWidget extends ListOnTabWidget {
-  const AllWorkoutsTabWidget({Key? key}) : super(key: key);
+/// Implementation of TabListWidget to show list of Workouts
+class WorkoutsTabWidget extends ListWidget<Workout> {
+  const WorkoutsTabWidget({Key? key}) : super(key: key);
 
   @override
-  State<AllWorkoutsTabWidget> createState() => _AllWorkoutsState();
-}
-
-class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
-  @override
-  void loadEntities(BuildContext context) {
-    GetIt.I
-        .get<Repository>()
-        .findAllWorkouts()
-        .then((List<Workout> workouts) {
-      setState(() {
-        entities = workouts;
-        entitiesReady = true;
-      });
-    }).catchError((error) {
-      log('Can not load exercises!');
-    });
-  }
+  List<Workout> storeConnectorConverter(Store<AppState> store) =>
+      store.state.workouts;
 
   @override
   Widget listItemTitle(BuildContext context, Workout workout) {
@@ -51,6 +37,7 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
 
   @override
   void listItemDeleteAction(BuildContext context, Workout workout) {
+    assert(workout.id != null, "Deleting workout without id isn't allowed.");
     _showDeleteDialog(context, workout.id!);
   }
 
@@ -73,26 +60,12 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
             actions: <Widget>[
               TextButton(
                 child: Text(appLocalizations.yes),
-                onPressed: () {
-                  GetIt.I
-                      .get<Repository>()
-                      .deleteWorkout(workoutId)
-                      .then((deletedCount) {
-                    if (deletedCount > 0) {
-                      setState(() {
-                        entities = null;
-                        entitiesReady = false;
-                      });
-                    }
-                  });
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => StoreProvider.of<AppState>(context)
+                    .dispatch(DeleteWorkoutAction(workoutId: workoutId)),
               ),
               TextButton(
                 child: Text(appLocalizations.no),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+                onPressed: () => Navigator.of(context).pop(),
               ),
             ],
           );
@@ -102,13 +75,12 @@ class _AllWorkoutsState extends ListOnTabState<AllWorkoutsTabWidget, Workout> {
   Widget _buildDialogContent(AppLocalizations appLocalizations) {
     return Row(children: [
       Expanded(
-          flex: 20,
-          child: FittedBox(
-              fit: BoxFit.fill,
-              child: Icon(
-                Icons.help,
-                color: Colors.yellow,
-              ))),
+        flex: 20,
+        child: FittedBox(
+          fit: BoxFit.fill,
+          child: Icon(Icons.help, color: Colors.yellow),
+        ),
+      ),
       Spacer(flex: 2),
       Expanded(
         flex: 60,
