@@ -12,8 +12,8 @@ AppStateReducer createReducer() {
     TypedReducer<AppState, AddWorkoutAction>(_addWorkoutReducer),
     TypedReducer<AppState, ModifyExerciseAction>(_modifyExerciseReducer),
     TypedReducer<AppState, ModifyWorkoutAction>(_modifyWorkoutReducer),
-    TypedReducer<AppState, RemoveExerciseAction>(_removeExerciseReducer),
-    TypedReducer<AppState, RemoveWorkoutAction>(_removeWorkoutReducer),
+    TypedReducer<AppState, DeleteExerciseAction>(_removeExerciseReducer),
+    TypedReducer<AppState, DeleteWorkoutAction>(_removeWorkoutReducer),
   ]);
 }
 
@@ -77,14 +77,14 @@ AppState _modifyWorkoutReducer(AppState state, ModifyWorkoutAction action) {
               : prevWorkouts[i]));
 }
 
-AppState _removeExerciseReducer(AppState state, RemoveExerciseAction action) {
+AppState _removeExerciseReducer(AppState state, DeleteExerciseAction action) {
   return AppState(
       exercises:
           state.exercises.where((ex) => ex.id != action.exerciseId).toList(),
       workouts: state.workouts);
 }
 
-AppState _removeWorkoutReducer(AppState state, RemoveWorkoutAction action) {
+AppState _removeWorkoutReducer(AppState state, DeleteWorkoutAction action) {
   return AppState(
       exercises: state.exercises,
       workouts:
