@@ -27,25 +27,19 @@ AppState _loadWorkoutsReducer(AppState state, LoadWorkoutsAction action) {
 
 AppState _addExerciseReducer(AppState state, AddExerciseAction action) {
   var addedExercise = action.exercise;
-  var newState;
-  if (addedExercise != null) {
-    newState = AppState(
-        exercises: [...state.exercises, addedExercise]
-          ..sort((e1, e2) => e1.name.compareTo(e2.name)),
-        workouts: state.workouts);
-  } else {
-    newState = state;
-  }
-  return newState;
+  return AppState(
+      exercises: [...state.exercises, addedExercise]
+        ..sort((e1, e2) => e1.name.compareTo(e2.name)),
+      workouts: state.workouts);
 }
 
 AppState _addWorkoutReducer(AppState state, AddWorkoutAction action) {
   var addedWorkout = action.workout;
   var newState;
-  if (addedWorkout?.id != null) {
+  if (addedWorkout.id != null) {
     newState = AppState(
         exercises: state.exercises,
-        workouts: [...state.workouts, addedWorkout!]
+        workouts: [...state.workouts, addedWorkout]
           ..sort((w1, w2) => w1.id! - w2.id!));
   } else {
     newState = state;
