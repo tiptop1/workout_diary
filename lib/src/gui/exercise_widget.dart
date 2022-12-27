@@ -1,30 +1,28 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 
+import '../controller/redux_actions.dart';
+import '../model/app_state.dart';
 import '../model/exercise.dart';
-import '../controller/repository.dart';
-import 'progress_widget.dart';
 
 class ExerciseWidget extends StatefulWidget {
   final bool _modifiable;
-  final int? _exerciseId;
+  final Exercise? _exercise;
 
-  const ExerciseWidget({Key? key, int? exerciseId, bool modifiable = false})
+  const ExerciseWidget({Key? key, Exercise? exercise, bool modifiable = false})
       : _modifiable = modifiable,
-        _exerciseId = exerciseId,
+        _exercise = exercise,
         super(key: key);
 
   @override
-  State<ExerciseWidget> createState() => ExerciseWidgetState();
+  State<ExerciseWidget> createState() => _ExerciseWidgetState();
 }
 
-class ExerciseWidgetState extends State<ExerciseWidget> {
+class _ExerciseWidgetState extends State<ExerciseWidget> {
   static const int nameMaxLength = 100;
   static const int descriptionMaxLength = 500;
 
-  Exercise? _exercise;
   late final TextEditingController _nameTextController;
   late final TextEditingController _descriptionTextController;
   late final GlobalKey<FormState> _formKey;
@@ -46,37 +44,17 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget? buildWidget;
-    var exerciseId = widget._exerciseId;
-    if (exerciseId != null) {
-      // Exercise is already created and in database - show or modify it.
-      if (_exercise == null) {
-        // Load already existed exercise from database.
-        GetIt.I.get<Repository>().findExerciseDetails(exerciseId).then((e) {
-          setState(() {
-            _exercise = e;
-          });
-        }).catchError((err) {
-          log('Can not load exercise (id: $exerciseId) from database.');
-        });
-        // Until load will complete show progress widget.
-        buildWidget = ProgressWidget();
-      } else {
-        // Exercise is already loaded from database,
-        // so initiate text controllers with values from the exercise.
-        _nameTextController.text = _exercise!.name;
-        var exerciseDescr = _exercise!.description;
-        if (exerciseDescr != null) {
-          _descriptionTextController.text = exerciseDescr;
-        }
-      }
-    }
-    return buildWidget ??
-        buildExerciseWidget(context, _nameTextController,
-            _descriptionTextController, widget._modifiable, exerciseId == null);
+    _nameTextController.text = widget._exercise?.name ?? '';
+    _descriptionTextController.text = widget._exercise?.description ?? '';
+    return _buildExerciseWidget(
+        context,
+        _nameTextController,
+        _descriptionTextController,
+        widget._modifiable,
+        widget._exercise == null);
   }
 
-  Widget buildExerciseWidget(
+  Widget _buildExerciseWidget(
       BuildContext context,
       TextEditingController nameTextController,
       TextEditingController descriptionTextController,
@@ -196,19 +174,14 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
       // New exercise not added, so return false
       Navigator.pop(context, false);
     } else {
-      var exercise = Exercise(
-        name: exerciseName,
-        description: (exerciseDescription.trim().length > 0
-            ? exerciseDescription
-            : null),
-      );
-      GetIt.I
-          .get<Repository>()
-          .insertExercise(exercise)
-          .then((Exercise ex) => Navigator.pop(context, true))
-          .catchError((error) {
-        log("Can not add new exercise. Error: $error.");
-      });
+      StoreProvider.of<AppState>(context).dispatch(AddExerciseAction(
+        exercise: Exercise(
+          name: exerciseName,
+          description: (exerciseDescription.trim().length > 0
+              ? exerciseDescription
+              : null),
+        ),
+      ));
     }
   }
 
@@ -219,28 +192,22 @@ class ExerciseWidgetState extends State<ExerciseWidget> {
     if (modifiedName == '') {
       // Exercise not modified, so return false
       Navigator.pop(context, false);
-    } else if (modifiedName == _exercise!.name &&
-        modifiedDescription == _exercise!.description) {
+    } else if (modifiedName == widget._exercise?.name &&
+        modifiedDescription == widget._exercise?.description) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseNotModifiedWarning),
       ));
       // Exercise not modified, so return false
       Navigator.pop(context, false);
     } else {
-      var modifiedExercise = Exercise(
-        id: _exercise!.id,
-        name: modifiedName,
-        description:
-            (modifiedDescription.trim() == '' ? null : modifiedDescription),
-      );
-      GetIt.I
-          .get<Repository>()
-          .updateExercise(modifiedExercise)
-          .then((Exercise? ex) {
-        assert(
-            ex != null, "Exercise with id:${modifiedExercise.id} not updated.");
-        Navigator.pop(context, true);
-      });
+      StoreProvider.of<AppState>(context).dispatch(ModifyExerciseAction(
+        exercise: Exercise(
+          id: widget._exercise?.id,
+          name: modifiedName,
+          description:
+              (modifiedDescription.trim() == '' ? null : modifiedDescription),
+        ),
+      ));
     }
   }
 

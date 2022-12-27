@@ -27,7 +27,7 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
       context,
       MaterialPageRoute(
         builder: (context) => ExerciseWidget(
-            key: UniqueKey(), exerciseId: exercise.id!, modifiable: true),
+            key: UniqueKey(), exercise: exercise, modifiable: true),
       ),
     );
   }
@@ -36,7 +36,8 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
   void listItemDeleteAction(BuildContext context, Exercise exercise) {
     var exerciseId = exercise.id;
     assert(exerciseId != null, "Deleting exercise without id isn't allowed.");
-    var relationsCount = countRelations(StoreProvider.of<AppState>(context).state.workouts, exerciseId!);
+    var relationsCount = countRelations(
+        StoreProvider.of<AppState>(context).state.workouts, exerciseId!);
     _showDialogAndDeleteExercise(context, relationsCount, exerciseId);
   }
 
@@ -45,7 +46,7 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ExerciseWidget(key: UniqueKey(), exerciseId: exercise.id!),
+            ExerciseWidget(key: UniqueKey(), exercise: exercise),
       ),
     );
   }
@@ -64,7 +65,8 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
               TextButton(
                 child: Text(appLocalizations.yes),
                 onPressed: () {
-                  StoreProvider.of<AppState>(context).dispatch(DeleteExerciseAction(exerciseId: exerciseId));
+                  StoreProvider.of<AppState>(context)
+                      .dispatch(DeleteExerciseAction(exerciseId: exerciseId));
                   Navigator.of(context).pop();
                 },
               ),
@@ -116,7 +118,9 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
   int countRelations(List<Workout> workouts, int exerciseId) {
     var count = 0;
     for (var workout in workouts) {
-      count += workout.exerciseSets.where((es) => es.exercise.id == exerciseId).length;
+      count += workout.exerciseSets
+          .where((es) => es.exercise.id == exerciseId)
+          .length;
     }
     return count;
   }

@@ -18,46 +18,29 @@ class ReduxStoreInitWidget extends StatefulWidget {
 }
 
 class _ReduxStoreInitWidgetState extends State<ReduxStoreInitWidget> {
-  late final Future<Repository> _repo;
+  Repository? _repo;
+  Store<AppState>? _store;
 
-  @override
-  void initState() {
-    super.initState();
-    _repo = Repository.init();
-  }
 
   @override
   void dispose() {
-    _repo.then((repo) => repo.dispose());
+    _repo?.dispose();
     super.dispose();
   }
 
-  // TODO: Refactor it - two FutureBuilders in the same build method - weird!
-  @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _repo,
-        builder:
-            (BuildContext context, AsyncSnapshot<Repository> repoSnapshot) {
-          if (repoSnapshot.hasData) {
-            var repo = repoSnapshot.data!;
-            var store = _createStore(repo);
-            return FutureBuilder(
-              future: store,
-              builder: (BuildContext context,
-                  AsyncSnapshot<Store<AppState>> storeSnapshot) {
-                if (storeSnapshot.hasData) {
-                  return StoreProvider(
-                      store: storeSnapshot.data!, child: widget.child);
-                } else {
-                  return ProgressWidget();
-                }
-              },
-            );
-          } else {
-            return ProgressWidget();
-          }
-        });
+    if (_store == null) {
+      Repository.init().then((repository) {
+        _repo = repository;
+        return _createStore(_repo!);
+      }).then((store) {
+        _store = store;
+        setState(() {});
+      });
+      return ProgressWidget();
+    } else {
+      return StoreProvider(store: _store!, child: widget.child);
+    }
   }
 
   Future<Store<AppState>> _createStore(Repository repo) async {

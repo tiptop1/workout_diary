@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
-import 'package:workout_diary/src/gui/progress_widget.dart';
-import 'package:workout_diary/src/controller/repository.dart';
 
+import '../controller/redux_actions.dart';
+import '../model/app_state.dart';
 import '../model/exercise.dart';
 import '../model/workout.dart';
 
@@ -24,10 +25,8 @@ class WorkoutWidget extends StatefulWidget {
   State<WorkoutWidget> createState() => _AddWorkoutState();
 }
 
-// TODO: Ensure that at least one Exercise has been added to database.
 class _AddWorkoutState extends State<WorkoutWidget> {
   static const int titleMaxLength = 500;
-  bool _inProgress = false;
   DateTime? _startTime;
   DateTime? _endTime;
   late TextEditingController _titleController;
@@ -59,70 +58,57 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context)!;
-    var widget;
-    if (_exercises == null) {
-      _inProgress = true;
-      GetIt.I.get<Repository>().findAllExercises().then((exercises) {
-        setState(() {
-          _exercises = exercises;
-          _inProgress = false;
-        });
-      });
-    }
-    if (_inProgress) {
-      widget = ProgressWidget();
-    } else {
-      Locale locale = Localizations.localeOf(context);
-      widget = Scaffold(
-        appBar: AppBar(
-          title: Text(appLocalizations.addWorkoutTitle),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => _backButtonCallback(context),
+    Locale locale = Localizations.localeOf(context);
+    var widget = Scaffold(
+      appBar: AppBar(
+        title: Text(appLocalizations.addWorkoutTitle),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => _backButtonCallback(context),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () => _saveButtonCallback(context),
           ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.check),
-              onPressed: () => _saveButtonCallback(context),
-            ),
+        ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            _createTitleWidget(context, appLocalizations),
+            _createDateTimeRow(
+                context, locale, appLocalizations.start, null, _startTime,
+                (dateTime) {
+              setState(() {
+                _startTime = dateTime;
+                _endTime = null;
+              });
+            }),
+            _createDateTimeRow(
+                context, locale, appLocalizations.end, _startTime, _endTime,
+                (dateTime) {
+              setState(() {
+                _endTime = dateTime;
+              });
+            }),
+            _createPrecommentWidget(context, appLocalizations),
+            _createWorkoutEntryWidget(context),
+            _createPostcommentWidget(context, appLocalizations),
           ],
         ),
-        body: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _createTitleWidget(context, appLocalizations),
-              _createDateTimeRow(
-                  context, locale, appLocalizations.start, null, _startTime,
-                  (dateTime) {
-                setState(() {
-                  _startTime = dateTime;
-                  _endTime = null;
-                });
-              }),
-              _createDateTimeRow(
-                  context, locale, appLocalizations.end, _startTime, _endTime,
-                  (dateTime) {
-                setState(() {
-                  _endTime = dateTime;
-                });
-              }),
-              _createPrecommentWidget(context, appLocalizations),
-              _createWorkoutEntryWidget(context),
-              _createPostcommentWidget(context, appLocalizations),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                _entryTuples
-                    .add(Tuple2(_exercises!.first, TextEditingController()));
-              });
-            },
-            child: const Icon(Icons.add)),
-      );
-    }
+      ),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              _entryTuples
+                  .add(Tuple2(_exercises!.first, TextEditingController()));
+            });
+          },
+          child: const Icon(Icons.add)),
+    );
+
     return widget;
   }
 
@@ -152,18 +138,15 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   void _saveButtonCallback(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      var workout = Workout(
-          startTime: _startTime,
-          endTime: _endTime,
-          title: _titleController.value.text,
-          preComment: _preCommentController.value.text,
-          postComment: _postCommentController.value.text);
-      var repo = GetIt.I.get<Repository>();
-      repo
-          .insertWorkout(workout)
-          .then((insertedWorkout) => Navigator.pop(context, true));
-      // TODO: Add error handling for workout insert.
-      setState(() => _inProgress = true);
+      StoreProvider.of<AppState>(context).dispatch(AddWorkoutAction(
+        workout: Workout(
+            startTime: _startTime,
+            endTime: _endTime,
+            title: _titleController.value.text,
+            preComment: _preCommentController.value.text,
+            postComment: _postCommentController.value.text),
+      ));
+      Navigator.pop(context, true);
     }
   }
 
