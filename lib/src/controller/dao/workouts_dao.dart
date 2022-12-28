@@ -37,7 +37,7 @@ class WorkoutsDao {
         orderBy: '$colExerciseSetId DESC',
         whereArgs: [workoutRecord[colWorkoutId]]));
     List<Map<String, Object?>> exerciseSetRecords =
-        await batch.commit() as List<Map<String, Object?>>;
+    (await batch.commit()).cast<Map<String, Object?>>();
 
     return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
@@ -217,14 +217,14 @@ class WorkoutsDao {
     var endTime = workoutRecord[colWorkoutEndTime] as int?;
     return Workout(
       title: workoutRecord[colWorkoutTitle] as String,
-      id: workoutRecord[colWorkoutId] as int,
+      id: workoutRecord[colWorkoutId] as int?,
       startTime: startTime != null
           ? DateTime.fromMillisecondsSinceEpoch(startTime)
           : null,
       endTime:
           endTime != null ? DateTime.fromMillisecondsSinceEpoch(endTime) : null,
-      preComment: workoutRecord[colWorkoutPreComment] as String,
-      postComment: workoutRecord[colWorkoutPostComment] as String,
+      preComment: workoutRecord[colWorkoutPreComment] as String?,
+      postComment: workoutRecord[colWorkoutPostComment] as String?,
       exerciseSets: _createExerciseSetList(exerciseSetRecords, exercises),
     );
   }
