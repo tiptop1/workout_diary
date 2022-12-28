@@ -20,9 +20,9 @@ class ExercisesDao {
     return List.generate(records.length, (i) {
       var record = records[i];
       return Exercise(
-        id: record[colId] as int,
+        id: record[colId] as int?,
         name: record[colName] as String,
-        description: record[colDescription] as String,
+        description: record[colDescription] as String?,
       );
     });
   }
