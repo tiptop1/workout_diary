@@ -170,10 +170,8 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
   void addExerciseCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
-    if (exerciseName == '') {
-      // New exercise not added, so return false
-      Navigator.pop(context, false);
-    } else {
+    var exerciseAdded = false;
+    if (exerciseName != '') {
       StoreProvider.of<AppState>(context).dispatch(AddExerciseAction(
         exercise: Exercise(
           name: exerciseName,
@@ -182,7 +180,9 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
               : null),
         ),
       ));
+      exerciseAdded = true;
     }
+    Navigator.pop(context, exerciseAdded);
   }
 
   void modifyExerciseCallback(BuildContext context) {
