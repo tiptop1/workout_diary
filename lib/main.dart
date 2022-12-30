@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:logging/logging.dart';
 import 'package:workout_diary/src/gui/redux_store_init_widget.dart';
 import 'package:workout_diary/src/gui/workout_diary_widget.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Logging configuration
+  Logger.root.level = Level.WARNING;
+  Logger.root.onRecord.listen((record) {
+    print('${record.level.name}/${record.loggerName}: ${record.message}');
+  });
 
   runApp(ReduxStoreInitWidget(
     child: MaterialApp(
