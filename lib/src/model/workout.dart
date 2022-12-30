@@ -73,4 +73,27 @@ class Workout extends Entity {
   String toString() {
     return toJson().toString();
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is Workout &&
+          runtimeType == other.runtimeType &&
+          startTime == other.startTime &&
+          endTime == other.endTime &&
+          title == other.title &&
+          preComment == other.preComment &&
+          postComment == other.postComment &&
+          _exerciseSets == other._exerciseSets;
+
+  @override
+  int get hashCode =>
+      super.hashCode ^
+      startTime.hashCode ^
+      endTime.hashCode ^
+      title.hashCode ^
+      preComment.hashCode ^
+      postComment.hashCode ^
+      _exerciseSets.hashCode;
 }

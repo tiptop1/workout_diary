@@ -29,4 +29,16 @@ class ExerciseSet extends Entity {
   String toString() {
     return toJson().toString();
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is ExerciseSet &&
+          runtimeType == other.runtimeType &&
+          exercise == other.exercise &&
+          details == other.details;
+
+  @override
+  int get hashCode => super.hashCode ^ exercise.hashCode ^ details.hashCode;
 }
