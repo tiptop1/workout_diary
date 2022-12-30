@@ -18,6 +18,7 @@ abstract class ListWidget<E extends Entity> extends StatelessWidget {
     return StoreConnector<AppState, List<E>>(
       converter: storeConnectorConverter,
       builder: listBuilder,
+      distinct: true,
     );
   }
 
