@@ -32,13 +32,19 @@ class WorkoutsDao {
     );
 
     var batch = _db.batch();
-    workoutRecords.forEach((workoutRecord) => batch.query(tableExerciseSets,
+    for (var workoutRec in workoutRecords) {
+      batch.query(
+        tableExerciseSets,
         where: '$colExerciseSetWorkoutId = ?',
         orderBy: '$colExerciseSetId DESC',
-        whereArgs: [workoutRecord[colWorkoutId]]));
-    List<Map<String, Object?>> exerciseSetRecords =
-    (await batch.commit()).cast<Map<String, Object?>>();
-
+        whereArgs: [workoutRec[colWorkoutId]],
+      );
+    }
+    var exerciseSetRecords = <Map<String, Object?>>[];
+    var batchResults = await batch.commit();
+    for (var i = 0; i < batchResults.length; i++) {
+      exerciseSetRecords.add(batchResults[i] as Map<String, Object?>);
+    }
     return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
 
