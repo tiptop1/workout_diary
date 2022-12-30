@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_redux/flutter_redux.dart';
 
 import '../controller/redux_actions.dart';
-import '../model/app_state.dart';
 import '../model/exercise.dart';
 
 class ExerciseWidget extends StatefulWidget {
@@ -152,65 +150,65 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     if (_formKey.currentState!.validate()) {
       if (shouldAddExercise(modifiable, addExercise)) {
         // Add new exercise
-        addExerciseCallback(context);
+        _addExerciseCallback(context);
       } else if (modifiable && !addExercise) {
         // Modify already existed exercise
-        modifyExerciseCallback(context);
+        _modifyExerciseCallback(context);
       } else {
         // Just show (without modification) exercise
-        showExerciseCallback(context);
+        _showExerciseCallback(context);
       }
     }
   }
 
   void _backButtonCallback(BuildContext context) {
-    Navigator.pop(context, false);
+    Navigator.pop(context, null);
   }
 
-  void addExerciseCallback(BuildContext context) {
+  void _addExerciseCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
-    var exerciseAdded = false;
+    var action;
     if (exerciseName != '') {
-      StoreProvider.of<AppState>(context).dispatch(AddExerciseAction(
+      action = AddExerciseAction(
         exercise: Exercise(
           name: exerciseName,
           description: (exerciseDescription.trim().length > 0
               ? exerciseDescription
               : null),
         ),
-      ));
-      exerciseAdded = true;
+      );
     }
-    Navigator.pop(context, exerciseAdded);
+    Navigator.pop(context, action);
   }
 
-  void modifyExerciseCallback(BuildContext context) {
+  void _modifyExerciseCallback(BuildContext context) {
     var modifiedName = _nameTextController.value.text;
     var modifiedDescription = _descriptionTextController.value.text;
 
     if (modifiedName == '') {
       // Exercise not modified, so return false
-      Navigator.pop(context, false);
+      Navigator.pop(context, null);
     } else if (modifiedName == widget._exercise?.name &&
         modifiedDescription == widget._exercise?.description) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseNotModifiedWarning),
       ));
       // Exercise not modified, so return false
-      Navigator.pop(context, false);
+      Navigator.pop(context, null);
     } else {
-      StoreProvider.of<AppState>(context).dispatch(ModifyExerciseAction(
+      var action = ModifyExerciseAction(
         exercise: Exercise(
           id: widget._exercise?.id,
           name: modifiedName,
           description:
-              (modifiedDescription.trim() == '' ? null : modifiedDescription),
+              modifiedDescription.trim() == '' ? null : modifiedDescription,
         ),
-      ));
+      );
+      Navigator.pop(context, action);
     }
   }
 
-  void showExerciseCallback(BuildContext context) =>
-      Navigator.pop(context, false);
+  void _showExerciseCallback(BuildContext context) =>
+      Navigator.pop(context, null);
 }

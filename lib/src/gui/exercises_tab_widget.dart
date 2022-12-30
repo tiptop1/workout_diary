@@ -29,7 +29,11 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
         builder: (context) => ExerciseWidget(
             key: UniqueKey(), exercise: exercise, modifiable: true),
       ),
-    );
+    ).then((action) {
+      if (action != null) {
+        StoreProvider.of<AppState>(context).dispatch(action);
+      }
+    });
   }
 
   @override
@@ -48,7 +52,11 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
         builder: (context) =>
             ExerciseWidget(key: UniqueKey(), exercise: exercise),
       ),
-    );
+    ).then((action) {
+      if (action != null) {
+        StoreProvider.of<AppState>(context).dispatch(action);
+      }
+    });
   }
 
   void _showDialogAndDeleteExercise(

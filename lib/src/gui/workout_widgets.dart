@@ -133,20 +133,20 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   void _backButtonCallback(BuildContext context) {
-    Navigator.pop(context, false);
+    Navigator.pop(context, null);
   }
 
   void _saveButtonCallback(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      StoreProvider.of<AppState>(context).dispatch(AddWorkoutAction(
+      var action = AddWorkoutAction(
         workout: Workout(
             startTime: _startTime,
             endTime: _endTime,
             title: _titleController.value.text,
             preComment: _preCommentController.value.text,
             postComment: _postCommentController.value.text),
-      ));
-      Navigator.pop(context, true);
+      );
+      Navigator.pop(context, action);
     }
   }
 
