@@ -33,7 +33,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   late TextEditingController _preCommentController;
   late TextEditingController _postCommentController;
   late List<Tuple2<Exercise, TextEditingController>> _entryTuples;
-  List<Exercise>? _exercises;
   late final GlobalKey<FormState> _formKey;
 
   @override
@@ -59,54 +58,59 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context)!;
     Locale locale = Localizations.localeOf(context);
-    var widget = Scaffold(
-      appBar: AppBar(
-        title: Text(appLocalizations.addWorkoutTitle),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => _backButtonCallback(context),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.check),
-            onPressed: () => _saveButtonCallback(context),
+    var widget = StoreConnector<AppState, List<Exercise>>(
+      converter: (store) => store.state.exercises,
+      builder: (context, exercises) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(appLocalizations.addWorkoutTitle),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => _backButtonCallback(context),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.check),
+                onPressed: () => _saveButtonCallback(context),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            _createTitleWidget(context, appLocalizations),
-            _createDateTimeRow(
-                context, locale, appLocalizations.start, null, _startTime,
-                (dateTime) {
-              setState(() {
-                _startTime = dateTime;
-                _endTime = null;
-              });
-            }),
-            _createDateTimeRow(
-                context, locale, appLocalizations.end, _startTime, _endTime,
-                (dateTime) {
-              setState(() {
-                _endTime = dateTime;
-              });
-            }),
-            _createPrecommentWidget(context, appLocalizations),
-            _createWorkoutEntryWidget(context),
-            _createPostcommentWidget(context, appLocalizations),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              _entryTuples
-                  .add(Tuple2(_exercises!.first, TextEditingController()));
-            });
-          },
-          child: const Icon(Icons.add)),
+          body: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                _createTitleWidget(context, appLocalizations),
+                _createDateTimeRow(
+                    context, locale, appLocalizations.start, null, _startTime,
+                    (dateTime) {
+                  setState(() {
+                    _startTime = dateTime;
+                    _endTime = null;
+                  });
+                }),
+                _createDateTimeRow(
+                    context, locale, appLocalizations.end, _startTime, _endTime,
+                    (dateTime) {
+                  setState(() {
+                    _endTime = dateTime;
+                  });
+                }),
+                _createPrecommentWidget(context, appLocalizations),
+                _createWorkoutEntryWidget(context, exercises),
+                _createPostcommentWidget(context, appLocalizations),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                setState(() {
+                  _entryTuples
+                      .add(Tuple2(exercises.first, TextEditingController()));
+                });
+              },
+              child: const Icon(Icons.add)),
+        );
+      },
     );
 
     return widget;
@@ -150,10 +154,10 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     }
   }
 
-  Widget _createWorkoutEntryWidget(BuildContext context) {
+  Widget _createWorkoutEntryWidget(BuildContext context, List<Exercise> exercises) {
     var listTiles = <Widget>[];
     for (var i = 0; i < _entryTuples.length; i++) {
-      listTiles.add(_createWorkoutEntryListTile(i, _entryTuples[i]));
+      listTiles.add(_createWorkoutEntryListTile(i, exercises, _entryTuples[i]));
     }
     return Expanded(
       child: ListView(
@@ -186,24 +190,21 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createWorkoutEntryListTile(
-      int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+  Widget _createWorkoutEntryListTile(int index, List<Exercise> exercises, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return ListTile(
-      leading: _createExerciseDropDownButton(index, workoutEntryTuple),
+      leading: _createExerciseDropDownButton(index, exercises, workoutEntryTuple),
       title: TextFormField(controller: workoutEntryTuple.item2),
     );
   }
 
-  Widget _createExerciseDropDownButton(
-      int index, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+  Widget _createExerciseDropDownButton(int index, List<Exercise> exercises, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return DropdownButton<int>(
         items:
-            _exercises!.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
+            exercises.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
         value: workoutEntryTuple.item1.id,
         onChanged: (int? newExerciseId) {
           setState(() {
-            _entryTuples[index] = workoutEntryTuple.withItem1(_exercises!
-                .firstWhere((exercise) => exercise.id == newExerciseId));
+            _entryTuples[index] = workoutEntryTuple.withItem1(exercises.firstWhere((exercise) => exercise.id == newExerciseId));
           });
         });
   }
