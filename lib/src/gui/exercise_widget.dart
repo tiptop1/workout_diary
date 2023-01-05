@@ -45,28 +45,18 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     _nameTextController.text = widget._exercise?.name ?? '';
     _descriptionTextController.text = widget._exercise?.description ?? '';
     return _buildExerciseWidget(
-        context,
-        _nameTextController,
-        _descriptionTextController,
-        widget._modifiable,
-        widget._exercise == null);
+        context, widget._modifiable, widget._exercise == null);
   }
 
   Widget _buildExerciseWidget(
-      BuildContext context,
-      TextEditingController nameTextController,
-      TextEditingController descriptionTextController,
-      bool modifiable,
-      bool addExercise) {
+      BuildContext context, bool modifiable, bool addExercise) {
     var appLocalizations = AppLocalizations.of(context)!;
 
-    var nameTextField = TextFormField(
-      enabled: modifiable,
+    var nameTextField = _createTextFormField(
+      modifiable: modifiable,
       controller: _nameTextController,
-      decoration: InputDecoration(
-          labelText: appLocalizations.exerciseName,
-          border: OutlineInputBorder(),
-          hintText: appLocalizations.exerciseNameHint),
+      labelText: appLocalizations.exerciseName,
+      hintText: appLocalizations.exerciseNameHint,
       validator: (value) {
         var msg;
         if (value == null || value.isEmpty) {
@@ -78,19 +68,16 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
       },
     );
 
-    var descriptionTextField = TextFormField(
-      enabled: modifiable,
-      controller: _descriptionTextController,
-      decoration: InputDecoration(
+    var descriptionTextField = _createTextFormField(
+        modifiable: modifiable,
+        controller: _descriptionTextController,
         labelText: appLocalizations.exerciseDescription,
-        border: OutlineInputBorder(),
         hintText: appLocalizations.exerciseDescriptionHint,
-      ),
-      validator: (value) => value != null && value.length > descriptionMaxLength
-          ? appLocalizations
-              .exerciseDescriptionValidation_tooLong(descriptionMaxLength)
-          : null,
-    );
+        validator: (value) =>
+            value != null && value.length > descriptionMaxLength
+                ? appLocalizations
+                    .exerciseDescriptionValidation_tooLong(descriptionMaxLength)
+                : null);
 
     return Scaffold(
         appBar: AppBar(
@@ -114,9 +101,9 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
             children: [
               SizedBox(height: 10),
               nameTextField,
-              if (modifiable || descriptionTextController.text.isNotEmpty)
+              if (modifiable || _descriptionTextController.text.isNotEmpty)
                 SizedBox(height: 10),
-              if (modifiable || descriptionTextController.text.isNotEmpty)
+              if (modifiable || _descriptionTextController.text.isNotEmpty)
                 descriptionTextField,
             ],
           ),
@@ -211,4 +198,22 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 
   void _showExerciseCallback(BuildContext context) =>
       Navigator.pop(context, null);
+
+  Widget _createTextFormField(
+      {required bool modifiable,
+      required TextEditingController controller,
+      required String labelText,
+      required String hintText,
+      required FormFieldValidator<String> validator}) {
+    return TextFormField(
+      enabled: modifiable,
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(),
+        hintText: hintText,
+      ),
+      validator: validator,
+    );
+  }
 }
