@@ -30,7 +30,7 @@ class Repository {
           'CREATE TABLE ${ExercisesDao.table}(${ExercisesDao.colId} INTEGER PRIMARY KEY AUTOINCREMENT, ${ExercisesDao.colName} TEXT NOT NULL, ${ExercisesDao.colDescription} TEXT)',
         );
         db.execute(
-            'CREATE TABLE ${WorkoutsDao.tableExerciseSets}(${WorkoutsDao.colExerciseSetId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colExerciseSetExerciseId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetWorkoutId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetDetails} TEXT, FOREIGN KEY (${WorkoutsDao.colExerciseSetExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}) ON DELETE CASCADE, FOREIGN KEY (${WorkoutsDao.colExerciseSetWorkoutId}) REFERENCES ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId}) ON DELETE CASCADE)');
+            'CREATE TABLE ${WorkoutsDao.tableExerciseSets}(${WorkoutsDao.colExerciseSetId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colExerciseSetExerciseId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetWorkoutId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetDetails} TEXT, FOREIGN KEY (${WorkoutsDao.colExerciseSetExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}), FOREIGN KEY (${WorkoutsDao.colExerciseSetWorkoutId}) REFERENCES ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId}))');
         db.execute(
             'CREATE TABLE ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colWorkoutStartTime} INTEGER, ${WorkoutsDao.colWorkoutEndTime} INTEGER, ${WorkoutsDao.colWorkoutTitle} TEXT NOT NULL, ${WorkoutsDao.colWorkoutPreComment} TEXT, ${WorkoutsDao.colWorkoutPostComment} TEXT)');
       },
@@ -48,7 +48,11 @@ class Repository {
   Future<Exercise> updateExercise(Exercise exercise) =>
       _exercisesDao.update(exercise);
 
-  Future<bool> deleteExercise(int id) => _exercisesDao.delete(id);
+  Future<bool> deleteExercise(int id) async {
+    // TODO: It would be nice to remove exercise set and exercise in batch
+    await _workoutsDao.deleteExerciseSetByExerciseId(id);
+    return _exercisesDao.delete(id);
+  }
 
   Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) =>
       _workoutsDao.findAll(exercises);
