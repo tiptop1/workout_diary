@@ -92,6 +92,11 @@ class WorkoutsDao {
           .delete(tableWorkouts, where: '$colWorkoutId = ?', whereArgs: [id]) ==
       1;
 
+  Future<bool> deleteExerciseSetByExerciseId(int exerciseId) async =>
+      await _db.delete(tableExerciseSets,
+          where: '$colExerciseSetExerciseId = ?', whereArgs: [exerciseId]) >
+      0;
+
   Future<List<Object?>> _insertExerciseSets(
       int workoutId, List<ExerciseSet> exerciseSets, Transaction txn) async {
     var batch = txn.batch();
