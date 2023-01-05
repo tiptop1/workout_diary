@@ -1,6 +1,7 @@
 import 'package:redux/redux.dart';
 import 'package:workout_diary/src/controller/redux_actions.dart';
 import 'package:workout_diary/src/model/app_state.dart';
+import 'package:workout_diary/src/model/workout.dart';
 
 typedef AppStateReducer = AppState Function(AppState state, dynamic action);
 
@@ -72,10 +73,28 @@ AppState _modifyWorkoutReducer(AppState state, ModifyWorkoutAction action) {
 }
 
 AppState _removeExerciseReducer(AppState state, DeleteExerciseAction action) {
+  var exerciseId = action.exerciseId;
   return AppState(
-      exercises:
-          state.exercises.where((ex) => ex.id != action.exerciseId).toList(),
-      workouts: state.workouts);
+      exercises: state.exercises.where((ex) => ex.id != exerciseId).toList(),
+      workouts: _removeExerciseSetsByExerciseId(exerciseId, state.workouts));
+}
+
+List<Workout> _removeExerciseSetsByExerciseId(
+    int exerciseId, List<Workout> workouts) {
+  var newWorkouts = <Workout>[];
+  for (var workout in workouts) {
+    newWorkouts.add(Workout(
+        id: workout.id,
+        startTime: workout.startTime,
+        endTime: workout.endTime,
+        title: workout.title,
+        preComment: workout.preComment,
+        postComment: workout.postComment,
+        exerciseSets: workout.exerciseSets
+            .where((exSet) => exSet.exercise.id != exerciseId)
+            .toList()));
+  }
+  return newWorkouts;
 }
 
 AppState _removeWorkoutReducer(AppState state, DeleteWorkoutAction action) {
