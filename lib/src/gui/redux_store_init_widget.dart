@@ -11,7 +11,7 @@ import 'progress_widget.dart';
 class ReduxStoreInitWidget extends StatefulWidget {
   final Widget child;
 
-  const ReduxStoreInitWidget({required this.child, Key? key}) : super(key: key);
+  const ReduxStoreInitWidget({Key? key, required this.child}) : super(key: key);
 
   @override
   State<ReduxStoreInitWidget> createState() => _ReduxStoreInitWidgetState();
