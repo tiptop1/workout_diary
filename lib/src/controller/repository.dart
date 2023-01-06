@@ -49,7 +49,7 @@ class Repository {
       _exercisesDao.update(exercise);
 
   Future<bool> deleteExercise(int id) async {
-    // TODO: It would be nice to remove exercise set and exercise in batch
+    // TODO: It would be nice to use batch
     await _workoutsDao.deleteExerciseSetByExerciseId(id);
     return _exercisesDao.delete(id);
   }
@@ -63,5 +63,9 @@ class Repository {
   Future<Workout> updateWorkout(Workout workout) =>
       _workoutsDao.updateWorkout(workout);
 
-  Future<bool> deleteWorkout(int id) => _workoutsDao.deleteWorkout(id);
+  Future<bool> deleteWorkout(int id) async {
+    // TODO: It would be nice to use batch
+    await _workoutsDao.deleteExerciseSetByWorkoutId(id);
+    return _workoutsDao.deleteWorkout(id);
+  }
 }
