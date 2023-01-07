@@ -60,8 +60,10 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
             actions: <Widget>[
               TextButton(
                 child: Text(appLocalizations.yes),
-                onPressed: () => StoreProvider.of<AppState>(context)
-                    .dispatch(DeleteWorkoutAction(workoutId: workoutId)),
+                onPressed: () {
+                  StoreProvider.of<AppState>(context).dispatch(DeleteWorkoutAction(workoutId: workoutId));
+                  Navigator.of(context).pop();
+                }
               ),
               TextButton(
                 child: Text(appLocalizations.no),
