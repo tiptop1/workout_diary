@@ -4,6 +4,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
+import 'package:workout_diary/src/model/exercise_set.dart';
 
 import '../controller/redux_actions.dart';
 import '../model/app_state.dart';
@@ -16,7 +17,8 @@ String dateStr(Locale locale, DateTime dateTime) =>
     DateFormat.yMd(locale.toLanguageTag()).format(dateTime);
 
 String dateTimeStr(Locale locale, DateTime dateTime) =>
-    '${dateStr(locale, dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
+    '${dateStr(locale, dateTime)} ${DateFormat.jm(locale.toLanguageTag())
+        .format(dateTime)}';
 
 class WorkoutWidget extends StatefulWidget {
   const WorkoutWidget({Key? key}) : super(key: key);
@@ -82,19 +84,19 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                 _createTitleWidget(context, appLocalizations),
                 _createDateTimeRow(
                     context, locale, appLocalizations.start, null, _startTime,
-                    (dateTime) {
-                  setState(() {
-                    _startTime = dateTime;
-                    _endTime = null;
-                  });
-                }),
+                        (dateTime) {
+                      setState(() {
+                        _startTime = dateTime;
+                        _endTime = null;
+                      });
+                    }),
                 _createDateTimeRow(
                     context, locale, appLocalizations.end, _startTime, _endTime,
-                    (dateTime) {
-                  setState(() {
-                    _endTime = dateTime;
-                  });
-                }),
+                        (dateTime) {
+                      setState(() {
+                        _endTime = dateTime;
+                      });
+                    }),
                 _createPrecommentWidget(context, appLocalizations),
                 _createWorkoutEntryWidget(context, exercises),
                 _createPostcommentWidget(context, appLocalizations),
@@ -116,8 +118,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     return widget;
   }
 
-  Widget _createTitleWidget(
-      BuildContext context, AppLocalizations appLocalizations) {
+  Widget _createTitleWidget(BuildContext context,
+      AppLocalizations appLocalizations) {
     return TextFormField(
       validator: (value) {
         var msg;
@@ -143,18 +145,20 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   void _saveButtonCallback(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       var action = AddWorkoutAction(
-        workout: Workout(
-            startTime: _startTime,
-            endTime: _endTime,
-            title: _titleController.value.text,
-            preComment: _preCommentController.value.text,
-            postComment: _postCommentController.value.text),
-      );
-      Navigator.pop(context, action);
-    }
+          workout: Workout(
+              startTime: _startTime,
+              endTime: _endTime,
+              title: _titleController.value.text,
+              preComment: _preCommentController.value.text,
+              postComment: _postCommentController.value.text,
+              exerciseSets: _createExerciseSetsList())
+    ,);
+    Navigator.pop(context, action);
+  }
   }
 
-  Widget _createWorkoutEntryWidget(BuildContext context, List<Exercise> exercises) {
+  Widget _createWorkoutEntryWidget(BuildContext context,
+      List<Exercise> exercises) {
     var listTiles = <Widget>[];
     for (var i = 0; i < _entryTuples.length; i++) {
       listTiles.add(_createWorkoutEntryListTile(i, exercises, _entryTuples[i]));
@@ -166,8 +170,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createPrecommentWidget(
-      BuildContext context, AppLocalizations appLocalizations) {
+  Widget _createPrecommentWidget(BuildContext context,
+      AppLocalizations appLocalizations) {
     return TextFormField(
       controller: _preCommentController,
       keyboardType: TextInputType.multiline,
@@ -178,8 +182,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createPostcommentWidget(
-      BuildContext context, AppLocalizations appLocalizations) {
+  Widget _createPostcommentWidget(BuildContext context,
+      AppLocalizations appLocalizations) {
     return TextFormField(
       controller: _postCommentController,
       keyboardType: TextInputType.multiline,
@@ -190,21 +194,26 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createWorkoutEntryListTile(int index, List<Exercise> exercises, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+  Widget _createWorkoutEntryListTile(int index, List<Exercise> exercises,
+      Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return ListTile(
-      leading: _createExerciseDropDownButton(index, exercises, workoutEntryTuple),
+      leading: _createExerciseDropDownButton(
+          index, exercises, workoutEntryTuple),
       title: TextFormField(controller: workoutEntryTuple.item2),
     );
   }
 
-  Widget _createExerciseDropDownButton(int index, List<Exercise> exercises, Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+  Widget _createExerciseDropDownButton(int index, List<Exercise> exercises,
+      Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
     return DropdownButton<int>(
         items:
-            exercises.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
+        exercises.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
         value: workoutEntryTuple.item1.id,
         onChanged: (int? newExerciseId) {
           setState(() {
-            _entryTuples[index] = workoutEntryTuple.withItem1(exercises.firstWhere((exercise) => exercise.id == newExerciseId));
+            _entryTuples[index] = workoutEntryTuple.withItem1(
+                exercises.firstWhere((exercise) => exercise.id ==
+                    newExerciseId));
           });
         });
   }
@@ -216,8 +225,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createDateTimeRow(
-      BuildContext context,
+  Widget _createDateTimeRow(BuildContext context,
       Locale locale,
       String fieldName,
       DateTime? minTime,
@@ -226,7 +234,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     return Row(
       children: [
         Text(
-            '$fieldName: ${initTime != null ? dateTimeStr(locale, initTime) : ""}'),
+            '$fieldName: ${initTime != null
+                ? dateTimeStr(locale, initTime)
+                : ""}'),
         IconButton(
             onPressed: () {
               DatePicker.showDateTimePicker(
@@ -248,12 +258,20 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     var localeType;
     for (var lt in LocaleType.values) {
       var localeTypeCountry =
-          lt.toString().substring(lt.toString().indexOf('.') + 1);
+      lt.toString().substring(lt.toString().indexOf('.') + 1);
       if (localeCountry == localeTypeCountry) {
         localeType = lt;
         break;
       }
     }
     return localeType != null ? localeType : LocaleType.en;
+  }
+
+  List<ExerciseSet> _createExerciseSetsList() {
+    return List.generate(_entryTuples.length, (index) {
+      var exercise = _entryTuples[index].item1;
+      var details = _entryTuples[index].item2.text;
+      return ExerciseSet(exercise: exercise, details: details,);
+    });
   }
 }
