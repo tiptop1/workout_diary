@@ -43,7 +43,10 @@ class WorkoutsDao {
     var exerciseSetRecords = <Map<String, Object?>>[];
     var batchResults = await batch.commit();
     for (var i = 0; i < batchResults.length; i++) {
-      exerciseSetRecords.add(batchResults[i] as Map<String, Object?>);
+        var exerciseSet = batchResults[i];
+        if (exerciseSet is Map<String, Object?>) {
+          exerciseSetRecords.add(exerciseSet);
+        }
     }
     return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
