@@ -67,5 +67,7 @@
   "no": "No",
   "yes": "Yes",
   "start": "Start",
-  "end": "End"
+  "end": "End",
+  "ok": "Ok",
+  "cancel": "Cancel"
 }

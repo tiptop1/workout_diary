@@ -58,5 +58,7 @@
   "no" : "Nie",
   "yes" : "Tak",
   "start" : "Pocz\u0105tek",
-  "end" : "Koniec"
+  "end" : "Koniec",
+  "ok": "Ok",
+  "cancel": "Anuluj"
 }
