@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'removable_button_widget.dart';
+
 class DateTimePickerWidget extends StatefulWidget {
   const DateTimePickerWidget({Key? key}) : super(key: key);
 
@@ -47,37 +49,18 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
     return !_timeIsSet
         ? IconButton(
             icon: Icon(Icons.access_time),
-            onPressed: () {
-              showDialog(context: context, builder: TimePickerWidget())
-                  .then((time) {
-                setState(() {
-                  _dateTime = DateTime(_dateTime.year, _dateTime.month,
-                      _dateTime.day, time.hour, time.minute, time.second);
-                  _timeIsSet = true;
-                });
-              });
-            },
+            onPressed: () => _showTimePicker(context),
           )
-        : RemovableButton(onPress: () {
-            showDialog(
-              context: context,
-              builder: TimePickerWidget(initialTime: _dateTime),
-            ).then(
-              (time) {
-                setState(() {
-                  _dateTime = DateTime(_dateTime.year, _dateTime.month,
-                      _dateTime.day, time.hour, time.minute, time.second);
-                  _timeIsSet = true;
-                });
-              },
-            );
-          }, onRemove: () {
-            setState(() {
-              _dateTime = DateTime(
-                  _dateTime.year, _dateTime.month, _dateTime.day, 0, 0, 0);
-              _timeIsSet = false;
+        : RemovableButton(
+            child: Text(TimeOfDay.fromDateTime(_dateTime).format(context)),
+            onPressed: () => _showTimePicker(context),
+            onRemoved: () {
+              setState(() {
+                _dateTime = DateTime(
+                    _dateTime.year, _dateTime.month, _dateTime.day, 0, 0, 0);
+                _timeIsSet = false;
+              });
             });
-          });
   }
 
   Widget _buildActionsRow(BuildContext context) {
@@ -94,5 +77,22 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
         ),
       ],
     );
+  }
+
+  void _showTimePicker(BuildContext context) {
+    showTimePicker(
+            context: context,
+            initialTime: _timeIsSet
+                ? TimeOfDay.fromDateTime(_dateTime)
+                : TimeOfDay.now())
+        .then((time) {
+      setState(() {
+        if (time != null) {
+          _dateTime = DateTime(_dateTime.year, _dateTime.month, _dateTime.day,
+              time.hour, time.minute);
+          _timeIsSet = true;
+        }
+      });
+    });
   }
 }
