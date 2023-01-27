@@ -20,11 +20,15 @@ class RemovableButton extends StatelessWidget {
         children: [
           child,
           IconButton(
-            icon: Icon(Icons.cancel_outlined),
+            icon: Icon(Icons.close),
             onPressed: onRemoved,
           ),
         ],
       ),
+      style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 1, vertical: 1),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
     );
   }
 }
