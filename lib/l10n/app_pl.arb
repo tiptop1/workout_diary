@@ -60,5 +60,8 @@
   "start" : "Pocz\u0105tek",
   "end" : "Koniec",
   "ok": "Ok",
-  "cancel": "Anuluj"
+  "cancel": "Anuluj",
+  "setDate": "Ustaw dat\u0119",
+  "setTime": "Ustaw czas",
+  "setDateOrTime": "Ustaw dat\u0119\\czas"
 }

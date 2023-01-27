@@ -69,5 +69,8 @@
   "start": "Start",
   "end": "End",
   "ok": "Ok",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "setDate": "Set date",
+  "setTime": "Set time",
+  "setDateOrTime": "Set date\\time"
 }
