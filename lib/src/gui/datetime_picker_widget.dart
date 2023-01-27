@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'removable_button_widget.dart';
+import 'data_time_select_button.dart';
+import 'removable_button.dart';
 
 class DateTimePickerWidget extends StatefulWidget {
   const DateTimePickerWidget({Key? key}) : super(key: key);
@@ -25,19 +26,22 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return SimpleDialog(
       children: [
-        CalendarDatePicker(
-          initialDate: _dateTime,
-          firstDate: DateTime(
-              _dateTime.year, _dateTime.month - dateTimeOffset, _dateTime.day),
-          lastDate: DateTime(
-              _dateTime.year, _dateTime.month + dateTimeOffset, _dateTime.day),
-          onDateChanged: (newDate) {
-            setState(() {
-              _dateTime = DateTime(newDate.year, newDate.month, newDate.day);
-            });
-          },
+        SizedBox(
+          width: double.maxFinite,
+          child: CalendarDatePicker(
+            initialDate: _dateTime,
+            firstDate: DateTime(_dateTime.year,
+                _dateTime.month - dateTimeOffset, _dateTime.day),
+            lastDate: DateTime(_dateTime.year, _dateTime.month + dateTimeOffset,
+                _dateTime.day),
+            onDateChanged: (newDate) {
+              setState(() {
+                _dateTime = DateTime(newDate.year, newDate.month, newDate.day);
+              });
+            },
+          ),
         ),
         _buildTimeSelectRow(context),
         _buildActionsRow(context),
@@ -46,26 +50,30 @@ class _DateTimePickerWidgetState extends State<DateTimePickerWidget> {
   }
 
   Widget _buildTimeSelectRow(BuildContext context) {
-    return !_timeIsSet
-        ? IconButton(
-            icon: Icon(Icons.access_time),
-            onPressed: () => _showTimePicker(context),
-          )
-        : RemovableButton(
-            child: Text(TimeOfDay.fromDateTime(_dateTime).format(context)),
-            onPressed: () => _showTimePicker(context),
-            onRemoved: () {
-              setState(() {
-                _dateTime = DateTime(
-                    _dateTime.year, _dateTime.month, _dateTime.day, 0, 0, 0);
-                _timeIsSet = false;
-              });
-            });
+    return Align(
+        alignment: Alignment.centerLeft,
+        child: !_timeIsSet
+            ? DateTimeSelectButton(
+                selectDate: false,
+                selectTime: true,
+                onPressed: () => _showTimePicker(context),
+              )
+            : RemovableButton(
+                child: Text(TimeOfDay.fromDateTime(_dateTime).format(context)),
+                onPressed: () => _showTimePicker(context),
+                onRemoved: () {
+                  setState(() {
+                    _dateTime = DateTime(_dateTime.year, _dateTime.month,
+                        _dateTime.day, 0, 0, 0);
+                    _timeIsSet = false;
+                  });
+                }));
   }
 
   Widget _buildActionsRow(BuildContext context) {
     var loc = AppLocalizations.of(context)!;
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
