@@ -1,9 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
+import 'package:workout_diary/src/gui/data_time_select_button.dart';
 import 'package:workout_diary/src/gui/datetime_picker_widget.dart';
+import 'package:workout_diary/src/gui/removable_button.dart';
 import 'package:workout_diary/src/model/exercise_set.dart';
 
 import '../controller/redux_actions.dart';
@@ -81,19 +85,32 @@ class _AddWorkoutState extends State<WorkoutWidget> {
             child: Column(
               children: [
                 _createTitleWidget(context, appLocalizations),
-                _createDateTimeRow(
-                    context, locale, appLocalizations.start, null, _startTime,
-                    (dateTime) {
+                _createDateTimeRow(appLocalizations.start, _startTime, () {
+                  showDialog(
+                          context: context,
+                          builder: (context) => DateTimePickerWidget())
+                      .then((dateTime) {
+                    setState(() {
+                      _startTime = dateTime;
+                    });
+                  });
+                }, () {
                   setState(() {
-                    _startTime = dateTime;
-                    _endTime = null;
+                    _startTime = null;
                   });
                 }),
-                _createDateTimeRow(
-                    context, locale, appLocalizations.end, _startTime, _endTime,
-                    (dateTime) {
+                _createDateTimeRow(appLocalizations.end, _endTime, () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => DateTimePickerWidget())
+                      .then((dateTime) {
+                    setState(() {
+                      _endTime = dateTime;
+                    });
+                  });
+                }, () {
                   setState(() {
-                    _endTime = dateTime;
+                    _endTime = null;
                   });
                 }),
                 _createPrecommentWidget(context, appLocalizations),
@@ -223,24 +240,22 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createDateTimeRow(
-      BuildContext context,
-      Locale locale,
-      String fieldName,
-      DateTime? minTime,
-      DateTime? initTime,
-      Function dateTimePickerCallback) {
+  Widget _createDateTimeRow(String fieldName, DateTime? dateTime,
+      VoidCallback dateTimeSetCallback, VoidCallback dateTimeRemoveCallback) {
+    var widget;
+    if (dateTime == null) {
+      widget = DateTimeSelectButton(
+          selectDate: true, selectTime: true, onPressed: dateTimeSetCallback);
+    } else {
+      widget = RemovableButton(
+          onPressed: dateTimeSetCallback,
+          onRemoved: dateTimeRemoveCallback,
+          child: Text(DateFormat.yMd().add_jm().format(dateTime)));
+    }
     return Row(
       children: [
-        Text(
-            '$fieldName: ${initTime != null ? dateTimeStr(locale, initTime) : ""}'),
-        IconButton(
-            onPressed: () {
-              showDialog(
-                      context: context, builder: (_) => DateTimePickerWidget())
-                  .then((dateTime) => dateTimePickerCallback(dateTime));
-            },
-            icon: Icon(Icons.access_time)),
+        Text(fieldName),
+        widget,
       ],
     );
   }
