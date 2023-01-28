@@ -41,8 +41,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   DateTime? _startTime;
   DateTime? _endTime;
   late TextEditingController _titleController;
-  late TextEditingController _preCommentController;
-  late TextEditingController _postCommentController;
+  late TextEditingController _commentController;
   late List<Tuple2<Exercise, TextEditingController>> _entryTuples;
   late final GlobalKey<FormState> _formKey;
 
@@ -50,16 +49,14 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _preCommentController = TextEditingController();
-    _postCommentController = TextEditingController();
+    _commentController = TextEditingController();
     _entryTuples = [];
     _formKey = GlobalKey<FormState>();
   }
 
   @override
   void dispose() {
-    _postCommentController.dispose();
-    _preCommentController.dispose();
+    _commentController.dispose();
     _entryTuples.forEach((t) => t.item2.dispose());
     _titleController.dispose();
     super.dispose();
@@ -89,7 +86,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
             key: _formKey,
             child: Column(
               children: [
-                _createTitleWidget(context, appLocalizations, widget._modifiable),
+                _createTitleTextField(context, appLocalizations, widget._modifiable),
                 _createDateTimeRow(appLocalizations.start, _startTime, () {
                   showDialog(
                           context: context,
@@ -118,9 +115,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                     _endTime = null;
                   });
                 }),
-                _createPrecommentWidget(context, appLocalizations),
+                _createCommentTextField(context, appLocalizations),
                 _createWorkoutEntryWidget(context, exercises),
-                _createPostcommentWidget(context, appLocalizations),
+
               ],
             ),
           ),
@@ -137,7 +134,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createTitleWidget(
+  Widget _createTitleTextField(
       BuildContext context, AppLocalizations appLocalizations, bool modifiable) {
     return TextFormField(
       validator: (value) {
@@ -168,8 +165,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
             startTime: _startTime,
             endTime: _endTime,
             title: _titleController.value.text,
-            preComment: _preCommentController.value.text,
-            postComment: _postCommentController.value.text,
+            comment: _commentController.value.text,
             exerciseSets: _createExerciseSetsList()),
       );
       Navigator.pop(context, action);
@@ -189,27 +185,15 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createPrecommentWidget(
+  Widget _createCommentTextField(
       BuildContext context, AppLocalizations appLocalizations) {
     return TextFormField(
-      controller: _preCommentController,
+      controller: _commentController,
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
-          labelText: appLocalizations.workoutPrecomment,
+          labelText: appLocalizations.workoutComment,
           border: OutlineInputBorder(),
-          hintText: appLocalizations.workoutPrecommentHint),
-    );
-  }
-
-  Widget _createPostcommentWidget(
-      BuildContext context, AppLocalizations appLocalizations) {
-    return TextFormField(
-      controller: _postCommentController,
-      keyboardType: TextInputType.multiline,
-      decoration: InputDecoration(
-          labelText: appLocalizations.workoutPostcomment,
-          border: OutlineInputBorder(),
-          hintText: appLocalizations.workoutPostcommentHint),
+          hintText: appLocalizations.workoutCommentHint),
     );
   }
 
