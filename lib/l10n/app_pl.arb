@@ -47,10 +47,8 @@
       }
     }
   },
-  "workoutPrecomment": "Warunki wst\u0119pne",
-  "workoutPrecommentHint": "Opcjonalne waruniki wst\u0119pne - np. Twoje samopoczucie.",
-  "workoutPostcomment": "Podsumowanie",
-  "workoutPostcommentHint": "Opcjonalne podsumowanie - np. Twoja ocena treningu.",
+  "workoutComment": "Komentarz",
+  "workoutCommentHint": "Opcjonalny komentarz.",
   "workoutDeleteTitle": "Usuwanie treningu",
   "workoutDeleteInfo": "Usun\u0105\u0107 trening?",
   "modify": "Modyfikuj",

@@ -88,8 +88,7 @@ List<Workout> _removeExerciseSetsByExerciseId(
         startTime: workout.startTime,
         endTime: workout.endTime,
         title: workout.title,
-        preComment: workout.preComment,
-        postComment: workout.postComment,
+        comment: workout.comment,
         exerciseSets: workout.exerciseSets
             .where((exSet) => exSet.exercise.id != exerciseId)
             .toList()));

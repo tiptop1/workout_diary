@@ -32,7 +32,7 @@ class Repository {
         db.execute(
             'CREATE TABLE ${WorkoutsDao.tableExerciseSets}(${WorkoutsDao.colExerciseSetId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colExerciseSetExerciseId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetWorkoutId} INTEGER NOT NULL, ${WorkoutsDao.colExerciseSetDetails} TEXT, FOREIGN KEY (${WorkoutsDao.colExerciseSetExerciseId}) REFERENCES ${ExercisesDao.table}(${ExercisesDao.colId}), FOREIGN KEY (${WorkoutsDao.colExerciseSetWorkoutId}) REFERENCES ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId}))');
         db.execute(
-            'CREATE TABLE ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colWorkoutStartTime} INTEGER, ${WorkoutsDao.colWorkoutEndTime} INTEGER, ${WorkoutsDao.colWorkoutTitle} TEXT NOT NULL, ${WorkoutsDao.colWorkoutPreComment} TEXT, ${WorkoutsDao.colWorkoutPostComment} TEXT)');
+            'CREATE TABLE ${WorkoutsDao.tableWorkouts}(${WorkoutsDao.colWorkoutId} INTEGER PRIMARY KEY AUTOINCREMENT, ${WorkoutsDao.colWorkoutStartTime} INTEGER, ${WorkoutsDao.colWorkoutEndTime} INTEGER, ${WorkoutsDao.colWorkoutTitle} TEXT NOT NULL, ${WorkoutsDao.colWorkoutComment} TEXT)');
       },
     );
     return Repository._internal(db);

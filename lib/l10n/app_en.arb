@@ -56,10 +56,8 @@
       }
     }
   },
-  "workoutPrecomment": "Preconditions",
-  "workoutPrecommentHint": "Optional preconditions - e.g. your mood.",
-  "workoutPostcomment": "Summary",
-  "workoutPostcommentHint": "Optional summary - e.g. workout rating.",
+  "workoutComment": "Comment",
+  "workoutCommentHint": "Optional comment.",
   "workoutDeleteTitle": "Delete workout",
   "workoutDeleteInfo": "Delete workout?",
   "modify": "Modify",

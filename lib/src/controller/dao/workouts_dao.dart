@@ -18,8 +18,7 @@ class WorkoutsDao {
   static const colWorkoutStartTime = 'startTime';
   static const colWorkoutEndTime = 'endTime';
   static const colWorkoutTitle = 'title';
-  static const colWorkoutPreComment = 'preComment';
-  static const colWorkoutPostComment = 'postComment';
+  static const colWorkoutComment = 'comment';
 
   late final Database _db;
 
@@ -154,8 +153,7 @@ class WorkoutsDao {
         colWorkoutStartTime: workout.startTime?.millisecondsSinceEpoch,
         colWorkoutEndTime: workout.endTime?.millisecondsSinceEpoch,
         colWorkoutTitle: workout.title,
-        colWorkoutPreComment: workout.preComment,
-        colWorkoutPostComment: workout.postComment,
+        colWorkoutComment: workout.comment,
       };
 
   Map<String, Object?> _exerciseSetToMap(ExerciseSet exerciseSet) => {
@@ -210,8 +208,7 @@ class WorkoutsDao {
       startTime: workout.startTime,
       endTime: workout.endTime,
       title: workout.title,
-      preComment: workout.preComment,
-      postComment: workout.postComment,
+      comment: workout.comment,
       exerciseSets: exerciseSets,
     );
   }
@@ -242,8 +239,7 @@ class WorkoutsDao {
           : null,
       endTime:
           endTime != null ? DateTime.fromMillisecondsSinceEpoch(endTime) : null,
-      preComment: workoutRecord[colWorkoutPreComment] as String?,
-      postComment: workoutRecord[colWorkoutPostComment] as String?,
+      comment: workoutRecord[colWorkoutComment] as String?,
       exerciseSets: _createExerciseSetList(exerciseSetRecords, exercises),
     );
   }
