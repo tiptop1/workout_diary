@@ -5,14 +5,12 @@ class Workout extends Entity {
   static const startTimeField = 'startTime';
   static const endTimeField = 'endTime';
   static const titleField = 'title';
-  static const preCommentField = 'preComment';
-  static const postCommentField = 'postComment';
+  static const commentField = 'comment';
 
   final DateTime? startTime;
   final DateTime? endTime;
   final String title;
-  final String? preComment;
-  final String? postComment;
+  final String? comment;
   final List<ExerciseSet> _exerciseSets;
 
   Workout(
@@ -20,8 +18,7 @@ class Workout extends Entity {
       this.startTime,
       this.endTime,
       required this.title,
-      this.preComment,
-      this.postComment,
+      this.comment,
       List<ExerciseSet> exerciseSets = const []})
       : assert(title.isNotEmpty),
         _exerciseSets = List.unmodifiable(exerciseSets),
@@ -32,8 +29,7 @@ class Workout extends Entity {
     DateTime? startTime,
     DateTime? endTime,
     String? title,
-    String? preComment,
-    String? postComment,
+    String? comment,
     List<ExerciseSet>? exerciseSets,
   }) {
     return Workout(
@@ -41,8 +37,7 @@ class Workout extends Entity {
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       title: title ?? this.title,
-      preComment: preComment ?? this.preComment,
-      postComment: postComment ?? this.postComment,
+      comment: comment ?? this.comment,
       exerciseSets: exerciseSets ?? this._exerciseSets,
     );
   }
@@ -53,8 +48,7 @@ class Workout extends Entity {
             startTime: json[startTimeField],
             endTime: json[endTimeField],
             title: json[titleField],
-            preComment: json[preCommentField],
-            postComment: json[postCommentField]);
+            comment: json[commentField]);
 
   List<ExerciseSet> get exerciseSets => _exerciseSets;
 
@@ -63,8 +57,7 @@ class Workout extends Entity {
     json[startTimeField] = startTime;
     json[endTimeField] = endTime;
     json[titleField] = title;
-    json[preCommentField] = preComment;
-    json[postCommentField] = postComment;
+    json[commentField] = comment;
     json['exerciseSets'] = _exerciseSets;
     return json;
   }
@@ -83,8 +76,7 @@ class Workout extends Entity {
           startTime == other.startTime &&
           endTime == other.endTime &&
           title == other.title &&
-          preComment == other.preComment &&
-          postComment == other.postComment &&
+          comment == other.comment &&
           _exerciseSets == other._exerciseSets;
 
   @override
@@ -93,7 +85,6 @@ class Workout extends Entity {
       startTime.hashCode ^
       endTime.hashCode ^
       title.hashCode ^
-      preComment.hashCode ^
-      postComment.hashCode ^
+      comment.hashCode ^
       _exerciseSets.hashCode;
 }
