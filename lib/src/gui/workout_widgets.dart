@@ -24,7 +24,13 @@ String dateTimeStr(Locale locale, DateTime dateTime) =>
     '${dateStr(locale, dateTime)} ${DateFormat.jm(locale.toLanguageTag()).format(dateTime)}';
 
 class WorkoutWidget extends StatefulWidget {
-  const WorkoutWidget({Key? key}) : super(key: key);
+  final Workout? _workout;
+  final bool _modifiable;
+
+  const WorkoutWidget({Key? key, Workout? workout, bool modifiable = false})
+      : _workout = workout,
+        _modifiable = modifiable,
+        super(key: key);
 
   @override
   State<WorkoutWidget> createState() => _AddWorkoutState();
@@ -62,8 +68,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   @override
   Widget build(BuildContext context) {
     var appLocalizations = AppLocalizations.of(context)!;
-    Locale locale = Localizations.localeOf(context);
-    var widget = StoreConnector<AppState, List<Exercise>>(
+    return StoreConnector<AppState, List<Exercise>>(
       converter: (store) => store.state.exercises,
       builder: (context, exercises) {
         return Scaffold(
@@ -84,7 +89,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
             key: _formKey,
             child: Column(
               children: [
-                _createTitleWidget(context, appLocalizations),
+                _createTitleWidget(context, appLocalizations, widget._modifiable),
                 _createDateTimeRow(appLocalizations.start, _startTime, () {
                   showDialog(
                           context: context,
@@ -101,8 +106,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                 }),
                 _createDateTimeRow(appLocalizations.end, _endTime, () {
                   showDialog(
-                      context: context,
-                      builder: (context) => DateTimePickerWidget())
+                          context: context,
+                          builder: (context) => DateTimePickerWidget())
                       .then((dateTime) {
                     setState(() {
                       _endTime = dateTime;
@@ -130,12 +135,10 @@ class _AddWorkoutState extends State<WorkoutWidget> {
         );
       },
     );
-
-    return widget;
   }
 
   Widget _createTitleWidget(
-      BuildContext context, AppLocalizations appLocalizations) {
+      BuildContext context, AppLocalizations appLocalizations, bool modifiable) {
     return TextFormField(
       validator: (value) {
         var msg;
@@ -271,3 +274,4 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     });
   }
 }
+
