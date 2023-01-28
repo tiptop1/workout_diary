@@ -70,12 +70,9 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
               var currentTab = tabs.keys.elementAt(_tabController.index);
               var tabWidget;
               if (currentTab == appLocalizations.workoutsTab) {
-                tabWidget = WorkoutWidget();
+                tabWidget = WorkoutWidget(key: UniqueKey(), modifiable: true,);
               } else if (currentTab == appLocalizations.exercisesTab) {
-                tabWidget = ExerciseWidget(
-                  key: UniqueKey(),
-                  modifiable: true,
-                );
+                tabWidget = ExerciseWidget(key: UniqueKey(), modifiable: true,);
               } else {
                 assert(false, 'Tab $currentTab not supported.');
               }
