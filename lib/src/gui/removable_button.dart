@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 
 class RemovableButton extends StatelessWidget {
   final VoidCallback onPressed;
-  final VoidCallback onRemoved;
+  final VoidCallback? onRemoved;
   final Widget child;
 
   const RemovableButton(
-      {Key? key,
-      required this.onPressed,
-      required this.onRemoved,
-      required this.child})
+      {Key? key, required this.onPressed, this.onRemoved, required this.child})
       : super(key: key);
 
   @override
@@ -19,10 +16,11 @@ class RemovableButton extends StatelessWidget {
       child: Row(
         children: [
           child,
-          IconButton(
-            icon: Icon(Icons.close),
-            onPressed: onRemoved,
-          ),
+          if (onRemoved != null)
+            IconButton(
+              icon: Icon(Icons.close),
+              onPressed: onRemoved,
+            ),
         ],
       ),
       style: OutlinedButton.styleFrom(
