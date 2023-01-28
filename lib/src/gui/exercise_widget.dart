@@ -28,8 +28,8 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
   @override
   void initState() {
     super.initState();
-    _nameTextController = TextEditingController();
-    _descriptionTextController = TextEditingController();
+    _nameTextController = TextEditingController(text: widget._exercise?.name ?? '');
+    _descriptionTextController = TextEditingController(text: widget._exercise?.description ?? '');
     _formKey = GlobalKey<FormState>();
   }
 
@@ -42,18 +42,11 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _nameTextController.text = widget._exercise?.name ?? '';
-    _descriptionTextController.text = widget._exercise?.description ?? '';
-    return _buildExerciseWidget(
-        context, widget._modifiable, widget._exercise == null);
-  }
-
-  Widget _buildExerciseWidget(
-      BuildContext context, bool modifiable, bool addExercise) {
+    var addExercise = widget._exercise == null;
     var appLocalizations = AppLocalizations.of(context)!;
 
     var nameTextField = _createTextFormField(
-      modifiable: modifiable,
+      modifiable: widget._modifiable,
       controller: _nameTextController,
       labelText: appLocalizations.exerciseName,
       hintText: appLocalizations.exerciseNameHint,
@@ -69,7 +62,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     );
 
     var descriptionTextField = _createTextFormField(
-        modifiable: modifiable,
+        modifiable: widget._modifiable,
         controller: _descriptionTextController,
         labelText: appLocalizations.exerciseDescription,
         hintText: appLocalizations.exerciseDescriptionHint,
@@ -82,7 +75,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     return Scaffold(
         appBar: AppBar(
           title:
-              Text(_calculateTitle(appLocalizations, modifiable, addExercise)),
+              Text(_calculateTitle(appLocalizations, widget._modifiable, addExercise)),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () => _backButtonCallback(context),
@@ -91,7 +84,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
             IconButton(
               icon: Icon(Icons.check),
               onPressed: () =>
-                  _saveButtonCallback(context, modifiable, addExercise),
+                  _saveButtonCallback(context, widget._modifiable, addExercise),
             ),
           ],
         ),
@@ -101,9 +94,9 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
             children: [
               SizedBox(height: 10),
               nameTextField,
-              if (modifiable || _descriptionTextController.text.isNotEmpty)
+              if (widget._modifiable || _descriptionTextController.text.isNotEmpty)
                 SizedBox(height: 10),
-              if (modifiable || _descriptionTextController.text.isNotEmpty)
+              if (widget._modifiable || _descriptionTextController.text.isNotEmpty)
                 descriptionTextField,
             ],
           ),
