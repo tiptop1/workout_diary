@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -49,8 +47,10 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   void initState() {
     super.initState();
     _titleController = TextEditingController();
+    _titleController.text = widget._workout?.title ?? '';
     _commentController = TextEditingController();
-    _entryTuples = [];
+    _commentController.text = widget._workout?.comment ?? '';
+    _entryTuples = _createEntryTuples();
     _formKey = GlobalKey<FormState>();
   }
 
@@ -76,17 +76,18 @@ class _AddWorkoutState extends State<WorkoutWidget> {
               onPressed: () => _backButtonCallback(context),
             ),
             actions: [
-              IconButton(
-                icon: Icon(Icons.check),
-                onPressed: () => _saveButtonCallback(context),
-              ),
+              if (widget._modifiable)
+                IconButton(
+                  icon: Icon(Icons.check),
+                  onPressed: () => _saveButtonCallback(context),
+                ),
             ],
           ),
           body: Form(
             key: _formKey,
             child: Column(
               children: [
-                _createTitleTextField(context, appLocalizations, widget._modifiable),
+                _createTitleTextField(context, appLocalizations),
                 _createDateTimeRow(appLocalizations.start, _startTime, () {
                   showDialog(
                           context: context,
@@ -117,7 +118,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                 }),
                 _createCommentTextField(context, appLocalizations),
                 _createWorkoutEntryWidget(context, exercises),
-
               ],
             ),
           ),
@@ -135,17 +135,22 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   Widget _createTitleTextField(
-      BuildContext context, AppLocalizations appLocalizations, bool modifiable) {
-    return TextFormField(
-      validator: (value) {
-        var msg;
+      BuildContext context, AppLocalizations appLocalizations) {
+    var validator;
+    if (widget._modifiable) {
+      validator = (String? value) {
+        String? msg;
         if (value == null || value.isEmpty) {
           msg = appLocalizations.workoutTitleValidation_required;
         } else if (value.length > titleMaxLength) {
           msg = appLocalizations.workoutTitleValidation_tooLong(titleMaxLength);
         }
         return msg;
-      },
+      };
+    }
+    return TextFormField(
+      enabled: widget._modifiable,
+      validator: validator,
       controller: _titleController,
       decoration: InputDecoration(
           labelText: appLocalizations.workoutTitle,
@@ -160,14 +165,23 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   void _saveButtonCallback(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      var action = AddWorkoutAction(
-        workout: Workout(
-            startTime: _startTime,
-            endTime: _endTime,
-            title: _titleController.value.text,
-            comment: _commentController.value.text,
-            exerciseSets: _createExerciseSetsList()),
-      );
+      var action;
+      var workout = Workout(
+          id: widget._workout != null ? widget._workout!.id : null,
+          startTime: _startTime,
+          endTime: _endTime,
+          title: _titleController.value.text,
+          comment: _commentController.value.text,
+          exerciseSets: _createExerciseSetsList());
+      if (widget._workout == null) {
+        action = AddWorkoutAction(
+          workout: workout,
+        );
+      } else {
+        action = ModifyWorkoutAction(
+          workout: workout,
+        );
+      }
       Navigator.pop(context, action);
     }
   }
@@ -257,5 +271,14 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       );
     });
   }
-}
 
+  List<Tuple2<Exercise, TextEditingController>> _createEntryTuples() {
+    var entryTuples = <Tuple2<Exercise, TextEditingController>>[];
+    for (ExerciseSet exerciseSet
+        in widget._workout?.exerciseSets ?? List.empty()) {
+      var controller = TextEditingController(text: exerciseSet.details ?? '');
+      entryTuples.add(Tuple2(exerciseSet.exercise, controller));
+    }
+    return entryTuples;
+  }
+}
