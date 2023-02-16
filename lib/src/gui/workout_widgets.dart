@@ -12,6 +12,7 @@ import '../controller/redux_actions.dart';
 import '../model/app_state.dart';
 import '../model/exercise.dart';
 import '../model/workout.dart';
+import 'commons.dart';
 
 const String dateLackMarker = '-';
 
@@ -88,34 +89,16 @@ class _AddWorkoutState extends State<WorkoutWidget> {
             child: Column(
               children: [
                 _createTitleTextField(context, appLocalizations),
-                _createDateTimeRow(appLocalizations.start, _startTime, () {
-                  showDialog(
-                          context: context,
-                          builder: (context) => DateTimePickerWidget())
-                      .then((dateTime) {
-                    setState(() {
-                      _startTime = dateTime;
-                    });
-                  });
-                }, () {
-                  setState(() {
-                    _startTime = null;
-                  });
-                }),
-                _createDateTimeRow(appLocalizations.end, _endTime, () {
-                  showDialog(
-                          context: context,
-                          builder: (context) => DateTimePickerWidget())
-                      .then((dateTime) {
-                    setState(() {
-                      _endTime = dateTime;
-                    });
-                  });
-                }, () {
-                  setState(() {
-                    _endTime = null;
-                  });
-                }),
+                DateTimeSelectRow(
+                  rowName: appLocalizations.start,
+                  initialDateTime: _startTime,
+                  updateCallback: (newStartTime) => _startTime = newStartTime,
+                ),
+                DateTimeSelectRow(
+                  rowName: appLocalizations.end,
+                  initialDateTime: _endTime,
+                  updateCallback: (newEndTime) => _endTime = newEndTime,
+                ),
                 _createCommentTextField(context, appLocalizations),
                 _createWorkoutEntryWidget(context, exercises),
               ],
@@ -280,5 +263,66 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       entryTuples.add(Tuple2(exerciseSet.exercise, controller));
     }
     return entryTuples;
+  }
+}
+
+class DateTimeSelectRow extends StatefulWidget {
+  final DateTime? initialDateTime;
+  final String rowName;
+  final UpdateDateTimeCallback updateCallback;
+
+  const DateTimeSelectRow(
+      {Key? key,
+      this.initialDateTime,
+      required this.rowName,
+      required this.updateCallback})
+      : super(key: key);
+
+  @override
+  State<DateTimeSelectRow> createState() => _DateTimeSelectRowState();
+}
+
+class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
+  DateTime? _dateTime;
+
+  @override
+  void initState() {
+    super.initState();
+    _dateTime = widget.initialDateTime;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var dateTimeWidget;
+    if (_dateTime == null) {
+      dateTimeWidget = DateTimeSelectButton(
+          selectDate: true, selectTime: true, onPressed: _setDateTimeCallback);
+    } else {
+      dateTimeWidget = RemovableButton(
+          onPressed: _setDateTimeCallback,
+          onRemoved: () {
+            setState(() {
+              _dateTime = null;
+            });
+            widget.updateCallback(null);
+          },
+          child: Text(DateFormat.yMd().add_jm().format(_dateTime!)));
+    }
+    return Row(
+      children: [
+        Text(widget.rowName),
+        dateTimeWidget,
+      ],
+    );
+  }
+
+  void _setDateTimeCallback() {
+    showDialog(context: context, builder: (context) => DateTimePickerWidget())
+        .then((dateTime) {
+      setState(() {
+        _dateTime = dateTime;
+      });
+      widget.updateCallback(dateTime);
+    });
   }
 }
