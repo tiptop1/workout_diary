@@ -43,9 +43,13 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
 
   @override
   void listItemShowAction(BuildContext context, Workout workout) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Workout show action not implemented yet!'),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WorkoutWidget(
+            workout: workout,
+          ),
+        ));
   }
 
   void _showDeleteDialog(BuildContext context, int workoutId) {
@@ -59,12 +63,12 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
             content: _buildDialogContent(appLocalizations),
             actions: <Widget>[
               TextButton(
-                child: Text(appLocalizations.yes),
-                onPressed: () {
-                  StoreProvider.of<AppState>(context).dispatch(DeleteWorkoutAction(workoutId: workoutId));
-                  Navigator.of(context).pop();
-                }
-              ),
+                  child: Text(appLocalizations.yes),
+                  onPressed: () {
+                    StoreProvider.of<AppState>(context)
+                        .dispatch(DeleteWorkoutAction(workoutId: workoutId));
+                    Navigator.of(context).pop();
+                  }),
               TextButton(
                 child: Text(appLocalizations.no),
                 onPressed: () => Navigator.of(context).pop(),
