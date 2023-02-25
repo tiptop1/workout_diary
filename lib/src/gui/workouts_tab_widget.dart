@@ -30,9 +30,14 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
 
   @override
   void listItemModifyAction(BuildContext context, Workout workout) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Workout modify action not implemented yet!'),
-    ));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WorkoutWidget(
+            workout: workout,
+            modifiable: true,
+          ),
+        ));
   }
 
   @override
