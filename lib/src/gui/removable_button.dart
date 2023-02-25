@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class RemovableButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final VoidCallback? onRemoved;
   final Widget child;
 
   const RemovableButton(
-      {Key? key, required this.onPressed, this.onRemoved, required this.child})
+      {Key? key, this.onPressed, this.onRemoved, required this.child})
       : super(key: key);
 
   @override
