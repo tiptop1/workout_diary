@@ -47,6 +47,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   @override
   void initState() {
     super.initState();
+    _startTime = widget._workout?.startTime;
+    _endTime = widget._workout?.endTime;
     _titleController = TextEditingController();
     _titleController.text = widget._workout?.title ?? '';
     _commentController = TextEditingController();
@@ -93,11 +95,13 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                   rowName: appLocalizations.start,
                   initialDateTime: _startTime,
                   updateCallback: (newStartTime) => _startTime = newStartTime,
+                  modifiable: widget._modifiable,
                 ),
                 DateTimeSelectRow(
                   rowName: appLocalizations.end,
                   initialDateTime: _endTime,
                   updateCallback: (newEndTime) => _endTime = newEndTime,
+                  modifiable: widget._modifiable,
                 ),
                 _createCommentTextField(context, appLocalizations),
                 _createWorkoutEntryWidget(context, exercises),
@@ -270,12 +274,14 @@ class DateTimeSelectRow extends StatefulWidget {
   final DateTime? initialDateTime;
   final String rowName;
   final UpdateDateTimeCallback updateCallback;
+  final bool modifiable;
 
   const DateTimeSelectRow(
       {Key? key,
       this.initialDateTime,
       required this.rowName,
-      required this.updateCallback})
+      required this.updateCallback,
+      this.modifiable = false})
       : super(key: key);
 
   @override
@@ -295,23 +301,17 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
   Widget build(BuildContext context) {
     var dateTimeWidget;
     if (_dateTime == null) {
-      dateTimeWidget = DateTimeSelectButton(
-          selectDate: true, selectTime: true, onPressed: _setDateTimeCallback);
+      dateTimeWidget = widget.modifiable ? DateTimeSelectButton(selectDate: true, selectTime: true, onPressed: _setDateTimeCallback) : null;
     } else {
       dateTimeWidget = RemovableButton(
-          onPressed: _setDateTimeCallback,
-          onRemoved: () {
-            setState(() {
-              _dateTime = null;
-            });
-            widget.updateCallback(null);
-          },
+          onPressed: widget.modifiable ? _setDateTimeCallback : null,
+          onRemoved: widget.modifiable ? _removeDateTimeCallback : null,
           child: Text(DateFormat.yMd().add_jm().format(_dateTime!)));
     }
     return Row(
       children: [
         Text(widget.rowName),
-        dateTimeWidget,
+        if (dateTimeWidget != null) dateTimeWidget,
       ],
     );
   }
@@ -324,5 +324,12 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
       });
       widget.updateCallback(dateTime);
     });
+  }
+
+  void _removeDateTimeCallback() {
+    setState(() {
+      _dateTime = null;
+    });
+    widget.updateCallback(null);
   }
 }
