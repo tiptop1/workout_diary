@@ -17,7 +17,7 @@ class DateTimeSelectButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var applocs = AppLocalizations.of(context)!;
-    var text;
+    String? text;
     if (selectDate && selectTime) {
       text = applocs.setDateOrTime;
     } else if (selectTime) {
@@ -30,7 +30,7 @@ class DateTimeSelectButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Icon(Icons.access_time),
+          const Icon(Icons.access_time),
           if (text != null) Text(text),
         ],
       ),

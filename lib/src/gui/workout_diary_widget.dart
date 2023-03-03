@@ -14,6 +14,7 @@ import 'workouts_tab_widget.dart';
 class WorkoutDiaryWidget extends StatefulWidget {
   const WorkoutDiaryWidget({Key? key}) : super(key: key);
 
+  @override
   State<WorkoutDiaryWidget> createState() => _WorkoutDiaryWidgetState();
 }
 
@@ -24,7 +25,7 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(vsync: this, length: 2);
+    _tabController = TabController(vsync: this, length: 2);
   }
 
   @override
@@ -68,13 +69,11 @@ class _WorkoutDiaryWidgetState extends State<WorkoutDiaryWidget>
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               var currentTab = tabs.keys.elementAt(_tabController.index);
-              var tabWidget;
-              if (currentTab == appLocalizations.workoutsTab) {
-                tabWidget = WorkoutWidget(key: UniqueKey(), modifiable: true,);
-              } else if (currentTab == appLocalizations.exercisesTab) {
+              Widget tabWidget;
+              if (currentTab == appLocalizations.exercisesTab) {
                 tabWidget = ExerciseWidget(key: UniqueKey(), modifiable: true,);
               } else {
-                assert(false, 'Tab $currentTab not supported.');
+                tabWidget = WorkoutWidget(key: UniqueKey(), modifiable: true,);
               }
               Navigator.push(context,
                       MaterialPageRoute(builder: (context) => tabWidget))

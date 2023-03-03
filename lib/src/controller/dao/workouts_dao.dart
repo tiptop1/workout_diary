@@ -42,10 +42,10 @@ class WorkoutsDao {
     var exerciseSetRecords = <Map<String, Object?>>[];
     var batchResults = await batch.commit();
     for (var i = 0; i < batchResults.length; i++) {
-        var exerciseSet = batchResults[i];
-        if (exerciseSet is Map<String, Object?>) {
-          exerciseSetRecords.add(exerciseSet);
-        }
+      var exerciseSet = batchResults[i];
+      if (exerciseSet is Map<String, Object?>) {
+        exerciseSetRecords.add(exerciseSet);
+      }
     }
     return _createWorkoutsList(workoutRecords, exerciseSetRecords, exercises);
   }
@@ -53,15 +53,16 @@ class WorkoutsDao {
   Future<Workout> insertWorkout(Workout workout) async {
     assert(workout.id == null,
         'Could not insert already inserted (having id) workout.');
-    var workoutId;
+    int? workoutId;
     List<ExerciseSet> exerciseSets = await _db.transaction((txn) async {
       workoutId = await txn.insert(
         tableWorkouts,
         _workoutToMap(workout),
         conflictAlgorithm: ConflictAlgorithm.rollback,
       );
+      assert(workoutId != null);
       return _toExerciseSet(workout.exerciseSets,
-          await _insertExerciseSets(workoutId, workout.exerciseSets, txn));
+          await _insertExerciseSets(workoutId!, workout.exerciseSets, txn));
     });
     return workout.copyWith(id: workoutId, exerciseSets: exerciseSets);
   }
@@ -216,12 +217,14 @@ class WorkoutsDao {
   List<Workout> _createWorkoutsList(List<Map<String, Object?>> workoutRecords,
       List<Map<String, Object?>> exerciseSetRecords, List<Exercise> exercises) {
     var workouts = <Workout>[];
-    workoutRecords.forEach((workoutRecord) => workouts.add(_createWorkout(
-        workoutRecord,
-        exerciseSetRecords.where((exerciseSetRecord) =>
-            exerciseSetRecord[colExerciseSetWorkoutId] ==
-            workoutRecord[colWorkoutId]),
-        exercises)));
+    for (var workoutRecord in workoutRecords) {
+      workouts.add(_createWorkout(
+          workoutRecord,
+          exerciseSetRecords.where((exerciseSetRecord) =>
+              exerciseSetRecord[colExerciseSetWorkoutId] ==
+              workoutRecord[colWorkoutId]),
+          exercises));
+    }
     return workouts;
   }
 
@@ -248,14 +251,15 @@ class WorkoutsDao {
       Iterable<Map<String, Object?>> exerciseSetRecords,
       List<Exercise> exercises) {
     var exerciseSet = <ExerciseSet>[];
-    var exercisesMapping =
-        Map.fromIterable(exercises, key: (e) => e.id, value: (e) => e);
-    exerciseSetRecords
-        .forEach((exerciseSetRecord) => exerciseSet.add(ExerciseSet(
-              exercise:
-                  exercisesMapping[exerciseSetRecord[colExerciseSetExerciseId]],
-              details: exerciseSetRecord[colExerciseSetDetails] as String?,
-            )));
+    var exercisesMapping = <int?, Exercise>{for (var e in exercises) e.id: e};
+
+    for (var exerciseSetRecord in exerciseSetRecords) {
+      var exerciseId = exerciseSetRecord[colExerciseSetExerciseId];
+      var exerciseSetDetails = exerciseSetRecord[colExerciseSetDetails] as String?;
+      if (exerciseId != null && exercisesMapping.containsKey(exerciseId)) {
+        exerciseSet.add(ExerciseSet(exercise: exercisesMapping[exerciseId]!, details: exerciseSetDetails,));
+      }
+    }
     return exerciseSet;
   }
 }

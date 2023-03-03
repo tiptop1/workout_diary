@@ -38,7 +38,7 @@ class Workout extends Entity {
       endTime: endTime ?? this.endTime,
       title: title ?? this.title,
       comment: comment ?? this.comment,
-      exerciseSets: exerciseSets ?? this._exerciseSets,
+      exerciseSets: exerciseSets ?? _exerciseSets,
     );
   }
 
@@ -52,6 +52,7 @@ class Workout extends Entity {
 
   List<ExerciseSet> get exerciseSets => _exerciseSets;
 
+  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = super.toJson();
     json[startTimeField] = startTime;

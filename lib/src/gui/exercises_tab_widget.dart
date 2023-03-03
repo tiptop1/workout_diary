@@ -18,16 +18,16 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
       store.state.exercises;
 
   @override
-  Widget listItemTitle(BuildContext context, Exercise exercise) =>
-      Text(exercise.name);
+  Widget listItemTitle(BuildContext context, Exercise entity) =>
+      Text(entity.name);
 
   @override
-  void listItemModifyAction(BuildContext context, Exercise exercise) {
+  void listItemModifyAction(BuildContext context, Exercise entity) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ExerciseWidget(
-            key: UniqueKey(), exercise: exercise, modifiable: true),
+            key: UniqueKey(), exercise: entity, modifiable: true),
       ),
     ).then((action) {
       if (action != null) {
@@ -37,20 +37,21 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
   }
 
   @override
-  void listItemDeleteAction(BuildContext context, Exercise exercise) {
-    var exerciseId = exercise.id;
+  void listItemDeleteAction(BuildContext context, Exercise entity) {
+    var exerciseId = entity.id;
     assert(exerciseId != null, "Deleting exercise without id isn't allowed.");
     var relationsCount = countRelations(
         StoreProvider.of<AppState>(context).state.workouts, exerciseId!);
     _showDialogAndDeleteExercise(context, relationsCount, exerciseId);
   }
 
-  void listItemShowAction(BuildContext context, Exercise exercise) {
+  @override
+  void listItemShowAction(BuildContext context, Exercise entity) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-            ExerciseWidget(key: UniqueKey(), exercise: exercise),
+            ExerciseWidget(key: UniqueKey(), exercise: entity),
       ),
     ).then((action) {
       if (action != null) {
@@ -90,9 +91,9 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
   }
 
   Widget _dialogContent(AppLocalizations appLocalizations, int relationsCount) {
-    var msg;
-    var icon;
-    var iconColor;
+    String msg;
+    IconData icon;
+    Color iconColor;
     if (relationsCount < 1) {
       msg = appLocalizations.deleteExerciseInfo;
       icon = Icons.info;
@@ -115,7 +116,7 @@ class ExercisesTabWidget extends ListWidget<Exercise> {
           child: Icon(icon, color: iconColor),
         ),
       ),
-      Spacer(flex: 2),
+      const Spacer(flex: 2),
       Expanded(
         flex: 60,
         child: Text(msg),

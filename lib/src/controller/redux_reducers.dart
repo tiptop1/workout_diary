@@ -36,7 +36,7 @@ AppState _addExerciseReducer(AppState state, AddExerciseAction action) {
 
 AppState _addWorkoutReducer(AppState state, AddWorkoutAction action) {
   var addedWorkout = action.workout;
-  var newState;
+  AppState newState;
   if (addedWorkout.id != null) {
     newState = AppState(
         exercises: state.exercises,

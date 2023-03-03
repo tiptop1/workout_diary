@@ -11,7 +11,6 @@ import '../controller/redux_actions.dart';
 import '../model/app_state.dart';
 import '../model/exercise.dart';
 import '../model/workout.dart';
-import 'commons.dart';
 
 const String dateLackMarker = '-';
 
@@ -59,7 +58,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   @override
   void dispose() {
     _commentController.dispose();
-    _entryTuples.forEach((t) => t.item2.dispose());
+    for (var t in _entryTuples) {
+      t.item2.dispose();
+    }
     _titleController.dispose();
     super.dispose();
   }
@@ -74,13 +75,13 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           appBar: AppBar(
             title: Text(appLocalizations.addWorkoutTitle),
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () => _backButtonCallback(context),
             ),
             actions: [
               if (widget._modifiable)
                 IconButton(
-                  icon: Icon(Icons.check),
+                  icon: const Icon(Icons.check),
                   onPressed: () => _saveButtonCallback(context),
                 ),
             ],
@@ -122,7 +123,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   Widget _createTitleTextField(
       BuildContext context, AppLocalizations appLocalizations) {
-    var validator;
+    FormFieldValidator<String>? validator;
     if (widget._modifiable) {
       validator = (String? value) {
         String? msg;
@@ -140,7 +141,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       controller: _titleController,
       decoration: InputDecoration(
           labelText: appLocalizations.workoutTitle,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           hintText: appLocalizations.workoutTitleHint),
     );
   }
@@ -151,7 +152,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 
   void _saveButtonCallback(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      var action;
+      Object action;
       var workout = Workout(
           id: widget._workout != null ? widget._workout!.id : null,
           startTime: _startTime,
@@ -192,7 +193,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       keyboardType: TextInputType.multiline,
       decoration: InputDecoration(
           labelText: appLocalizations.workoutComment,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           hintText: appLocalizations.workoutCommentHint),
     );
   }
@@ -227,27 +228,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  Widget _createDateTimeRow(String fieldName, DateTime? dateTime,
-      VoidCallback dateTimeSetCallback, VoidCallback dateTimeRemoveCallback) {
-    var widget;
-    if (dateTime == null) {
-      widget = DateTimeSelectButton(
-          selectDate: true, selectTime: true, onPressed: dateTimeSetCallback);
-    } else {
-      widget = InputChip(
-        label: Text(DateFormat.yMd().add_jm().format(dateTime)),
-        onPressed: dateTimeSetCallback,
-        onDeleted: dateTimeRemoveCallback,
-      );
-    }
-    return Row(
-      children: [
-        Text(fieldName),
-        widget,
-      ],
-    );
-  }
-
   List<ExerciseSet> _createExerciseSetsList() {
     return List.generate(_entryTuples.length, (index) {
       var exercise = _entryTuples[index].item1;
@@ -273,7 +253,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
 class DateTimeSelectRow extends StatefulWidget {
   final DateTime? initialDateTime;
   final String rowName;
-  final UpdateDateTimeCallback updateCallback;
+  final void Function(DateTime? dateTime) updateCallback;
   final bool modifiable;
 
   const DateTimeSelectRow(
@@ -299,7 +279,7 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
 
   @override
   Widget build(BuildContext context) {
-    var dateTimeWidget;
+    Widget? dateTimeWidget;
     if (_dateTime == null) {
       dateTimeWidget = widget.modifiable
           ? DateTimeSelectButton(
@@ -323,7 +303,7 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
   }
 
   void _setDateTimeCallback() {
-    showDialog(context: context, builder: (context) => DateTimePickerWidget())
+    showDialog(context: context, builder: (context) => const DateTimePickerWidget())
         .then((dateTime) {
       setState(() {
         _dateTime = dateTime;

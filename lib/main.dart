@@ -9,9 +9,6 @@ void main() {
 
   // Logging configuration
   Logger.root.level = Level.WARNING;
-  Logger.root.onRecord.listen((record) {
-    print('${record.level.name}/${record.loggerName}: ${record.message}');
-  });
 
   runApp(ReduxStoreInitWidget(
     child: MaterialApp(
@@ -20,7 +17,7 @@ void main() {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       onGenerateTitle: (BuildContext ctx) => AppLocalizations.of(ctx)!.appTitle,
-      home: WorkoutDiaryWidget(),
+      home: const WorkoutDiaryWidget(),
     ),
   ));
 }

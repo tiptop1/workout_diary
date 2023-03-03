@@ -28,6 +28,7 @@ class _ReduxStoreInitWidgetState extends State<ReduxStoreInitWidget> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     if (_store == null) {
       Repository.init().then((repository) {
@@ -37,7 +38,7 @@ class _ReduxStoreInitWidgetState extends State<ReduxStoreInitWidget> {
         _store = store;
         setState(() {});
       });
-      return ProgressWidget();
+      return const ProgressWidget();
     } else {
       return StoreProvider(store: _store!, child: widget.child);
     }

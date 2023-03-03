@@ -16,6 +16,7 @@ class Exercise extends Entity {
             name: json[nameField],
             description: json[descriptionField]);
 
+  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = super.toJson();
     json[nameField] = name;

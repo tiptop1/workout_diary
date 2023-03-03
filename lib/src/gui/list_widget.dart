@@ -14,6 +14,7 @@ abstract class ListWidget<E extends Entity> extends StatelessWidget {
 
   const ListWidget({Key? key}) : super(key: key);
 
+  @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, List<E>>(
       converter: storeConnectorConverter,
@@ -58,7 +59,7 @@ abstract class ListWidget<E extends Entity> extends StatelessWidget {
       BuildContext context, E entity) {
     var appLocalizations = AppLocalizations.of(context)!;
     return PopupMenuButton<ListItemAction>(
-      icon: Icon(Icons.menu_rounded),
+      icon: const Icon(Icons.menu_rounded),
       onSelected: (ListItemAction result) {
         if (result == ListItemAction.modify) {
           listItemModifyAction(context, entity);

@@ -51,7 +51,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
       labelText: appLocalizations.exerciseName,
       hintText: appLocalizations.exerciseNameHint,
       validator: (value) {
-        var msg;
+        String? msg;
         if (value == null || value.isEmpty) {
           msg = appLocalizations.exerciseNameValidation_required;
         } else if (value.length > nameMaxLength) {
@@ -77,12 +77,12 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
           title:
               Text(_calculateTitle(appLocalizations, widget._modifiable, addExercise)),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () => _backButtonCallback(context),
           ),
           actions: <Widget>[
             IconButton(
-              icon: Icon(Icons.check),
+              icon: const Icon(Icons.check),
               onPressed: () =>
                   _saveButtonCallback(context, widget._modifiable, addExercise),
             ),
@@ -92,10 +92,10 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
           key: _formKey,
           child: Column(
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               nameTextField,
               if (widget._modifiable || _descriptionTextController.text.isNotEmpty)
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               if (widget._modifiable || _descriptionTextController.text.isNotEmpty)
                 descriptionTextField,
             ],
@@ -111,7 +111,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
 
   String _calculateTitle(
       AppLocalizations appLocalizations, bool modifiable, bool addExercise) {
-    var title;
+    String title;
     if (shouldAddExercise(modifiable, addExercise)) {
       // Add new exercise
       title = appLocalizations.addExerciseTitle;
@@ -148,12 +148,12 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
   void _addExerciseCallback(BuildContext context) {
     var exerciseName = _nameTextController.value.text;
     var exerciseDescription = _descriptionTextController.value.text;
-    var action;
+    AddExerciseAction? action;
     if (exerciseName != '') {
       action = AddExerciseAction(
         exercise: Exercise(
           name: exerciseName,
-          description: (exerciseDescription.trim().length > 0
+          description: (exerciseDescription.trim().isNotEmpty
               ? exerciseDescription
               : null),
         ),
@@ -203,7 +203,7 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         hintText: hintText,
       ),
       validator: validator,

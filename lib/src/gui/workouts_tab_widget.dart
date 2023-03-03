@@ -18,41 +18,41 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
       store.state.workouts;
 
   @override
-  Widget listItemTitle(BuildContext context, Workout workout) {
-    var startTime = workout.startTime;
+  Widget listItemTitle(BuildContext context, Workout entity) {
+    var startTime = entity.startTime;
     var startTimeStr = startTime != null
         ? dateTimeStr(Localizations.localeOf(context), startTime)
         : dateLackMarker;
 
     return Text(
-        startTime != null ? '${workout.title} ($startTimeStr)' : workout.title);
+        startTime != null ? '${entity.title} ($startTimeStr)' : entity.title);
   }
 
   @override
-  void listItemModifyAction(BuildContext context, Workout workout) {
+  void listItemModifyAction(BuildContext context, Workout entity) {
     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => WorkoutWidget(
-            workout: workout,
+            workout: entity,
             modifiable: true,
           ),
         ));
   }
 
   @override
-  void listItemDeleteAction(BuildContext context, Workout workout) {
-    assert(workout.id != null, "Deleting workout without id isn't allowed.");
-    _showDeleteDialog(context, workout.id!);
+  void listItemDeleteAction(BuildContext context, Workout entity) {
+    assert(entity.id != null, "Deleting workout without id isn't allowed.");
+    _showDeleteDialog(context, entity.id!);
   }
 
   @override
-  void listItemShowAction(BuildContext context, Workout workout) {
+  void listItemShowAction(BuildContext context, Workout entity) {
     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => WorkoutWidget(
-            workout: workout,
+            workout: entity,
           ),
         ));
   }
@@ -85,14 +85,14 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
 
   Widget _buildDialogContent(AppLocalizations appLocalizations) {
     return Row(children: [
-      Expanded(
+      const Expanded(
         flex: 20,
         child: FittedBox(
           fit: BoxFit.fill,
           child: Icon(Icons.help, color: Colors.yellow),
         ),
       ),
-      Spacer(flex: 2),
+      const Spacer(flex: 2),
       Expanded(
         flex: 60,
         child: Text(appLocalizations.workoutDeleteInfo),

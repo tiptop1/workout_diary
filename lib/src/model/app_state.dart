@@ -6,8 +6,8 @@ class AppState {
   final List<Workout> workouts;
 
   AppState({required List<Exercise> exercises, required List<Workout> workouts})
-      : this.exercises = List.unmodifiable(exercises),
-        this.workouts = List.unmodifiable(workouts);
+      : exercises = List.unmodifiable(exercises),
+        workouts = List.unmodifiable(workouts);
 
   @override
   bool operator ==(Object other) =>
