@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:tuple/tuple.dart';
 import 'package:workout_diary/src/gui/data_time_select_button.dart';
 import 'package:workout_diary/src/gui/datetime_picker_widget.dart';
-import 'package:workout_diary/src/gui/removable_button.dart';
 import 'package:workout_diary/src/model/exercise_set.dart';
 
 import '../controller/redux_actions.dart';
@@ -235,10 +234,11 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       widget = DateTimeSelectButton(
           selectDate: true, selectTime: true, onPressed: dateTimeSetCallback);
     } else {
-      widget = RemovableButton(
-          onPressed: dateTimeSetCallback,
-          onRemoved: dateTimeRemoveCallback,
-          child: Text(DateFormat.yMd().add_jm().format(dateTime)));
+      widget = InputChip(
+        label: Text(DateFormat.yMd().add_jm().format(dateTime)),
+        onPressed: dateTimeSetCallback,
+        onDeleted: dateTimeRemoveCallback,
+      );
     }
     return Row(
       children: [
@@ -301,12 +301,18 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
   Widget build(BuildContext context) {
     var dateTimeWidget;
     if (_dateTime == null) {
-      dateTimeWidget = widget.modifiable ? DateTimeSelectButton(selectDate: true, selectTime: true, onPressed: _setDateTimeCallback) : null;
+      dateTimeWidget = widget.modifiable
+          ? DateTimeSelectButton(
+              selectDate: true,
+              selectTime: true,
+              onPressed: _setDateTimeCallback)
+          : null;
     } else {
-      dateTimeWidget = RemovableButton(
-          onPressed: widget.modifiable ? _setDateTimeCallback : null,
-          onRemoved: widget.modifiable ? _removeDateTimeCallback : null,
-          child: Text(DateFormat.yMd().add_jm().format(_dateTime!)));
+      dateTimeWidget = InputChip(
+        label: Text(DateFormat.yMd().add_jm().format(_dateTime!)),
+        onPressed: widget.modifiable ? _setDateTimeCallback : null,
+        onDeleted: widget.modifiable ? _removeDateTimeCallback : null,
+      );
     }
     return Row(
       children: [
