@@ -54,6 +54,8 @@ flutter:
 
   # Added to generate translations.
   generate: true
+dev_dependencies:
+  flutter_lints: ^2.0.1
 
   # To add assets to your application, add an assets section, like this:
   # assets:
