@@ -39,7 +39,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   DateTime? _endTime;
   late TextEditingController _titleController;
   late TextEditingController _commentController;
-  late List<Tuple2<Exercise, TextEditingController>> _entryTuples;
+  late List<Tuple2<Exercise, TextEditingController>> _exerciseSetTuples;
   late final GlobalKey<FormState> _formKey;
 
   @override
@@ -51,14 +51,14 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     _titleController.text = widget._workout?.title ?? '';
     _commentController = TextEditingController();
     _commentController.text = widget._workout?.comment ?? '';
-    _entryTuples = _createEntryTuples();
+    _exerciseSetTuples = _createEntryTuples();
     _formKey = GlobalKey<FormState>();
   }
 
   @override
   void dispose() {
     _commentController.dispose();
-    for (var t in _entryTuples) {
+    for (var t in _exerciseSetTuples) {
       t.item2.dispose();
     }
     _titleController.dispose();
@@ -111,7 +111,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           floatingActionButton: FloatingActionButton(
               onPressed: () {
                 setState(() {
-                  _entryTuples
+                  _exerciseSetTuples
                       .add(Tuple2(exercises.first, TextEditingController()));
                 });
               },
@@ -176,8 +176,8 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   Widget _createWorkoutEntryWidget(
       BuildContext context, List<Exercise> exercises) {
     var listTiles = <Widget>[];
-    for (var i = 0; i < _entryTuples.length; i++) {
-      listTiles.add(_createWorkoutEntryListTile(i, exercises, _entryTuples[i]));
+    for (var i = 0; i < _exerciseSetTuples.length; i++) {
+      listTiles.add(_createWorkoutEntryListTile(i, exercises, _exerciseSetTuples[i]));
     }
     return Expanded(
       child: ListView(
@@ -215,7 +215,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
         value: workoutEntryTuple.item1.id,
         onChanged: (int? newExerciseId) {
           setState(() {
-            _entryTuples[index] = workoutEntryTuple.withItem1(exercises
+            _exerciseSetTuples[index] = workoutEntryTuple.withItem1(exercises
                 .firstWhere((exercise) => exercise.id == newExerciseId));
           });
         });
@@ -229,9 +229,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   List<ExerciseSet> _createExerciseSetsList() {
-    return List.generate(_entryTuples.length, (index) {
-      var exercise = _entryTuples[index].item1;
-      var details = _entryTuples[index].item2.text;
+    return List.generate(_exerciseSetTuples.length, (index) {
+      var exercise = _exerciseSetTuples[index].item1;
+      var details = _exerciseSetTuples[index].item2.text;
       return ExerciseSet(
         exercise: exercise,
         details: details,
