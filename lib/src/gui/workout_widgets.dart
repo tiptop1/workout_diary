@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
-import 'package:tuple/tuple.dart';
 import 'package:workout_diary/src/gui/data_time_select_button.dart';
 import 'package:workout_diary/src/gui/datetime_picker_widget.dart';
 import 'package:workout_diary/src/model/exercise_set.dart';
@@ -13,6 +12,8 @@ import '../model/exercise.dart';
 import '../model/workout.dart';
 
 const String dateLackMarker = '-';
+
+typedef RemoveExerciseSetsCallback = void Function(int index);
 
 String dateStr(Locale locale, DateTime dateTime) =>
     DateFormat.yMd(locale.toLanguageTag()).format(dateTime);
@@ -39,7 +40,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   DateTime? _endTime;
   late TextEditingController _titleController;
   late TextEditingController _commentController;
-  late List<Tuple2<Exercise, TextEditingController>> _exerciseSetTuples;
+
+  late List<(Exercise, TextEditingController)> _exerciseSetRecords;
+
   late final GlobalKey<FormState> _formKey;
 
   @override
@@ -51,15 +54,16 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     _titleController.text = widget._workout?.title ?? '';
     _commentController = TextEditingController();
     _commentController.text = widget._workout?.comment ?? '';
-    _exerciseSetTuples = _createEntryTuples();
+    _exerciseSetRecords =
+        _createExerciseSetRecords(widget._workout?.exerciseSets ?? []);
     _formKey = GlobalKey<FormState>();
   }
 
   @override
   void dispose() {
     _commentController.dispose();
-    for (var t in _exerciseSetTuples) {
-      t.item2.dispose();
+    for (var r in _exerciseSetRecords) {
+      r.$2.dispose();
     }
     _titleController.dispose();
     super.dispose();
@@ -104,21 +108,32 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                   modifiable: widget._modifiable,
                 ),
                 _createCommentTextField(context, appLocalizations),
-                _createWorkoutEntryWidget(context, exercises),
+                Expanded(
+                  child: ExerciseSetsWidget(
+                    setRecords: _exerciseSetRecords,
+                    addSetCallback: () => _addExerciseSetCallback(exercises),
+                    removeSetCallback: _removeExerciseSetCallback,
+                    modifiable: widget._modifiable,
+                  ),
+                ),
               ],
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-              onPressed: () {
-                setState(() {
-                  _exerciseSetTuples
-                      .add(Tuple2(exercises.first, TextEditingController()));
-                });
-              },
-              child: const Icon(Icons.add)),
         );
       },
     );
+  }
+
+  void _addExerciseSetCallback(List<Exercise> exercises) {
+    setState(() {
+      _exerciseSetRecords.add((exercises[0], TextEditingController()));
+    });
+  }
+
+  void _removeExerciseSetCallback(int index) {
+    setState(() {
+      _exerciseSetRecords.removeAt(index);
+    });
   }
 
   Widget _createTitleTextField(
@@ -176,8 +191,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   Widget _createWorkoutEntryWidget(
       BuildContext context, List<Exercise> exercises) {
     var listTiles = <Widget>[];
-    for (var i = 0; i < _exerciseSetTuples.length; i++) {
-      listTiles.add(_createWorkoutEntryListTile(i, exercises, _exerciseSetTuples[i]));
+    for (var i = 0; i < _exerciseSetRecords.length; i++) {
+      listTiles.add(
+          _createWorkoutEntryListTile(i, exercises, _exerciseSetRecords[i]));
     }
     return Expanded(
       child: ListView(
@@ -199,24 +215,26 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   Widget _createWorkoutEntryListTile(int index, List<Exercise> exercises,
-      Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+      (Exercise, TextEditingController) exerciseSetRecord) {
     return ListTile(
       leading:
-          _createExerciseDropDownButton(index, exercises, workoutEntryTuple),
-      title: TextFormField(controller: workoutEntryTuple.item2),
+          _createExerciseDropDownButton(index, exercises, exerciseSetRecord),
+      title: TextFormField(controller: exerciseSetRecord.$2),
     );
   }
 
   Widget _createExerciseDropDownButton(int index, List<Exercise> exercises,
-      Tuple2<Exercise, TextEditingController> workoutEntryTuple) {
+      (Exercise, TextEditingController) exerciseSetRecord) {
     return DropdownButton<int>(
         items:
             exercises.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
-        value: workoutEntryTuple.item1.id,
+        value: exerciseSetRecord.$1.id,
         onChanged: (int? newExerciseId) {
           setState(() {
-            _exerciseSetTuples[index] = workoutEntryTuple.withItem1(exercises
-                .firstWhere((exercise) => exercise.id == newExerciseId));
+            _exerciseSetRecords[index] = (
+              exercises.firstWhere((exercise) => exercise.id == newExerciseId),
+              exerciseSetRecord.$2
+            );
           });
         });
   }
@@ -229,9 +247,9 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   }
 
   List<ExerciseSet> _createExerciseSetsList() {
-    return List.generate(_exerciseSetTuples.length, (index) {
-      var exercise = _exerciseSetTuples[index].item1;
-      var details = _exerciseSetTuples[index].item2.text;
+    return List.generate(_exerciseSetRecords.length, (index) {
+      var exercise = _exerciseSetRecords[index].$1;
+      var details = _exerciseSetRecords[index].$2.text;
       return ExerciseSet(
         exercise: exercise,
         details: details,
@@ -239,14 +257,13 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     });
   }
 
-  List<Tuple2<Exercise, TextEditingController>> _createEntryTuples() {
-    var entryTuples = <Tuple2<Exercise, TextEditingController>>[];
-    for (ExerciseSet exerciseSet
-        in widget._workout?.exerciseSets ?? List.empty()) {
-      var controller = TextEditingController(text: exerciseSet.details ?? '');
-      entryTuples.add(Tuple2(exerciseSet.exercise, controller));
+  List<(Exercise, TextEditingController)> _createExerciseSetRecords(
+      List<ExerciseSet> exerciseSets) {
+    var records = <(Exercise, TextEditingController)>[];
+    for (var es in exerciseSets) {
+      records.add((es.exercise, TextEditingController(text: es.details ?? '')));
     }
-    return entryTuples;
+    return records;
   }
 }
 
@@ -303,8 +320,9 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
   }
 
   void _setDateTimeCallback() {
-    showDialog(context: context, builder: (context) => const DateTimePickerWidget())
-        .then((dateTime) {
+    showDialog(
+        context: context,
+        builder: (context) => const DateTimePickerWidget()).then((dateTime) {
       setState(() {
         _dateTime = dateTime;
       });
@@ -317,5 +335,35 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
       _dateTime = null;
     });
     widget.updateCallback(null);
+  }
+}
+
+class ExerciseSetsWidget extends StatelessWidget {
+  final List<(Exercise, TextEditingController)> _setRecords;
+  final VoidCallback _addSetCallback;
+  final RemoveExerciseSetsCallback _removeSetCallback;
+  final bool _modifiable;
+
+  const ExerciseSetsWidget(
+      {super.key,
+      required List<(Exercise, TextEditingController)> setRecords,
+      required VoidCallback addSetCallback,
+      required RemoveExerciseSetsCallback removeSetCallback,
+      bool modifiable = false})
+      : _setRecords = setRecords,
+        _addSetCallback = addSetCallback,
+        _removeSetCallback = removeSetCallback,
+        _modifiable = modifiable;
+
+  @override
+  Widget build(BuildContext context) {
+    var listTiles = <Widget>[];
+    for (var i = 0; i < _exerciseSetRecords.length; i++) {
+      listTiles.add(
+          _createWorkoutEntryListTile(i, exercises, _exerciseSetRecords[i]));
+    }
+    return ListView(
+      children: listTiles,
+    );
   }
 }
