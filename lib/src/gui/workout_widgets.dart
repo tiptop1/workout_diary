@@ -13,7 +13,14 @@ import '../model/workout.dart';
 
 const String dateLackMarker = '-';
 
-typedef RemoveExerciseSetsCallback = void Function(int index);
+typedef AddExerciseSetCallback = void Function();
+typedef RemoveExerciseSetCallback = void Function(int index);
+typedef ModifyExerciseSetCallback = void Function(
+    int index, int exerciseId, String details);
+typedef ExerciseSetRecord = (
+  Exercise exercise,
+  TextEditingController controller
+);
 
 String dateStr(Locale locale, DateTime dateTime) =>
     DateFormat.yMd(locale.toLanguageTag()).format(dateTime);
@@ -41,7 +48,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
   late TextEditingController _titleController;
   late TextEditingController _commentController;
 
-  late List<(Exercise, TextEditingController)> _exerciseSetRecords;
+  late List<ExerciseSetRecord> _exerciseSetRecords;
 
   late final GlobalKey<FormState> _formKey;
 
@@ -192,8 +199,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       BuildContext context, List<Exercise> exercises) {
     var listTiles = <Widget>[];
     for (var i = 0; i < _exerciseSetRecords.length; i++) {
-      listTiles.add(
-          _createWorkoutEntryListTile(i, exercises, _exerciseSetRecords[i]));
+      listTiles.add(_exerciseSetTile(i, exercises, _exerciseSetRecords[i]));
     }
     return Expanded(
       child: ListView(
@@ -211,38 +217,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
           labelText: appLocalizations.workoutComment,
           border: const OutlineInputBorder(),
           hintText: appLocalizations.workoutCommentHint),
-    );
-  }
-
-  Widget _createWorkoutEntryListTile(int index, List<Exercise> exercises,
-      (Exercise, TextEditingController) exerciseSetRecord) {
-    return ListTile(
-      leading:
-          _createExerciseDropDownButton(index, exercises, exerciseSetRecord),
-      title: TextFormField(controller: exerciseSetRecord.$2),
-    );
-  }
-
-  Widget _createExerciseDropDownButton(int index, List<Exercise> exercises,
-      (Exercise, TextEditingController) exerciseSetRecord) {
-    return DropdownButton<int>(
-        items:
-            exercises.map((e) => _createExerciseDropdownMenuItem(e)).toList(),
-        value: exerciseSetRecord.$1.id,
-        onChanged: (int? newExerciseId) {
-          setState(() {
-            _exerciseSetRecords[index] = (
-              exercises.firstWhere((exercise) => exercise.id == newExerciseId),
-              exerciseSetRecord.$2
-            );
-          });
-        });
-  }
-
-  DropdownMenuItem<int> _createExerciseDropdownMenuItem(Exercise exercise) {
-    return DropdownMenuItem<int>(
-      value: exercise.id,
-      child: Text(exercise.name),
     );
   }
 
@@ -340,30 +314,71 @@ class _DateTimeSelectRowState extends State<DateTimeSelectRow> {
 
 class ExerciseSetsWidget extends StatelessWidget {
   final List<(Exercise, TextEditingController)> _setRecords;
-  final VoidCallback _addSetCallback;
-  final RemoveExerciseSetsCallback _removeSetCallback;
+  final List<Exercise> _exercises;
+  final AddExerciseSetCallback _addSetCallback;
+  final ModifyExerciseSetCallback _modifySetCallback;
+  final RemoveExerciseSetCallback _removeSetCallback;
   final bool _modifiable;
 
   const ExerciseSetsWidget(
       {super.key,
       required List<(Exercise, TextEditingController)> setRecords,
-      required VoidCallback addSetCallback,
-      required RemoveExerciseSetsCallback removeSetCallback,
+      required List<Exercise> exercises,
+      required AddExerciseSetCallback addSetCallback,
+      required ModifyExerciseSetCallback modifySetCallback,
+      required RemoveExerciseSetCallback removeSetCallback,
       bool modifiable = false})
       : _setRecords = setRecords,
+        _exercises = exercises,
         _addSetCallback = addSetCallback,
+        _modifySetCallback = modifySetCallback,
         _removeSetCallback = removeSetCallback,
         _modifiable = modifiable;
 
   @override
   Widget build(BuildContext context) {
-    var listTiles = <Widget>[];
-    for (var i = 0; i < _exerciseSetRecords.length; i++) {
-      listTiles.add(
-          _createWorkoutEntryListTile(i, exercises, _exerciseSetRecords[i]));
-    }
     return ListView(
-      children: listTiles,
+      children: [
+        ...List.generate(
+            _setRecords.length, (i) => _exerciseSetTile(i, _setRecords[i])),
+        if (_modifiable)
+          IconButton(onPressed: _addSetCallback, icon: const Icon(Icons.add)),
+      ],
+    );
+  }
+
+  Widget _exerciseSetTile(int i, (Exercise, TextEditingController) setRecord) {
+    return ListTile(
+      leading: _modifiable
+          ? _exercisesDropDownButton(i, setRecord)
+          : Text(setRecord.$1.name),
+      title: _modifiable
+          ? TextFormField(controller: setRecord.$2)
+          : Text(setRecord.$2.value.text),
+      trailing: _modifiable
+          ? IconButton(
+              onPressed: () => _removeSetCallback(i),
+              icon: const Icon(Icons.delete),
+            )
+          : null,
+    );
+  }
+
+  Widget _exercisesDropDownButton(
+      int i, (Exercise, TextEditingController) setRecord) {
+    return DropdownButton<int>(
+      items: List.generate(
+          _exercises.length, (i) => exerciseDropdownMenuItem(_exercises[i])),
+      value: setRecord.$1.id,
+      onChanged: (int? exerciseId) =>
+          _modifySetCallback(i, exerciseId!, setRecord.$2.value.text),
+    );
+  }
+
+  DropdownMenuItem<int> exerciseDropdownMenuItem(Exercise exercise) {
+    return DropdownMenuItem<int>(
+      value: exercise.id,
+      child: Text(exercise.name),
     );
   }
 }
