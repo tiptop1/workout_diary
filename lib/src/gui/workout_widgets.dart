@@ -93,7 +93,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
               if (widget._modifiable)
                 IconButton(
                   icon: const Icon(Icons.check),
-                  onPressed: () => _saveButtonCallback(context),
+                  onPressed: () => _saveWorkout(context),
                 ),
             ],
           ),
@@ -118,8 +118,14 @@ class _AddWorkoutState extends State<WorkoutWidget> {
                 Expanded(
                   child: ExerciseSetsWidget(
                     setRecords: _exerciseSetRecords,
-                    addSetCallback: () => _addExerciseSetCallback(exercises),
-                    removeSetCallback: _removeExerciseSetCallback,
+                    exercises: exercises,
+                    addSetCallback: () => _addExerciseSetRecord(exercises[0]),
+                    modifySetCallback: (i, exerciseId, details) =>
+                        _modifyExerciseSetRecord(
+                            i,
+                            exercises.firstWhere((e) => e.id == exerciseId),
+                            details),
+                    removeSetCallback: (i) => _removeExerciseSetRecord(i),
                     modifiable: widget._modifiable,
                   ),
                 ),
@@ -131,15 +137,26 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     );
   }
 
-  void _addExerciseSetCallback(List<Exercise> exercises) {
+  void _addExerciseSetRecord(Exercise initialExercise) {
     setState(() {
-      _exerciseSetRecords.add((exercises[0], TextEditingController()));
+      _exerciseSetRecords.add((initialExercise, TextEditingController()));
     });
   }
 
-  void _removeExerciseSetCallback(int index) {
+  void _removeExerciseSetRecord(int index) {
     setState(() {
+      var controller = _exerciseSetRecords[index].$2;
       _exerciseSetRecords.removeAt(index);
+      controller.dispose();
+    });
+  }
+
+  void _modifyExerciseSetRecord(int index, Exercise exercise, String details) {
+    setState(() {
+      var setRecord = _exerciseSetRecords[index];
+      var controller = setRecord.$2;
+      controller.text = details;
+      _exerciseSetRecords[index] = (exercise, controller);
     });
   }
 
@@ -172,7 +189,7 @@ class _AddWorkoutState extends State<WorkoutWidget> {
     Navigator.pop(context, null);
   }
 
-  void _saveButtonCallback(BuildContext context) {
+  void _saveWorkout(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       Object action;
       var workout = Workout(
@@ -193,19 +210,6 @@ class _AddWorkoutState extends State<WorkoutWidget> {
       }
       Navigator.pop(context, action);
     }
-  }
-
-  Widget _createWorkoutEntryWidget(
-      BuildContext context, List<Exercise> exercises) {
-    var listTiles = <Widget>[];
-    for (var i = 0; i < _exerciseSetRecords.length; i++) {
-      listTiles.add(_exerciseSetTile(i, exercises, _exerciseSetRecords[i]));
-    }
-    return Expanded(
-      child: ListView(
-        children: listTiles,
-      ),
-    );
   }
 
   Widget _createCommentTextField(
