@@ -37,7 +37,11 @@ class WorkoutsTabWidget extends ListWidget<Workout> {
             workout: entity,
             modifiable: true,
           ),
-        ));
+        )).then((action) {
+          if (action != null) {
+            StoreProvider.of<AppState>(context).dispatch(action);
+          }
+    });
   }
 
   @override
