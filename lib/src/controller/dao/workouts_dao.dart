@@ -24,7 +24,7 @@ class WorkoutsDao {
 
   WorkoutsDao(Database db) : _db = db;
 
-  Future<List<Workout>> findAll(List<Exercise> exercises) async {
+  Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) async {
     List<Map<String, Object?>> workoutRecords = await _db.query(
       tableWorkouts,
       orderBy: '$colWorkoutId DESC',
@@ -69,25 +69,27 @@ class WorkoutsDao {
 
   Future<Workout> updateWorkout(Workout workout) async {
     assert(workout.id != null, 'Could not update workout without id.');
-    var insertedExerciseSets = <int, ExerciseSet>{};
-    var exerciseSetIdsToDelete =
-        await _findExerciseSetIdsByWorkoutId(workout.id!);
-    var results = await _db.transaction((txn) async {
-      var batch = txn.batch();
-      _updateWorkoutInBatch(workout, batch);
-      var i = 0;
+    var workoutId = workout.id!;
+    var esIdsToDelete = _exerciseSetIdsToDelete(
+        await _findExerciseSetIdsByWorkoutId(workoutId),
+        workout.exerciseSets.map((e) => e.id).toList(growable: false));
+    var esIdsInserted = await _db.transaction((txn) {
+      var esInsertBatch = txn.batch();
+      var otherBatch = txn.batch();
+      _batchUpdateWorkout(workout, otherBatch);
       for (var es in workout.exerciseSets) {
         if (es.id == null) {
-          insertedExerciseSets[i++] = es;
-          _insertExerciseSetInBatch(es, workout.id!, batch);
+          _batchInsertExerciseSets(es, workoutId, esInsertBatch);
         } else {
-          _updateExerciseSetInBatch(es, workout.id!, batch);
+          _batchUpdateExerciseSets(es, workoutId, otherBatch);
         }
       }
-      _deleteExerciseSetsInBatch(exerciseSetIdsToDelete, batch);
-      batch.commit();
+      _batchDeleteExerciseSets(esIdsToDelete, otherBatch);
+      otherBatch.commit();
+      return esInsertBatch.commit();
     });
-    return _toWorkout(workout, insertedExerciseSets, results);
+    return _toWorkout(
+        workout, esIdsInserted.map((e) => e as int).toList(growable: false));
   }
 
   Future<bool> deleteWorkout(int id) async =>
@@ -143,7 +145,7 @@ class WorkoutsDao {
     return List.generate(records.length, (i) => records[i][colExerciseSetId]);
   }
 
-  void _updateWorkoutInBatch(Workout workout, Batch batch) {
+  void _batchUpdateWorkout(Workout workout, Batch batch) {
     batch.update(tableWorkouts, _workoutToMap(workout),
         where: '$colWorkoutId = ?',
         whereArgs: [workout.id],
@@ -162,7 +164,7 @@ class WorkoutsDao {
         colExerciseSetDetails: exerciseSet.details,
       };
 
-  void _insertExerciseSetInBatch(
+  void _batchInsertExerciseSets(
       ExerciseSet exerciseSet, int workoutId, Batch batch) {
     batch.insert(
         tableExerciseSets,
@@ -173,7 +175,7 @@ class WorkoutsDao {
         conflictAlgorithm: ConflictAlgorithm.rollback);
   }
 
-  void _updateExerciseSetInBatch(
+  void _batchUpdateExerciseSets(
       ExerciseSet exerciseSet, int workoutId, Batch batch) {
     batch.update(
       tableExerciseSets,
@@ -187,22 +189,22 @@ class WorkoutsDao {
     );
   }
 
-  void _deleteExerciseSetsInBatch(List<int> exerciseSetIds, Batch batch) {
+  void _batchDeleteExerciseSets(List<int> exerciseSetIds, Batch batch) {
     batch.delete(tableExerciseSets,
         where:
             '$colExerciseSetId in (${exerciseSetIds.map((e) => "?").join(",")})',
         whereArgs: exerciseSetIds);
   }
 
-  Workout _toWorkout(Workout workout,
-      Map<int, ExerciseSet> insertedExerciseSets, List<int> results) {
-    var exerciseSets = List.generate(workout.exerciseSets.length, (i) {
-      var es = workout.exerciseSets[i];
-      if (es.id == null) {
-        es = ExerciseSet(
-            id: results[i + 1], exercise: es.exercise, details: es.details);
-      }
-      return es;
+  Workout _toWorkout(Workout workout, List<int> insertedExerciseSetIds) {
+    var currEsList = workout.exerciseSets;
+    var insertedEsIndex = 0;
+    var newEsList = List.generate(currEsList.length, (i) {
+      var currEs = currEsList[i];
+      return ExerciseSet(
+          id: currEs.id ?? insertedExerciseSetIds[insertedEsIndex++],
+          exercise: currEs.exercise,
+          details: currEs.details);
     });
     return Workout(
       id: workout.id,
@@ -210,7 +212,7 @@ class WorkoutsDao {
       endTime: workout.endTime,
       title: workout.title,
       comment: workout.comment,
-      exerciseSets: exerciseSets,
+      exerciseSets: newEsList,
     );
   }
 
@@ -255,11 +257,25 @@ class WorkoutsDao {
 
     for (var exerciseSetRecord in exerciseSetRecords) {
       var exerciseId = exerciseSetRecord[colExerciseSetExerciseId];
-      var exerciseSetDetails = exerciseSetRecord[colExerciseSetDetails] as String?;
+      var exerciseSetDetails =
+          exerciseSetRecord[colExerciseSetDetails] as String?;
       if (exerciseId != null && exercisesMapping.containsKey(exerciseId)) {
-        exerciseSet.add(ExerciseSet(exercise: exercisesMapping[exerciseId]!, details: exerciseSetDetails,));
+        exerciseSet.add(ExerciseSet(
+          exercise: exercisesMapping[exerciseId]!,
+          details: exerciseSetDetails,
+        ));
       }
     }
     return exerciseSet;
+  }
+
+  List<int> _exerciseSetIdsToDelete(List<int> dbEsIds, List<int?> esIds) {
+    var idsToDelete = <int>[];
+    for (var dbEsId in dbEsIds) {
+      if (!esIds.contains(dbEsId)) {
+        idsToDelete.add(dbEsId);
+      }
+    }
+    return idsToDelete;
   }
 }
