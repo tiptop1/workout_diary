@@ -55,7 +55,7 @@ class Repository {
   }
 
   Future<List<Workout>> findAllWorkouts(List<Exercise> exercises) =>
-      _workoutsDao.findAll(exercises);
+      _workoutsDao.findAllWorkouts(exercises);
 
   Future<Workout> insertWorkout(Workout workout) =>
       _workoutsDao.insertWorkout(workout);
