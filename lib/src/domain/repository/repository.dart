@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 
 import '../../common/failures.dart';
-import '../entities/exercise.dart';
-import '../entities/workout.dart';
+import '../entity/exercise.dart';
+import '../entity/workout.dart';
 
 abstract class Repository {
   Future<Either<Failure, List<Exercise>>> getAllExercises();
