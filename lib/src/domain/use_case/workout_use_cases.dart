@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 
 import '../../common/failures.dart';
-import '../entities/workout.dart';
-import '../repositories/repository.dart';
+import '../entity/workout.dart';
+import '../repository/repository.dart';
 
 class WorkoutUseCases {
   final Repository repository;

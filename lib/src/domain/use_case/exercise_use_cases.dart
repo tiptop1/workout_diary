@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 
 import '../../common/failures.dart';
-import '../entities/exercise.dart';
-import '../repositories/repository.dart';
+import '../entity/exercise.dart';
+import '../repository/repository.dart';
 
 class ExerciseUseCases {
   final Repository repository;
