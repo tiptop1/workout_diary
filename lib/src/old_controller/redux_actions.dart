@@ -1,5 +1,5 @@
-import '../model/exercise.dart';
-import '../model/workout.dart';
+import '../old_model/exercise.dart';
+import '../old_model/workout.dart';
 
 class LoadExercisesAction {
   final List<Exercise>? exercises;

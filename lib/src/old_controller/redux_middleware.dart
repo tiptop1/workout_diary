@@ -1,6 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:redux/redux.dart';
-import 'package:workout_diary/src/model/app_state.dart';
+import '../old_model/app_state.dart';
 
 import 'redux_actions.dart';
 import 'repository.dart';

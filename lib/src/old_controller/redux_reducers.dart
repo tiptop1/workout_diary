@@ -1,7 +1,7 @@
 import 'package:redux/redux.dart';
-import 'package:workout_diary/src/controller/redux_actions.dart';
-import 'package:workout_diary/src/model/app_state.dart';
-import 'package:workout_diary/src/model/workout.dart';
+import '../old_controller/redux_actions.dart';
+import '../old_model/app_state.dart';
+import '../old_model/workout.dart';
 
 typedef AppStateReducer = AppState Function(AppState state, dynamic action);
 

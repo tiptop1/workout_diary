@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../model/exercise.dart';
-import '../model/workout.dart';
+import '../old_model/exercise.dart';
+import '../old_model/workout.dart';
 import 'dao/exercises_dao.dart';
 import 'dao/workouts_dao.dart';
 
