@@ -1,4 +1,5 @@
 import 'package:floor/floor.dart';
+
 import 'exercise.dart';
 import 'workout.dart';
 
@@ -8,20 +9,20 @@ class ExerciseSet {
   @PrimaryKey(autoGenerate: true)
   final int id;
   @ForeignKey(
-    childColumns: ['exercise'],
+    childColumns: ['exerciseId'],
     parentColumns: ['id'],
     entity: Exercise,
   )
-  final Exercise exercise;
+  final int exerciseId;
   @ForeignKey(
-      childColumns: ['workout'],
+      childColumns: ['workoutId'],
       parentColumns: ['id'],
       entity: Workout,
       onDelete: ForeignKeyAction.cascade)
-  final Workout workout;
+  final int workoutId;
   final int orderNumber;
   final String? details;
 
   const ExerciseSet(
-      this.id, this.exercise, this.workout, this.orderNumber, this.details);
+      this.id, this.exerciseId, this.workoutId, this.orderNumber, this.details);
 }
