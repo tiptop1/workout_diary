@@ -1,13 +1,13 @@
 import 'package:floor/floor.dart';
-import '../entities/exercise.dart';
+import '../entity/exercise.dart';
 
 @dao
-abstract class ExercisDao {
+abstract class ExerciseDao {
   @Query('SELECT * FROM Exercise')
   Future<List<Exercise>> findAllExercises();
 
   @insert
-  Future<Exercise> insertExercise(Exercise exercise);
+  Future<int> insertExercise(Exercise exercise);
 
   @update
   Future<void> updateExercise(Exercise exercise);
