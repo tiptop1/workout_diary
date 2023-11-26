@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 
-import '../entities/exercise_set.dart';
+import '../entity/exerciseset.dart';
 
 @dao
 abstract class ExerciseSetDao {
@@ -8,7 +8,7 @@ abstract class ExerciseSetDao {
   Future<List<ExerciseSet>> findExerciseSetsByWorkoutId(int workoutId);
 
   @insert
-  Future<ExerciseSet> insertExerciseSet(ExerciseSet exerciseSet);
+  Future<int> insertExerciseSet(ExerciseSet exerciseSet);
 
   @update
   Future<void> updateExerciseSet(ExerciseSet exerciseSet);
