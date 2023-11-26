@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
-import 'package:workout_diary/src/controller/redux_actions.dart';
-import 'package:workout_diary/src/gui/list_widget.dart';
-import 'package:workout_diary/src/model/workout.dart';
+import '../old_controller/redux_actions.dart';
+import 'list_widget.dart';
+import '../old_model/workout.dart';
 
-import '../model/app_state.dart';
-import '../model/exercise.dart';
+import '../old_model/app_state.dart';
+import '../old_model/exercise.dart';
 import 'exercise_widget.dart';
 
 class ExercisesTabWidget extends ListWidget<Exercise> {

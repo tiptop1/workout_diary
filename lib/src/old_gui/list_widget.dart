@@ -3,8 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import '../model/app_state.dart';
-import '../model/entity.dart';
+import '../old_model/app_state.dart';
+import '../old_model/entity.dart';
 
 enum ListItemAction { modify, delete }
 

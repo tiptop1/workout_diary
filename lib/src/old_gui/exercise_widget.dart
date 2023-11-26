@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../controller/redux_actions.dart';
-import '../model/exercise.dart';
+import '../old_controller/redux_actions.dart';
+import '../old_model/exercise.dart';
 
 class ExerciseWidget extends StatefulWidget {
   final bool _modifiable;
@@ -167,14 +167,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     var modifiedDescription = _descriptionTextController.value.text;
 
     if (modifiedName == '') {
-      // Exercise not modified, so return false
+      // exercise.dart not modified, so return false
       Navigator.pop(context, null);
     } else if (modifiedName == widget._exercise?.name &&
         modifiedDescription == widget._exercise?.description) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseNotModifiedWarning),
       ));
-      // Exercise not modified, so return false
+      // exercise.dart not modified, so return false
       Navigator.pop(context, null);
     } else {
       var action = ModifyExerciseAction(

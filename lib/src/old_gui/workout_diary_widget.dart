@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 
-import '../model/app_state.dart';
-import '../model/exercise.dart';
+import '../old_model/app_state.dart';
+import '../old_model/exercise.dart';
 import 'exercise_widget.dart';
 import 'exercises_tab_widget.dart';
 import 'workout_widgets.dart';

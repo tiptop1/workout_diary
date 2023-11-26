@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 
-import '../controller/redux_reducers.dart';
-import '../controller/redux_middleware.dart';
-import '../controller/repository.dart';
-import '../model/app_state.dart';
+import '../old_controller/redux_reducers.dart';
+import '../old_controller/redux_middleware.dart';
+import '../old_controller/repository.dart';
+import '../old_model/app_state.dart';
 import 'progress_widget.dart';
 
 class ReduxStoreInitWidget extends StatefulWidget {

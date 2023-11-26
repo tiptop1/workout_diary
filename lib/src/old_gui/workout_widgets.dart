@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:intl/intl.dart';
-import 'package:workout_diary/src/gui/data_time_select_button.dart';
-import 'package:workout_diary/src/gui/datetime_picker_widget.dart';
-import 'package:workout_diary/src/model/exercise_set.dart';
+import 'data_time_select_button.dart';
+import 'datetime_picker_widget.dart';
+import '../old_model/exercise_set.dart';
 
-import '../controller/redux_actions.dart';
-import '../model/app_state.dart';
-import '../model/exercise.dart';
-import '../model/workout.dart';
+import '../old_controller/redux_actions.dart';
+import '../old_model/app_state.dart';
+import '../old_model/exercise.dart';
+import '../old_model/workout.dart';
 
 const String dateLackMarker = '-';
 
