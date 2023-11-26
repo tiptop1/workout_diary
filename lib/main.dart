@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:logging/logging.dart';
-import 'package:workout_diary/src/gui/redux_store_init_widget.dart';
-import 'package:workout_diary/src/gui/workout_diary_widget.dart';
+import 'src/old_gui/redux_store_init_widget.dart';
+import 'src/old_gui/workout_diary_widget.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
