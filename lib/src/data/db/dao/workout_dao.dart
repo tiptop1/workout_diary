@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 
-import '../entities/workout.dart';
+import '../entity/workout.dart';
 
 @dao
 abstract class WorkoutDao {
@@ -8,12 +8,15 @@ abstract class WorkoutDao {
   Future<List<Workout>> findAllWorkouts();
 
   @insert
-  Future<Workout> insertWorkout(Workout workout);
+  @transaction
+  Future<int> insertWorkout(Workout workout);
 
   @update
+  @transaction
   Future<void> updateWorkout(Workout workout);
 
   @delete
+  @transaction
   Future<void> deleteWorkout(Workout workout);
 
 }
