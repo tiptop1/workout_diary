@@ -2,6 +2,13 @@
 
 Lite application to record your workouts.
 
-## Getting Started
+## Code generation - required by floor library
+Run the generator with:
+```shell
+$ flutter packages pub run build_runner build
+```
 
-Nothing to write down at the moment :)
+To automatically run it, whenever a file changes, use:
+```shell
+$ flutter packages pub run build_runner watch
+```
