@@ -127,7 +127,7 @@ class WorkoutsDao {
   List<ExerciseSet> _toExerciseSet(
       List<ExerciseSet> exerciseSets, List<Object?> insertedIds) {
     assert(exerciseSets.length == insertedIds.length,
-        'exercise.dart set list length (${exerciseSets.length} different than inserted ids list length (${insertedIds.length}).');
+        'exercise_db_entity.dart set list length (${exerciseSets.length} different than inserted ids list length (${insertedIds.length}).');
     return List.generate(
         exerciseSets.length,
         (i) => ExerciseSet(
