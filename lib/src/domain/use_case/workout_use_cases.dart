@@ -13,21 +13,19 @@ class WorkoutUseCases {
     return await repository.getAllWorkouts();
   }
 
-  Future<Either<Failure, void>> addWorkout(Workout workout) async {
-    return await repository.addWorkout(workout);
+  Future<Either<Failure, Workout>> getWorkoutDetails(DateTime startTime) async {
+    return await repository.getWorkout(startTime);
   }
 
-  Future<Either<Failure, void>> removeWorkout(
-      String title, DateTime startTime) async {
-    return await repository.removeWorkout(title, startTime);
+  Future<Either<Failure, void>> addWorkout(Workout workout) async {
+    return await repository.addWorkout(workout);
   }
 
   Future<Either<Failure, void>> modifyWorkout(Workout workout) async {
     return await repository.modifyWorkout(workout);
   }
 
-  Future<Either<Failure, Workout>> getWorkoutDetails(
-      String title, DateTime startTime) async {
-    return await repository.getWorkoutDetails(title, startTime);
+  Future<Either<Failure, void>> removeWorkout(DateTime startTime) async {
+    return await repository.removeWorkout(startTime);
   }
 }
