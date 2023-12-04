@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 enum FailureCode {
-  someFailure;
+  databaseError;
 }
 
 abstract class Failure extends Equatable {
@@ -16,4 +16,8 @@ abstract class Failure extends Equatable {
 
   @override
   bool get stringify => true;
+}
+
+class DatabaseError extends Failure {
+  const DatabaseError({String? details, Object? cause}) : super(code: FailureCode.databaseError, details: details, cause: cause);
 }
