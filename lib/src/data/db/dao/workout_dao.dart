@@ -1,22 +1,22 @@
 import 'package:floor/floor.dart';
 
-import '../entity/workout.dart';
+import '../model/workout_model.dart';
 
 @dao
 abstract class WorkoutDao {
-  @Query('SELECT * FROM Workout')
-  Future<List<Workout>> findAllWorkouts();
+  @Query('SELECT * FROM WorkoutModel')
+  Future<List<WorkoutModel>> findAllWorkouts();
+
+  /// Find [WorkoutModel] by natural key [startTime].
+  @Query('SELECT * FROM WorkoutModel WHERE startTime = :startTime')
+  Future<WorkoutModel?> findWorkoutByStartTime(DateTime startTime);
 
   @insert
-  @transaction
-  Future<int> insertWorkout(Workout workout);
+  Future<int> insertWorkout(WorkoutModel workout);
 
   @update
-  @transaction
-  Future<void> updateWorkout(Workout workout);
+  Future<void> updateWorkout(WorkoutModel workout);
 
   @delete
-  @transaction
-  Future<void> deleteWorkout(Workout workout);
-
+  Future<void> deleteWorkout(WorkoutModel workout);
 }
