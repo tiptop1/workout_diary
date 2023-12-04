@@ -167,14 +167,14 @@ class _ExerciseWidgetState extends State<ExerciseWidget> {
     var modifiedDescription = _descriptionTextController.value.text;
 
     if (modifiedName == '') {
-      // exercise.dart not modified, so return false
+      // exercise_db_entity.dart not modified, so return false
       Navigator.pop(context, null);
     } else if (modifiedName == widget._exercise?.name &&
         modifiedDescription == widget._exercise?.description) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(AppLocalizations.of(context)!.exerciseNotModifiedWarning),
       ));
-      // exercise.dart not modified, so return false
+      // exercise_db_entity.dart not modified, so return false
       Navigator.pop(context, null);
     } else {
       var action = ModifyExerciseAction(
