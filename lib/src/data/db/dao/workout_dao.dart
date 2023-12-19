@@ -7,16 +7,18 @@ abstract class WorkoutDao {
   @Query('SELECT * FROM WorkoutModel')
   Future<List<WorkoutModel>> findAllWorkouts();
 
-  /// Find [WorkoutModel] by natural key [startTime].
-  @Query('SELECT * FROM WorkoutModel WHERE startTime = :startTime')
-  Future<WorkoutModel?> findWorkoutByStartTime(DateTime startTime);
+  @Query('SELECT * FROM WorkoutModel WHERE id = :id')
+  Future<WorkoutModel?> findWorkoutById(int id);
+
+  @Query('SELECT max(id) FROM WorkoutModel')
+  Future<int?> maxId();
 
   @insert
   Future<int> insertWorkout(WorkoutModel workout);
 
   @update
-  Future<void> updateWorkout(WorkoutModel workout);
+  Future<int> updateWorkout(WorkoutModel workout);
 
   @delete
-  Future<void> deleteWorkout(WorkoutModel workout);
+  Future<int> deleteWorkout(WorkoutModel workout);
 }

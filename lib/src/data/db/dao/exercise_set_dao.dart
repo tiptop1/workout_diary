@@ -4,16 +4,22 @@ import '../model/exercise_set_model.dart';
 
 @dao
 abstract class ExerciseSetDao {
+  @Query('SELECT * FROM ExerciseSetModel WHERE id = :id')
+  Future<ExerciseSetModel?> findExerciseSetById(int id);
+
   @Query(
       'SELECT * FROM ExerciseSetModel WHERE workoutId = :workoutId ORDER BY orderNumber')
   Future<List<ExerciseSetModel>> findExerciseSetsByWorkoutId(int workoutId);
+
+  @Query('SELECT max(id) FROM ExerciseSetModel')
+  Future<int?> maxId();
 
   @insert
   Future<int> insertExerciseSet(ExerciseSetModel exerciseSet);
 
   @update
-  Future<void> updateExerciseSet(ExerciseSetModel exerciseSet);
+  Future<int> updateExerciseSet(ExerciseSetModel exerciseSet);
 
   @delete
-  Future<void> deleteExerciseSet(ExerciseSetModel exerciseSet);
+  Future<int> deleteExerciseSet(ExerciseSetModel exerciseSet);
 }
