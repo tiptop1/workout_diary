@@ -1,19 +1,34 @@
 import 'package:equatable/equatable.dart';
 
 import 'exercise.dart';
-import 'workout.dart';
+
+class ExerciseSetId extends Equatable {
+  final int id;
+
+  const ExerciseSetId(this.id);
+
+  @override
+  List<Object> get props => [id];
+
+  @override
+  bool get stringify => true;
+}
 
 class ExerciseSet extends Equatable {
+  final ExerciseSetId id;
   final Exercise exercise;
-  final Workout workout;
   final int orderNumber;
   final String? details;
 
-  const ExerciseSet(
-      {required this.exercise, required this.workout, this.orderNumber = 0, this.details});
+  const ExerciseSet({
+    required this.id,
+    required this.exercise,
+    this.orderNumber = 0,
+    this.details,
+  });
 
   @override
-  List<Object> get props => [exercise, workout, orderNumber];
+  List<Object> get props => [id];
 
   @override
   bool get stringify => true;
