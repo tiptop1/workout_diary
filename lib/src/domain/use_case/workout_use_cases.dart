@@ -1,4 +1,4 @@
-import 'package:dartz/dartz.dart';
+import 'package:fpdart/fpdart.dart';
 
 import '../../common/failures.dart';
 import '../entity/workout.dart';
@@ -13,8 +13,8 @@ class WorkoutUseCases {
     return await repository.getAllWorkouts();
   }
 
-  Future<Either<Failure, Workout>> getWorkoutDetails(DateTime startTime) async {
-    return await repository.getWorkout(startTime);
+  Future<Either<Failure, Workout>> getWorkout(WorkoutId id) async {
+    return await repository.getWorkout(id);
   }
 
   Future<Either<Failure, void>> addWorkout(Workout workout) async {
@@ -25,7 +25,7 @@ class WorkoutUseCases {
     return await repository.modifyWorkout(workout);
   }
 
-  Future<Either<Failure, void>> removeWorkout(DateTime startTime) async {
-    return await repository.removeWorkout(startTime);
+  Future<Either<Failure, void>> removeWorkout(Workout workout) async {
+    return await repository.removeWorkout(workout);
   }
 }
