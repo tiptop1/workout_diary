@@ -10,20 +10,20 @@ import 'model/workout_model.dart';
 import 'model/exercise_set_model.dart';
 import 'workout_diary_database.dart';
 
-class LocalFloorRepository implements Repository {
-  final WorkoutDiaryDatabase database;
+class LocalRepository implements Repository {
+  final WorkoutDiaryDatabase db;
   int? exerciseMaxId;
   int? workoutMaxId;
   int? exerciseSetMaxId;
 
-  LocalFloorRepository(this.database);
+  LocalRepository(this.db);
 
   @override
   Future<Either<Failure, void>> addExercise(Exercise exercise) async {
     Either<Failure, void> result;
     try {
       var exerciseModel = _toExerciseModel(exercise);
-      await database.exerciseDao.insertExercise(exerciseModel);
+      await db.exerciseDao.insertExercise(exerciseModel);
       result = const Right(null);
     } catch (e) {
       result = Left(DatabaseError(
@@ -40,11 +40,11 @@ class LocalFloorRepository implements Repository {
     try {
       var id = workout.id.id;
       var workoutModel = _toWorkoutModel(workout);
-      await database.workoutDao.insertWorkout(workoutModel);
+      await db.workoutDao.insertWorkout(workoutModel);
 
       for (var exerciseSet in workout.exerciseSets) {
         var model = _toExerciseSetModel(id, exerciseSet);
-        database.exerciseSetDao.insertExerciseSet(model);
+        db.exerciseSetDao.insertExerciseSet(model);
       }
       result = const Right(null);
     } catch (e) {
@@ -60,7 +60,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, List<Exercise>>> getAllExercises() async {
     Either<Failure, List<Exercise>> result;
     try {
-      var exerciseModels = await database.exerciseDao.findAllExercises();
+      var exerciseModels = await db.exerciseDao.findAllExercises();
       result = Right(exerciseModels
           .map((e) => Exercise(
                 id: ExerciseId(e.id),
@@ -81,7 +81,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, List<Workout>>> getAllWorkouts() async {
     Either<Failure, List<Workout>> result;
     try {
-      var workoutModels = await database.workoutDao.findAllWorkouts();
+      var workoutModels = await db.workoutDao.findAllWorkouts();
       result = Right(workoutModels
           .map((workoutModel) => Workout(
                 id: WorkoutId(workoutModel.id),
@@ -105,7 +105,7 @@ class LocalFloorRepository implements Repository {
     Either<Failure, Exercise> result;
     try {
       var exerciseModel =
-          await database.exerciseDao.findExerciseById(exerciseId.id);
+          await db.exerciseDao.findExerciseById(exerciseId.id);
       if (exerciseModel != null) {
         var exercise = Exercise(
           id: exerciseId,
@@ -131,7 +131,7 @@ class LocalFloorRepository implements Repository {
     Either<Failure, Workout> result;
     try {
       var workoutModel =
-          await database.workoutDao.findWorkoutById(workoutId.id);
+          await db.workoutDao.findWorkoutById(workoutId.id);
       if (workoutModel != null) {
         var workout = Workout(
           id: workoutId,
@@ -161,7 +161,7 @@ class LocalFloorRepository implements Repository {
     Either<Failure, void> result;
     try {
       var exerciseModel = _toExerciseModel(exercise);
-      await database.exerciseDao.updateExercise(exerciseModel);
+      await db.exerciseDao.updateExercise(exerciseModel);
       result = const Right(null);
     } catch (e) {
       result = Left(DatabaseError(
@@ -177,13 +177,13 @@ class LocalFloorRepository implements Repository {
     Either<Failure, void> result;
     try {
       var id = workout.id.id;
-      var workoutModel = await database.workoutDao.findWorkoutById(id);
+      var workoutModel = await db.workoutDao.findWorkoutById(id);
       if (workoutModel != null) {
         if (workoutModel.title != workout.title ||
             workoutModel.startTime != workout.startTime ||
             workoutModel.endTime != workout.endTime ||
             workoutModel.comment != workout.comment) {
-          await database.workoutDao.updateWorkout(_toWorkoutModel(workout));
+          await db.workoutDao.updateWorkout(_toWorkoutModel(workout));
         }
         result = await _modifyExerciseSets(id, workout.exerciseSets);
       } else {
@@ -203,7 +203,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, void>> removeExercise(Exercise exercise) async {
     Either<Failure, void> result;
     try {
-      await database.exerciseDao.deleteExercise(_toExerciseModel(exercise));
+      await db.exerciseDao.deleteExercise(_toExerciseModel(exercise));
       result = const Right(null);
     } catch (e) {
       result = Left(DatabaseError(
@@ -218,7 +218,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, void>> removeWorkout(Workout workout) async {
     Either<Failure, void> result;
     try {
-      await database.workoutDao.deleteWorkout(_toWorkoutModel(workout));
+      await db.workoutDao.deleteWorkout(_toWorkoutModel(workout));
       result = const Right(null);
     } catch (e) {
       result = Left(DatabaseError(
@@ -233,7 +233,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, ExerciseId>> nextExerciseId() async {
     Either<Failure, ExerciseId> result;
     try {
-      exerciseMaxId ??= await database.exerciseDao.maxId();
+      exerciseMaxId ??= await db.exerciseDao.maxId();
       exerciseMaxId = (exerciseMaxId != null ? exerciseMaxId! + 1 : 1);
       result = Right(ExerciseId(exerciseMaxId!));
     } catch (e) {
@@ -249,7 +249,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, WorkoutId>> nextWorkoutId() async {
     Either<Failure, WorkoutId> result;
     try {
-      workoutMaxId ??= await database.workoutDao.maxId();
+      workoutMaxId ??= await db.workoutDao.maxId();
       workoutMaxId = (workoutMaxId != null ? workoutMaxId! + 1 : 1);
       result = Right(WorkoutId(workoutMaxId!));
     } catch (e) {
@@ -265,7 +265,7 @@ class LocalFloorRepository implements Repository {
   Future<Either<Failure, ExerciseSetId>> nextExerciseSetId() async {
     Either<Failure, ExerciseSetId> result;
     try {
-      exerciseSetMaxId ??= await database.exerciseSetDao.maxId();
+      exerciseSetMaxId ??= await db.exerciseSetDao.maxId();
       exerciseSetMaxId = (exerciseSetMaxId != null ? exerciseSetMaxId! + 1 : 1);
       result = Right(ExerciseSetId(exerciseSetMaxId!));
     } catch (e) {
@@ -282,7 +282,7 @@ class LocalFloorRepository implements Repository {
     Either<Failure, void> result;
     try {
       var currEsModels = <int, ExerciseSetModel>{};
-      for (var esModel in await database.exerciseSetDao
+      for (var esModel in await db.exerciseSetDao
           .findExerciseSetsByWorkoutId(workoutId)) {
         currEsModels[esModel.id] = esModel;
       }
@@ -297,15 +297,15 @@ class LocalFloorRepository implements Repository {
               newEsModel.workoutId != currEsModel.workoutId ||
               newEsModel.details != currEsModel.details ||
               newEsModel.orderNumber != currEsModel.orderNumber) {
-            database.exerciseSetDao.updateExerciseSet(newEsModel);
+            db.exerciseSetDao.updateExerciseSet(newEsModel);
           } else {
-            database.exerciseSetDao.insertExerciseSet(newEsModel);
+            db.exerciseSetDao.insertExerciseSet(newEsModel);
           }
         }
       }
       for (var currEsId in currEsModels.keys) {
         if (!newEsModels.containsKey(currEsId)) {
-          database.exerciseSetDao.deleteExerciseSet(currEsModels[currEsId]!);
+          db.exerciseSetDao.deleteExerciseSet(currEsModels[currEsId]!);
         }
       }
       result = const Right(null);
@@ -346,7 +346,7 @@ class LocalFloorRepository implements Repository {
 
   Future<List<ExerciseSet>> _getExerciseSets(int workoutId) async {
     var exerciseSets = [];
-    for (var esModel in await database.exerciseSetDao
+    for (var esModel in await db.exerciseSetDao
         .findExerciseSetsByWorkoutId(workoutId)) {
       exerciseSets.add(ExerciseSet(
         id: ExerciseSetId(esModel.id),
@@ -359,7 +359,7 @@ class LocalFloorRepository implements Repository {
   }
 
   Future<Exercise> _getExercise(int exerciseId) async {
-    var exerciseModel = await database.exerciseDao.findExerciseById(exerciseId);
+    var exerciseModel = await db.exerciseDao.findExerciseById(exerciseId);
     if (exerciseModel != null) {
       return Exercise(
         id: ExerciseId(exerciseModel.id),
