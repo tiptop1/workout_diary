@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-  intl: ^0.18.0
+  intl:
   sqflite: ^2.2.0
   path:
   async: ^2.8.1
@@ -39,6 +39,7 @@ dependencies:
   flutter_redux: ^0.10.0
   logging:
   floor: ^1.4.2
+  get_it: ^7.6.6
 
 #dev_dependencies:
 #  flutter_test:
@@ -58,7 +59,7 @@ flutter:
   # Added to generate translations.
   generate: true
 dev_dependencies:
-  flutter_lints: ^2.0.1
+  flutter_lints: ^3.0.0
   floor_generator: ^1.4.2
   build_runner: ^2.1.2
   # To add assets to your application, add an assets section, like this:
