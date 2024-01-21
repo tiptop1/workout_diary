@@ -19,5 +19,6 @@ abstract class Failure extends Equatable {
 }
 
 class DatabaseError extends Failure {
-  const DatabaseError({String? details, Object? cause}) : super(code: FailureCode.databaseError, details: details, cause: cause);
+  const DatabaseError({super.details, super.cause})
+      : super(code: FailureCode.databaseError);
 }
