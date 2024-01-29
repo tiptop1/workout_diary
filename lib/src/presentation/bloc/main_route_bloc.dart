@@ -20,13 +20,13 @@ class MainRouteBloc extends Bloc<WorkoutDiaryEvent, WorkoutDiaryState> {
     add(const ShowMainRouteEvent());
   }
 
-  void _onShowMainRoute(
+  Future<void> _onShowMainRoute(
       ShowMainRouteEvent event, Emitter<WorkoutDiaryState> emit) async {
     emit(ProgressIndicatorState());
-    _emitMainRouteState(emit);
+    await _emitMainRouteState(emit);
   }
 
-  void _onDeleteExercise(
+  Future<void> _onDeleteExercise(
       DeleteExerciseEvent event, Emitter<WorkoutDiaryState> emit) async {
     emit(ProgressIndicatorState());
     (await exerciseUseCases.removeExercise(event.exercise)).fold((failure) {
@@ -34,7 +34,7 @@ class MainRouteBloc extends Bloc<WorkoutDiaryEvent, WorkoutDiaryState> {
     }, (_) {});
   }
 
-  void _onDeleteWorkout(
+  Future<void> _onDeleteWorkout(
       DeleteWorkoutEvent event, Emitter<WorkoutDiaryState> emit) async {
     emit(ProgressIndicatorState());
     (await workoutUseCases.removeWorkout(event.workout)).fold((failure) {
@@ -42,29 +42,30 @@ class MainRouteBloc extends Bloc<WorkoutDiaryEvent, WorkoutDiaryState> {
     }, (_) {});
   }
 
-  void _onAddExercise(
+  Future<void> _onAddExercise(
       AddExerciseEvent event, Emitter<WorkoutDiaryState> emit) async {
     emit(ProgressIndicatorState());
     (await exerciseUseCases.addExercise(event.name, event.description)).fold(
         (failure) {
       emit(ErrorMessageState(failure.code, failure.details, failure.cause));
-    }, (_) {
-      _emitMainRouteState(emit);
+    }, (_) async {
+      await _emitMainRouteState(emit);
     });
   }
 
-  void _onModifyExercise(
+  Future<void> _onModifyExercise(
       ModifyExerciseEvent event, Emitter<WorkoutDiaryState> emit) async {
     emit(ProgressIndicatorState());
     (await exerciseUseCases.modifyExercise(event.exercise)).fold((failure) {
       emit(ErrorMessageState(failure.code, failure.details, failure.cause));
-    }, (_) {
-      _emitMainRouteState(emit);
+    }, (_) async {
+      await _emitMainRouteState(emit);
     });
   }
 
-  void _emitMainRouteState(Emitter<WorkoutDiaryState> emit) async {
-    (await exerciseUseCases.getAllExercises()).fold(
+  Future<void> _emitMainRouteState(Emitter<WorkoutDiaryState> emit) async {
+    var exercisesEither = await exerciseUseCases.getAllExercises();
+    await exercisesEither.fold(
       (failure) {
         emit(ErrorMessageState(failure.code, failure.details, failure.cause));
       },
