@@ -4,14 +4,14 @@ import '../model/exercise_set_model.dart';
 
 @dao
 abstract class ExerciseSetDao {
-  @Query('SELECT * FROM ExerciseSetModel WHERE id = :id')
+  @Query('SELECT * FROM exercise_sets WHERE id = :id')
   Future<ExerciseSetModel?> findExerciseSetById(int id);
 
   @Query(
-      'SELECT * FROM ExerciseSetModel WHERE workoutId = :workoutId ORDER BY orderNumber')
+      'SELECT * FROM exercise_sets WHERE workoutId = :workoutId ORDER BY orderNumber')
   Future<List<ExerciseSetModel>> findExerciseSetsByWorkoutId(int workoutId);
 
-  @Query('SELECT max(id) FROM ExerciseSetModel')
+  @Query('SELECT max(id) FROM exercise_sets')
   Future<int?> maxId();
 
   @insert
