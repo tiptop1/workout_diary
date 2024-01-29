@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:get_it/get_it.dart';
 import 'package:workout_diary/src/presentation/bloc/workout_diary_states.dart';
 import 'package:workout_diary/src/presentation/routes/workouts_tab_content.dart';
 import 'package:workout_diary/src/presentation/widgets/progress_indicator.dart';
