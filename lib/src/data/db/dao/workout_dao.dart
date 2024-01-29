@@ -4,13 +4,13 @@ import '../model/workout_model.dart';
 
 @dao
 abstract class WorkoutDao {
-  @Query('SELECT * FROM WorkoutModel')
+  @Query('SELECT * FROM workouts')
   Future<List<WorkoutModel>> findAllWorkouts();
 
-  @Query('SELECT * FROM WorkoutModel WHERE id = :id')
+  @Query('SELECT * FROM workouts WHERE id = :id')
   Future<WorkoutModel?> findWorkoutById(int id);
 
-  @Query('SELECT max(id) FROM WorkoutModel')
+  @Query('SELECT max(id) FROM workouts')
   Future<int?> maxId();
 
   @insert
