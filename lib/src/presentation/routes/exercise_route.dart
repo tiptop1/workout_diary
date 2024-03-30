@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:workout_diary/src/presentation/bloc/workout_diary_events.dart';
 
 import '../../domain/entity/exercise.dart';
 
@@ -148,10 +149,7 @@ class _ExerciseRouteState extends State<ExerciseRoute> {
   void _addExerciseCallback(BuildContext context) {
     var name = _nameTextController.value.text;
     var description = _descriptionTextController.value.text;
-    Navigator.pop(context, (
-      name: name,
-      description: (description.trim().isNotEmpty ? description : null),
-    ));
+    Navigator.pop(context, AddExerciseEvent(name, (description.trim().isNotEmpty ? description : null)));
   }
 
   void _modifyExerciseCallback(BuildContext context) {
@@ -174,7 +172,7 @@ class _ExerciseRouteState extends State<ExerciseRoute> {
         description:
             modifiedDescription.trim() == '' ? null : modifiedDescription,
       );
-      Navigator.pop(context, modifiedExercise);
+      Navigator.pop(context, ModifyExerciseEvent(modifiedExercise));
     }
   }
 
